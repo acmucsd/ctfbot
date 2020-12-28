@@ -71,9 +71,11 @@ The third command will remove the indicated team server from the indicated CTF. 
 /team add NAME [DESCRIPTION]
 ```
 
-Creating a team this way does not add anybody to the team, it is an *empty team*, initially.
+Creating a team this way does not add anybody to the team, it is an *empty team*, initially. *This is the only command that technically creates invalid data.*
 
-**Note**: creating a team will always cause the creation of an associated *team role* and *team channel*. 
+**Note**: this will add a team to your current team server. If you are not in a team server, or the team server is full, even if there are other available team servers, the command will fail.
+
+**Note 2**: creating a team will always cause the creation of an associated *team role* and *team channel* in your current team server.
 
 #### editing a team
 ```java
