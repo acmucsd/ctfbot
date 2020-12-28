@@ -56,13 +56,13 @@ This causes the removal of the current guild's CTF *and all associated Teams, Ca
 #### managing team servers
 ```java
 /ctf server get [CTF_NAME]
-/ctf server add NAME LIMIT [CTF_NAME]
+/ctf server add NAME LIMIT CTF_NAME
 /ctf server del NAME [CTF_NAME]
 ```
 
 The first command will list all of the team servers belonging to the indicated CTF. The current CTF will be inferred if you are already on the main CTF guild or a team server.
 
-The second command will add the current guild as a team server for the indicated or inferred CTF. Again, you must be an admin on the main CTF guild to run this command. 
+The second command will add the current guild as a team server for the indicated CTF. Again, you must be an admin on the main CTF guild to run this command. 
 
 The third command will remove the indicated team server from the indicated CTF. The CTF can also be inferred by the guild you are on. 
 
