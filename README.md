@@ -68,23 +68,26 @@ The third command will remove the indicated team server from the indicated CTF. 
 
 #### creating a team
 ```java
-/team add NAME [DESCRIPTION]
+/team add NAME [SERVER_NAME]
 ```
 
 Creating a team this way does not add anybody to the team, it is an *empty team*, initially. *This is the only command that technically creates invalid data.*
 
-**Note**: this will add a team to your current team server. If you are not in a team server, or the team server is full, even if there are other available team servers, the command will fail.
+**Note**: this will add a team to the indicated team server, or the server will be inferred from the current guild. If you are not in a team server, or the team server is full, even if there are other available team servers, the command will fail.
 
-**Note 2**: creating a team will always cause the creation of an associated *team role* and *team channel* in your current team server.
+**Note 2**: creating a team will always cause the creation of an associated *team role* and *team channel*.
 
 #### editing a team
 ```java
 /team set name NAME [TEAM_ROLE]
 /team set description DESCRIPTION [TEAM_ROLE]
 /team set color COLOR [TEAM_ROLE]
+/team set server SERVER_NAME [TEAM_ROLE]
 ```
 
 Edit the name, description, and role color of the associated team. If no team role is provided, the team to edit will be inferred, firstly from the current channel, and secondarily from the current user's team.
+
+**Note**: when setting the team server of a team, the target team server must not be full. Also, the current team's channels will be deleted, message history will be lost, and current members will be given an invite to the new server where their new team channels await.
 
 #### managing teams
 ```java
