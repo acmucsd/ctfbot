@@ -118,7 +118,7 @@ Deletes the team indicated, or infers the team to delete, firstly from the curre
 
 **Note**: This command kicks all the users off the team and adds each of them to individual teams.
 
-**Note 2**: This will also cause the deletion of the team role and the team channels.
+**Note 2**: This will also cause the permanent deletion of the team role and the team channels.
 
 #### creating new categories
 ```java
@@ -167,6 +167,7 @@ All of these settings can be changed in further commands.
 
 #### editing challenges
 ```java
+/challenge set name NAME [CHALLENGE_NAME]
 /challenge set author AUTHOR [CHALLENGE_NAME]
 /challenge set prompt PROMPT [CHALLENGE_NAME]
 /challenge set difficulty DIFFICULTY [CHALLENGE_NAME]
@@ -207,7 +208,7 @@ Removes the challenge indicated, or infers it from the current challenge channel
 /challenge attach del NAME [CHALLENGE_NAME]
 ```
 
-The first command will list all file attachements of a particular challenge. The current challenge can also be inferred if you are in a challenge channel.
+The first command will list all file attachments of a particular challenge. The current challenge can also be inferred if you are in a challenge channel.
 
 The second command will add a file attachment to an existing challenge. 
 
