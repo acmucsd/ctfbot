@@ -216,4 +216,60 @@ The third command will delete a file attachment from a challenge.
 
 ### user commands
 
-All users in a server 
+All users in a the server are able to use these commands regardless of admin status
+
+#### joining a team
+```java
+/team invite [DISCORD_USERNAME]
+/team join [TEAM_NAME]
+```
+
+Invite allows for the owner of a team to invite a user within the CTF to their current 
+team. Only succeeds if the username is valid, if the user has accepted ToS, and if the
+user hasn't already joined a team or invited people to their own team.
+
+Join works similarly to this, attempting to join a team but only succeeding if the 
+team name is valid, if the user attempting to join a team hasn't already joined another
+team, and as long as the user attempting to join has been invited to the team they
+are trying to join. If the user has yet to be invited, the bot will DM the team owner
+a message in which they can react with either a thumbs up to accept the user into the
+team or a thumbs down to reject them. The user is allowed to be rejected only twice 
+before not being able to attempt joining that team again, giving users an oppurtunity
+for a do-over in case something gets messed up.
+
+#### team management
+```java
+/team set name [NAME]
+/team set description [DESCRIPTION]
+/team set color [COLOR]
+```
+
+Similar to the admin only commands, these take in no argument for team and will only affect
+the user's current team. Non-admins will only be allowed to use this command in their specific
+team channel, but the functionality will carry over.
+
+#### scoreboard
+```java
+/scoreboard top [CATEGORY]
+/scoreboard team [TEAM_NAME]
+/scoreboard standing [TEAM_NAME]
+```
+
+First command prints a scoreboard detailing the top 20 teams and their total points in the specified
+category. If no category is specified, it will instead list the top 20 teams overall in the CTF.
+Second command gives info about a specific team, detailing their info (name, description, members,
+etc.) and thier standing along with total points and attempt correct percentage. If no team is specified,
+it basis it on the user's current team.
+Third command gives the a view similar to top for the specified team, listing the 9 teams above and below
+the specified team overall and their names, points, and place values. If no team is specified, the user's
+team will be inferred.
+
+#### challenges
+```java
+/challenge submit [CHALLENGE_NAME] [FLAG]
+```
+
+Allows a user to submit a flag for a specified challenge, only counting the attempt as valid if the 
+challenge name is valid. If the name is a valid challenge, then the bot checks to assure the flag is
+correct, adjusting the user's attempts total accordingly with correct and incorrect attempts. If correct,
+first blood checks are done along with adjusting of points for that challenge.
