@@ -271,21 +271,9 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "color_red",
-                  "description" : "The desired red value (0-255)",
-                  "type" : 4,
-                  "required" : true
-                },
-                {
-                  "name" : "color_green",
-                  "description" : "The desired green value (0-255)",
-                  "type" : 4,
-                  "required" : true
-                },
-                {
-                  "name" : "color_blue",
-                  "description" : "The desired blue value (0-255)",
-                  "type" : 4,
+                  "name" : "color",
+                  "description" : "The desired hex code in the format of \"AB121F\"",
+                  "type" : 3,
                   "required" : true
                 },
                 {
