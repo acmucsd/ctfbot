@@ -34,7 +34,6 @@
     "erlpack": "github:discord/erlpack",
     "libsodium-wrappers": "^0.7.8",
     "pg": "^8.5.1",
-    "pg-native": "^3.0.0",
     "utf-8-validate": "^5.0.4",
     "zlib-sync": "^0.1.7"
   },

@@ -1,1 +1,3 @@
-console.log('Hello world for real');
+import database from './core/database';
+
+console.log(database);
