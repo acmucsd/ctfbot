@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="29601830-a8a9-4e40-8f76-f94841390639" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.eslintignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/config.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/database.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +72,7 @@
       <option name="presentableId" value="Default" />
       <updated>1609877290372</updated>
       <workItem from="1609877291632" duration="2418000" />
-      <workItem from="1610465249360" duration="7693000" />
+      <workItem from="1610465249360" duration="8233000" />
     </task>
     <task id="LOCAL-00001" summary="details for removing a user">
       <created>1609880141557</created>
@@ -102,7 +95,21 @@
       <option name="project" value="LOCAL" />
       <updated>1610466641052</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="structure and backbone">
+      <created>1610474352124</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1610474352124</updated>
+    </task>
+    <task id="LOCAL-00005" summary="webstorm config files">
+      <created>1610474361318</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1610474361318</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -124,7 +131,9 @@
     <MESSAGE value="details for removing a user" />
     <MESSAGE value="grammer? i hardly even know her!" />
     <MESSAGE value="typescript and eslint environment with hello world" />
-    <option name="LAST_COMMIT_MESSAGE" value="typescript and eslint environment with hello world" />
+    <MESSAGE value="structure and backbone" />
+    <MESSAGE value="webstorm config files" />
+    <option name="LAST_COMMIT_MESSAGE" value="webstorm config files" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
