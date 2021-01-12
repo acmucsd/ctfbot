@@ -219,7 +219,7 @@ The third command will delete a file attachment from a challenge.
 
 ### user commands
 
-All users in a the server are able to use these commands regardless of admin status
+All users in the server are able to use these commands regardless of admin status
 
 #### joining a team
 ```java
@@ -234,11 +234,11 @@ Join works similarly to this, attempting to join a team but only succeeding if t
 team name is valid, if the user attempting to join a team hasn't already joined another
 team, and as long as the user attempting to join has been invited to the team they
 are trying to join. If the user has yet to be invited, the bot will DM the team owner
-a message in which they can react to accept this invite. The message will only be sent once regardless of the times invited, and thus an ignore/ "no reaction" is equivalent to a reject.
+a message in which they can react to accept this invite. The message will only be sent once regardless of the times invited, and thus an ignore / "no reaction" is equivalent to a reject.
 
-**Note 1:** check for individuals being on a team of one through the databse, not the server
+**Note 1:** check for individuals being on a team of one through the database, not the server
 
-**Note 2:** if these are used outside of the main server, the user is given instructions on 
+**Note 2:** if these are used outside the main server, the user is given instructions on 
 how to do it properly in the main server
 
 
@@ -264,10 +264,10 @@ First command prints a scoreboard detailing the top 20 teams and their total poi
 category. If no category is specified, it will instead list the top 20 teams overall in the CTF.
 
 Second command gives info about a specific team, detailing their info (name, description, members,
-etc.) and thier standing along with total points and attempt correct percentage. If no team is specified,
+etc.) and their standing along with total points and attempt correct percentage. If no team is specified,
 it bases it on the user's current team.
 
-Third command gives the a view similar to top for the specified team, listing the 9 teams above and below
+Third command gives a view similar to top for the specified team, listing the 9 teams above and below
 the specified team overall and their names, points, and place values. If no team is specified, the user's
 team will be inferred.
 
