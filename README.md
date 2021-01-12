@@ -19,8 +19,7 @@ Lastly, to clone the project, build the dependencies, compile the code, and exec
 ```bash
 git clone https://github.com/acmucsd/ctfbot.git
 npm install # may require postgres to be installed
-npm build # compile from typescript 
-npm start # run distribution version
+npm start # run development mode, changes trigger a reload
 ```
 
 ## commands
