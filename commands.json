@@ -138,7 +138,7 @@
               "options" : [
                 {
                   "name" : "name",
-                  "description" : "?",
+                  "description" : "The unique identifier the server will be referred to as",
                   "type" : 3,
                   "required" : true
                 },
@@ -150,7 +150,7 @@
                 },
                 {
                   "name" : "ctf_name",
-                  "description" : "The name of the CTF to add the guild too",
+                  "description" : "The name of the CTF to add the guild to",
                   "type" : 3,
                   "required" : true
                 }
@@ -166,12 +166,6 @@
                   "description" : "The name of the team server",
                   "type" : 3,
                   "required" : true
-                },
-                {
-                  "name" : "ctf_name",
-                  "description" : "The name of the CTF to remove the guild from",
-                  "type" : 3,
-                  "required" : false
                 }
               ]
             }
@@ -277,21 +271,9 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "color_red",
-                  "description" : "The desired red value (0-255)",
-                  "type" : 4,
-                  "required" : true
-                },
-                {
-                  "name" : "color_green",
-                  "description" : "The desired green value (0-255)",
-                  "type" : 4,
-                  "required" : true
-                },
-                {
-                  "name" : "color_blue",
-                  "description" : "The desired blue value (0-255)",
-                  "type" : 4,
+                  "name" : "color",
+                  "description" : "The desired hex code in the format of \"AB121F\"",
+                  "type" : 3,
                   "required" : true
                 },
                 {
@@ -550,16 +532,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's current name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "new_name",
                   "description" : "The challenge's new name",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -569,16 +551,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "author",
                   "description" : "The author or authors",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_name",
+                  "description" : "The challenge's name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -588,16 +570,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "prompt",
                   "description" : "The desired challenge prompt",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -606,12 +588,6 @@
               "description" : "[A] Sets the difficulty of the indicated challenge",
               "type" : 1,
               "options" : [
-                {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
                 {
                   "name" : "difficulty",
                   "description" : "The challenge's difficulty",
@@ -635,6 +611,12 @@
                       "value" : "3"
                     }
                   ]
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -644,16 +626,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "points",
                   "description" : "The desired points",
                   "type" : 4,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -663,16 +645,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "points",
                   "description" : "The desired points",
                   "type" : 4,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -682,16 +664,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "points",
                   "description" : "The desired points",
                   "type" : 4,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -701,16 +683,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "decay",
                   "description" : "Number of solves",
                   "type" : 4,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -720,16 +702,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "flag",
                   "description" : "The challenge's flag",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -739,15 +721,15 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "publish_time",
                   "description" : "The desired publish date in a 'May 26, 2002 06:24:00' format",
                   "type" : 3,
+                  "required" : false
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
                   "required" : false
                 }
               ]
@@ -773,9 +755,9 @@
           "type" : 1,
           "options" : [
             {
-              "name" : "challenge_name",
-              "description" : "The challenge to remove",
-              "type" : 3,
+              "name" : "challenge_channel",
+              "description" : "The challenge's current name",
+              "type" : 7,
               "required" : false
             }
           ]
@@ -791,10 +773,10 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 3,
-                  "required" : true
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -803,12 +785,6 @@
               "description" : "[A] Adds a file attachment to the existing specified challenge",
               "type" : 1,
               "options" : [
-                {
-                  "name" : "challenge_name",
-                  "description" : "The challenge to add the attachment to",
-                  "type" : 3,
-                  "required" : true
-                },
                 {
                   "name" : "file_name",
                   "description" : "The name the file will be referred to",
@@ -820,6 +796,12 @@
                   "description" : "The download url for the file",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             },
@@ -829,16 +811,16 @@
               "type" : 1,
               "options" : [
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge to remove the attachment from",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
                   "name" : "file_name",
                   "description" : "The name of the attachment",
                   "type" : 3,
                   "required" : true
+                },
+                {
+                  "name" : "challenge_channel",
+                  "description" : "The challenge's current name",
+                  "type" : 7,
+                  "required" : false
                 }
               ]
             }
