@@ -82,10 +82,11 @@ Creating a team this way does not add anybody to the team, it is an *empty team*
 /team set name NAME [TEAM_ROLE]
 /team set description DESCRIPTION [TEAM_ROLE]
 /team set color COLOR [TEAM_ROLE]
+/team set captain USER [TEAM_ROLE]
 /team set server SERVER_NAME [TEAM_ROLE]
 ```
 
-Edit the name, description, and role color of the associated team. If no team role is provided, the team to edit will be inferred, firstly from the current channel, and secondarily from the current user's team.
+Edit the name, description, role color, and captain of the associated team. If no team role is provided, the team to edit will be inferred, firstly from the current channel, and secondarily from the current user's team.
 
 **Note**: when setting the team server of a team, the target team server must not be full. Also, the current team's channels will be deleted, message history will be lost, and current members will be given an invite to the new server where their new team channels await.
 
@@ -108,6 +109,8 @@ Allows you to list the users in a team, add a user to a team, and delete a user 
 **Note**: The usual restrictions apply; adding a user to a team will remove them from their previous team, removing a user from a team will add them to an individual team, and removing all the users from a team will cause that team to be deleted.
 
 **Note 2**: Removing a user from a team will cause that team to lose the points that the user earned on behalf of the team. The user will keep credit for the flags they've submitted, and if you add them to a different team, their new team will gain points accordingly. 
+
+**Note 3**: Removing a user from a team that is the team captain will *not* cause the captain to be reassigned, that must be done separately.
 
 #### removing teams
 ```java
