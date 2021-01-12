@@ -7,7 +7,9 @@
     "start": "node ./dist/index.js",
     "build": "npm run build-ts",
     "build-ts": "tsc",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "lint": "eslint --ext .ts ./src",
+    "lint-fix": "eslint --ext .ts ./src --fix"
   },
   "repository": {
     "type": "git",
@@ -31,11 +33,19 @@
     "erlpack": "github:discord/erlpack",
     "libsodium-wrappers": "^0.7.8",
     "pg": "^8.5.1",
+    "pg-native": "^3.0.0",
     "utf-8-validate": "^5.0.4",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {
     "@types/node": "^14.14.20",
+    "@types/pg": "^7.14.7",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-airbnb-typescript": "^12.0.0",
+    "eslint-plugin-import": "^2.22.1",
     "typescript": "^4.1.3"
   }
 }

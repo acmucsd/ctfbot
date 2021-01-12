@@ -1,6 +1,28 @@
 # ctfbot
 Discord bot to facilitate an entire Capture the Flag competition internally. Official CTF platform of [San Diego CTF](https://sdc.tf).
 
+## getting started
+
+Before you run the project, you'll need to have a postgres instance to connect to.
+You can configure the connection parameters with the [usual environment variables](https://node-postgres.com/features/connecting),
+or if you have docker installed, you can spin up a postgres server that the development version can connect to with **no configuration**
+with the following command:
+
+```bash
+docker run --name ctfbot-postgres -p 5432:5432 -e POSTGRES_PASSWORD=dAf1bjOwYUrVse8DsAZZBh2fkxXQwAbGrmE7EHUA -e POSTGRES_USER=ctfbot -d postgres
+```
+
+From here, you'll need [node-gyp installed](https://github.com/nodejs/node-gyp#installation) and all the build tools to compile native bindings.
+
+Lastly, to clone the project, build the dependencies, compile the code, and execute:
+
+```bash
+git clone https://github.com/acmucsd/ctfbot.git
+npm install # may require postgres to be installed
+npm build # compile from typescript 
+npm start # run distribution version
+```
+
 ## commands
 
 The bot is controlled primarily through [Slash Commands](https://discord.com/developers/docs/interactions/slash-commands). 
