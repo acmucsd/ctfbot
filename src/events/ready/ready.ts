@@ -1,5 +1,7 @@
+import log from '../../log';
+
 const readyEvent = (client) => {
-  console.log('Cool');
+  log('Discord connected');
 };
 
 export default readyEvent;
