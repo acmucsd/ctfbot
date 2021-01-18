@@ -1,4 +1,4 @@
-const postgresConfig = {
+const postgres = {
   user: process.env.PGUSER || 'ctfbot',
   host: process.env.PGHOST || 'localhost',
   database: process.env.PGDATABASE || 'ctfbot',
@@ -6,4 +6,4 @@ const postgresConfig = {
   port: Number(process.env.PGPORT) || 5432,
 };
 
-export default postgresConfig;
+export default postgres;
