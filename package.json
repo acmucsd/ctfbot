@@ -2,9 +2,8 @@
   "name": "ctfbot",
   "version": "1.0.0",
   "description": "CTF embedded into a Discord bot",
-  "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev --respawn -- src/index.ts",
+    "start": "ts-node-dev --respawn -r dotenv/config ./src",
     "start:prod": "node ./dist/index.js",
     "build": "npm run build-ts",
     "build-ts": "tsc",
@@ -31,6 +30,7 @@
     "@discordjs/opus": "^0.3.3",
     "bufferutil": "^4.0.3",
     "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
     "erlpack": "github:discord/erlpack",
     "libsodium-wrappers": "^0.7.8",
     "pg": "^8.5.1",

@@ -1,826 +1,616 @@
 {
-  "commands" : [
+  "commands": [
     {
-      "name" : "ctf",
-      "description" : "Add or manage aspects of CTFs",
-      "options" : [
+      "name": "category",
+      "description": "Challenge category management",
+      "options": [
         {
-          "name" : "add",
-          "description" : "[A] Creates a new CTF in the current guild",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "name",
-              "description" : "The name of the CTF",
-              "type" : 3,
-              "required" : true
-            },
-            {
-              "name" : "description",
-              "description" : "An optional description of the CTF",
-              "type" : 3,
-              "required" : false
-            }
-          ]
-        },
-        {
-          "name" : "set",
-          "description" : "Change various aspects of the CTF",
-          "type" : 2,
-          "options" : [
-            {
-              "name" : "name",
-              "description" : "[A] Set the name of the CTF",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "name",
-                  "description" : "The desired name",
-                  "type" : 3,
-                  "required" : true
-                }
-              ]
-            },
-            {
-              "name" : "description",
-              "description" : "[A] Set the description of the CTF",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "description",
-                  "description" : "The desired description",
-                  "type" : 3,
-                  "required" : true
-                }
-              ]
-            },
-            {
-              "name" : "admin",
-              "description" : "[A] Set the admin role for the CTF",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "admin_role",
-                  "description" : "The desired role",
-                  "type" : 8,
-                  "required" : true
-                }
-              ]
-            },
-            {
-              "name" : "start",
-              "description" : "[A] Set the start date for the CTF. If no date is indicated, sets it to now",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "start_date",
-                  "description" : "The desired start date in a 'May 26, 2002 06:24:00' format",
-                  "type" : 3,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "end",
-              "description" : "[A] Set the end date for the CTF. If no date is indicated, sets it to now",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "end_date",
-                  "description" : "The desired end date in a 'May 26, 2002 06:24:00' format",
-                  "type" : 3,
-                  "required" : false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name" : "announce",
-          "description" : "[A] Posts the message provided to the official CTF #announcements channel",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "message",
-              "description" : "The message to post to #announcements",
-              "type" : 3,
-              "required" : true
-            }
-          ]
-        },
-        {
-          "name" : "del",
-          "description": "[A] Causes the removal of the current guild's CTF and all associated Teams, Categories, and Challenges. There is no going back.",
-          "type" : 1
-        },
-        {
-          "name" : "server",
-          "description" : "Management for the team servers",
-          "type" : 2,
-          "options" : [
-            {
-              "name" : "get",
-              "description" : "[A] Lists all of the team servers belonging to the indicated CTF (or current guild's CTF if none is specified)",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "name",
-                  "description" : "The name of the CTF",
-                  "type" : 3,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "add",
-              "description" : "[A] Adds the current guild as a team server for the indicated CTF",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "name",
-                  "description" : "The unique identifier the server will be referred to as",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
-                  "name" : "limit",
-                  "description" : "[A] The max number of teams allowed to be in the server",
-                  "type" : 4,
-                  "required" : true
-                },
-                {
-                  "name" : "ctf_name",
-                  "description" : "The name of the CTF to add the guild to",
-                  "type" : 3,
-                  "required" : true
-                }
-              ]
-            },
-            {
-              "name" : "del",
-              "description" : "[A] Removes the indicated team server from the indicated CTF",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "name",
-                  "description" : "The name of the team server",
-                  "type" : 3,
-                  "required" : true
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name" : "team",
-      "description" : "Team management commands",
-      "options" : [
-        {
-          "name" : "invite",
-          "description" : "Invites the indicated user to join your team. You must be Team Captain to do this.",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "user",
-              "description" : "The user to invite",
-              "type" : 6,
-              "required" : true
-            }
-          ]
-        },
-        {
-          "name" : "join",
-          "description" : "Sends a request to join the indicated team.",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "team_name",
-              "description" : "The team you wish to join",
-              "type" : 3,
-              "required" : true
-            }
-          ]
-        },
-        {
-          "name" : "add",
-          "description" : "[A] Creates an empty team in the indicated server (or current server if none is specified)",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "name",
-              "description" : "The team's name",
-              "type" : 3,
-              "required" : true
-            },
-            {
-              "name" : "server_name",
-              "description" : "The server to create the team on",
-              "type" : 3,
-              "required" : false
-            }
-          ]
-        },
-        {
-          "name" : "set",
-          "description" : "Edit various aspects of a team",
-          "type" : 2,
-          "options" : [
-            {
-              "name" : "name",
-              "descritpion" : "Change the team name",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "name",
-                  "description" : "The desired name",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "[A] The team to set the name of",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "description",
-              "descritpion" : "Change the team description",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "description",
-                  "description" : "The desired description",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "[A] The team to set the description of",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "color",
-              "descritpion" : "Change the team's role color",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "color",
-                  "description" : "The desired hex code in the format of \"AB121F\"",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "[A] The team to set the color of",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "server",
-              "descritpion" : "[A] Change the server the team belongs to",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "server_name",
-                  "description" : "The name of the server to add the team to",
-                  "type" : 3,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "The team to move",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name" : "get",
-          "description" : "Returns a list of all teams currently in the CTF.",
-          "type" : 1
-        },
-        {
-          "name" : "user",
-          "description" : "Team user management",
-          "type" : 2,
-          "options" : [
-            {
-              "name" : "get",
-              "description": "Lists the users in the indicated team (the user's current team if not specifed)",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "team_role",
-                  "description" : "The team to list the users of",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "add",
-              "description": "[A] Adds a user to the indicated team",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "user",
-                  "description" : "The user to add",
-                  "type" : 6,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "The team to add the user to",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            },
-            {
-              "name" : "del",
-              "description": "[A] Removes a user from the indicated team",
-              "type" : 1,
-              "options" : [
-                {
-                  "name" : "user",
-                  "description" : "The user to remove",
-                  "type" : 6,
-                  "required" : true
-                },
-                {
-                  "name" : "team_role",
-                  "description" : "The team to remove the user from",
-                  "type" : 8,
-                  "required" : false
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name" : "del",
-          "description": "[A] Removes the indicated team from the CTF",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "team_role",
-              "description" : "The team to remove",
-              "type" : 8,
-              "required" : false
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name" : "category",
-      "description" : "Challenge category management",
-      "options" : [
-        {
-          "name" : "add",
-          "description" : "[A] Creates a new category with the indicated name and description.",
-          "type" : 1,
-          "options" : [
+          "name": "add",
+          "description": "[A] Creates a new category with the indicated name and description.",
+          "type": 1,
+          "options": [
             {
               "name": "name",
-              "description" : "The desired category name",
-              "type" : 3,
-              "required" : true
+              "description": "The desired category name",
+              "type": 3,
+              "required": true
             },
             {
-              "name" : "description",
-              "description" : "The desired category description",
-              "type" : 3,
-              "required" : false
+              "name": "description",
+              "description": "The desired category description",
+              "type": 3,
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "del",
+          "description": "[A] Removes the provided category from the current CTF.",
+          "type": 1,
+          "options": [
+            {
+              "name": "name",
+              "description": "The category name",
+              "type": 3,
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "get",
+          "description": "If a category is indicated, lists all challenges within the category. If none is specified, lists all categories within the CTF.",
+          "type": 1,
+          "options": [
+            {
+              "name": "name",
+              "description": "The category name",
+              "type": 3,
+              "required": false
             }
           ]
         },
         {
           "name": "set",
-          "description" : "Category info management",
-          "type" : 2,
-          "options" : [
+          "description": "Category info management",
+          "type": 2,
+          "options": [
             {
-              "name" : "name",
-              "description" : "[A] Changes the name of the indicated category",
-              "type" : 1,
-              "options" : [
+              "name": "name",
+              "description": "[A] Changes the name of the indicated category",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "category_name",
-                  "description" : "The current category name",
-                  "type" : 3,
-                  "required" : true
+                  "name": "category_name",
+                  "description": "The current category name",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "new_name",
-                  "description" : "The new category name",
-                  "type" : 3,
-                  "required" : true
+                  "name": "new_name",
+                  "description": "The new category name",
+                  "type": 3,
+                  "required": true
                 }
               ]
             },
             {
-              "name" : "description",
-              "description" : "[A] Changes the description of the indicated category",
-              "type" : 1,
-              "options" : [
+              "name": "description",
+              "description": "[A] Changes the description of the indicated category",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "category_name",
-                  "description" : "The current category name",
-                  "type" : 3,
-                  "required" : true
+                  "name": "category_name",
+                  "description": "The current category name",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "description",
-                  "description" : "The new category description",
-                  "type" : 3,
-                  "required" : true
+                  "name": "description",
+                  "description": "The new category description",
+                  "type": 3,
+                  "required": true
                 }
               ]
-            }
-          ]
-        },
-        {
-          "name" : "get",
-          "description" : "If a category is indicated, lists all challenges within the category. If none is specified, lists all categories within the CTF.",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "name",
-              "description" : "The category name",
-              "type" : 3,
-              "required" : false
-            }
-          ]
-        },
-        {
-          "name" : "del",
-          "description" : "[A] Removes the provided category from the current CTF.",
-          "type" : 1,
-          "options" : [
-            {
-              "name" : "name",
-              "description" : "The category name",
-              "type" : 3,
-              "required" : true
             }
           ]
         }
       ]
     },
     {
-      "name" : "challenge",
-      "description" : "Challenge management and submission",
-      "options" : [
+      "name": "challenge",
+      "description": "Challenge management and submission",
+      "options": [
         {
-          "name" : "submit",
-          "description" : "Submits a challenge's flag",
-          "type" : 1,
-          "options" : [
+          "name": "add",
+          "description": "[A] Creates a new CTF challenge.",
+          "type": 1,
+          "options": [
             {
-              "name" : "challenge_name",
-              "description" : "The challenge being attempted",
-              "type" : 3,
-              "required" : true
+              "name": "name",
+              "description": "The challenge's name",
+              "type": 3,
+              "required": true
             },
             {
-              "name" : "flag",
-              "description" : "The challenge's flag",
-              "type" : 3,
-              "required" : true
+              "name": "category",
+              "description": "The challenge's category",
+              "type": 3,
+              "required": true
             }
           ]
         },
         {
-          "name" : "add",
-          "description" : "[A] Creates a new CTF challenge.",
-          "type" : 1,
-          "options" : [
+          "name": "attach",
+          "description": "Challenge attachment management",
+          "type": 2,
+          "options": [
             {
-              "name" : "name",
-              "description" : "The challenge's name",
-              "type" : 3,
-              "required" : true
+              "name": "get",
+              "description": "[A] Lists all file attachments of the specified challenge",
+              "type": 1,
+              "options": [
+                {
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
+                }
+              ]
             },
             {
-              "name" : "category",
-              "description" : "The challenge's category",
-              "type" : 3,
-              "required" : true
+              "name": "add",
+              "description": "[A] Adds a file attachment to the existing specified challenge",
+              "type": 1,
+              "options": [
+                {
+                  "name": "file_name",
+                  "description": "The name the file will be referred to",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "file_url",
+                  "description": "The download url for the file",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "del",
+              "description": "[A] Deletes a file attachment from the existing specified challenge.",
+              "type": 1,
+              "options": [
+                {
+                  "name": "file_name",
+                  "description": "The name of the attachment",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
+                }
+              ]
             }
           ]
         },
         {
-          "name" : "set",
-          "description" : "Challenge info managament",
-          "type" : 2,
-          "options" : [
+          "name": "del",
+          "description": "[A] Removes the indicated challenge from existance.  If none is specified, then the challenge is inferred from the current channel",
+          "type": 1,
+          "options": [
             {
-              "name" : "name",
-              "description" : "[A] Changes the name of the indicated challenge",
-              "type" : 1,
-              "options" : [
+              "name": "challenge_channel",
+              "description": "The challenge's current name",
+              "type": 7,
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "get",
+          "description": "Gives info on the indicated challenge, and if none is specified returns all challenges in the CTF",
+          "type": 1,
+          "options": [
+            {
+              "name": "challenge_name",
+              "description": "The challenge to get info on",
+              "type": 3,
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "set",
+          "description": "Challenge info managament",
+          "type": 2,
+          "options": [
+            {
+              "name": "name",
+              "description": "[A] Changes the name of the indicated challenge",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "new_name",
-                  "description" : "The challenge's new name",
-                  "type" : 3,
-                  "required" : true
+                  "name": "new_name",
+                  "description": "The challenge's new name",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "author",
-              "description" : "[A] Sets the indicated challenge's author",
-              "type" : 1,
-              "options" : [
+              "name": "author",
+              "description": "[A] Sets the indicated challenge's author",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "author",
-                  "description" : "The author or authors",
-                  "type" : 3,
-                  "required" : true
+                  "name": "author",
+                  "description": "The author or authors",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_name",
-                  "description" : "The challenge's name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_name",
+                  "description": "The challenge's name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "prompt",
-              "description" : "[A] Changes the indicated challenge's prompt",
-              "type" : 1,
-              "options" : [
+              "name": "prompt",
+              "description": "[A] Changes the indicated challenge's prompt",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "prompt",
-                  "description" : "The desired challenge prompt",
-                  "type" : 3,
-                  "required" : true
+                  "name": "prompt",
+                  "description": "The desired challenge prompt",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "difficulty",
-              "description" : "[A] Sets the difficulty of the indicated challenge",
-              "type" : 1,
-              "options" : [
+              "name": "difficulty",
+              "description": "[A] Sets the difficulty of the indicated challenge",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "difficulty",
-                  "description" : "The challenge's difficulty",
-                  "type" : 3,
-                  "required" : true,
-                  "choices" : [
+                  "name": "difficulty",
+                  "description": "The challenge's difficulty",
+                  "type": 3,
+                  "required": true,
+                  "choices": [
                     {
-                      "name" : "Baby",
-                      "value" : "0"
+                      "name": "Baby",
+                      "value": "0"
                     },
                     {
-                      "name" : "Easy",
-                      "value" : "1"
+                      "name": "Easy",
+                      "value": "1"
                     },
                     {
-                      "name" : "Medium",
-                      "value" : "2"
+                      "name": "Medium",
+                      "value": "2"
                     },
                     {
-                      "name" : "Hard",
-                      "value" : "3"
+                      "name": "Hard",
+                      "value": "3"
                     }
                   ]
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "points",
-              "description" : "[A] Sets both the initial and minimum points",
-              "type" : 1,
-              "options" : [
+              "name": "points",
+              "description": "[A] Sets both the initial and minimum points",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "points",
-                  "description" : "The desired points",
-                  "type" : 4,
-                  "required" : true
+                  "name": "points",
+                  "description": "The desired points",
+                  "type": 4,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "initialpoints",
-              "description" : "[A] Sets the challenge's initial points",
-              "type" : 1,
-              "options" : [
+              "name": "initialpoints",
+              "description": "[A] Sets the challenge's initial points",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "points",
-                  "description" : "The desired points",
-                  "type" : 4,
-                  "required" : true
+                  "name": "points",
+                  "description": "The desired points",
+                  "type": 4,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "minimumpoints",
-              "description" : "[A] Sets the challenge's minimum points",
-              "type" : 1,
-              "options" : [
+              "name": "minimumpoints",
+              "description": "[A] Sets the challenge's minimum points",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "points",
-                  "description" : "The desired points",
-                  "type" : 4,
-                  "required" : true
+                  "name": "points",
+                  "description": "The desired points",
+                  "type": 4,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "pointdecay",
-              "description" : "[A] Sets the challenges point decay (i.e. number of solves until the minimum point value is reached)",
-              "type" : 1,
-              "options" : [
+              "name": "pointdecay",
+              "description": "[A] Sets the challenges point decay (i.e. number of solves until the minimum point value is reached)",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "decay",
-                  "description" : "Number of solves",
-                  "type" : 4,
-                  "required" : true
+                  "name": "decay",
+                  "description": "Number of solves",
+                  "type": 4,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "flag",
-              "description" : "[A] Sets the challenge's flag",
-              "type" : 1,
-              "options" : [
+              "name": "flag",
+              "description": "[A] Sets the challenge's flag",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "flag",
-                  "description" : "The challenge's flag",
-                  "type" : 3,
-                  "required" : true
+                  "name": "flag",
+                  "description": "The challenge's flag",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "publish",
-              "description" : "[A] Sets when the challenge is going to be released. If no time is specified, publishes the challenge now",
-              "type" : 1,
-              "options" : [
+              "name": "publish",
+              "description": "[A] Sets when the challenge is going to be released. If no time is specified, publishes the challenge now",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "publish_time",
-                  "description" : "The desired publish date in a 'May 26, 2002 06:24:00' format",
-                  "type" : 3,
-                  "required" : false
+                  "name": "publish_time",
+                  "description": "The desired publish date in a 'May 26, 2002 06:24:00' format",
+                  "type": 3,
+                  "required": false
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "challenge_channel",
+                  "description": "The challenge's current name",
+                  "type": 7,
+                  "required": false
                 }
               ]
             }
           ]
         },
         {
-          "name" : "get",
-          "description" : "Gives info on the indicated challenge, and if none is specified returns all challenges in the CTF",
-          "type" : 1,
-          "options" : [
+          "name": "submit",
+          "description": "Submits a challenge's flag",
+          "type": 1,
+          "options": [
             {
-              "name" : "challenge_name",
-              "description" : "The challenge to get info on",
-              "type" : 3,
-              "required" : false
+              "name": "challenge_name",
+              "description": "The challenge being attempted",
+              "type": 3,
+              "required": true
+            },
+            {
+              "name": "flag",
+              "description": "The challenge's flag",
+              "type": 3,
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ctf",
+      "description": "Add or manage aspects of CTFs",
+      "options": [
+        {
+          "name": "add",
+          "description": "[A] Creates a new CTF in the current guild",
+          "type": 1,
+          "options": [
+            {
+              "name": "name",
+              "description": "The name of the CTF",
+              "type": 3,
+              "required": true
+            },
+            {
+              "name": "description",
+              "description": "An optional description of the CTF",
+              "type": 3,
+              "required": false
             }
           ]
         },
         {
-          "name" : "del",
-          "description" : "[A] Removes the indicated challenge from existance.  If none is specified, then the challenge is inferred from the current channel",
-          "type" : 1,
-          "options" : [
+          "name": "announce",
+          "description": "[A] Posts the message provided to the official CTF #announcements channel",
+          "type": 1,
+          "options": [
             {
-              "name" : "challenge_channel",
-              "description" : "The challenge's current name",
-              "type" : 7,
-              "required" : false
+              "name": "message",
+              "description": "The message to post to #announcements",
+              "type": 3,
+              "required": true
             }
           ]
         },
         {
-          "name" : "attach",
-          "description" : "Challenge attachment management",
-          "type" : 2,
-          "options" : [
+          "name": "del",
+          "description": "[A] Causes the removal of the current guild's CTF and all associated Teams, Categories, and Challenges. There is no going back.",
+          "type": 1
+        },
+        {
+          "name": "server",
+          "description": "Management for the team servers",
+          "type": 2,
+          "options": [
             {
-              "name" : "get",
-              "description" : "[A] Lists all file attachments of the specified challenge",
-              "type" : 1,
-              "options" : [
+              "name": "get",
+              "description": "[A] Lists all of the team servers belonging to the indicated CTF (or current guild's CTF if none is specified)",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "name",
+                  "description": "The name of the CTF",
+                  "type": 3,
+                  "required": false
                 }
               ]
             },
             {
-              "name" : "add",
-              "description" : "[A] Adds a file attachment to the existing specified challenge",
-              "type" : 1,
-              "options" : [
+              "name": "add",
+              "description": "[A] Adds the current guild as a team server for the indicated CTF",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "file_name",
-                  "description" : "The name the file will be referred to",
-                  "type" : 3,
-                  "required" : true
+                  "name": "name",
+                  "description": "The unique identifier the server will be referred to as",
+                  "type": 3,
+                  "required": true
                 },
                 {
-                  "name" : "file_url",
-                  "description" : "The download url for the file",
-                  "type" : 3,
-                  "required" : true
+                  "name": "limit",
+                  "description": "[A] The max number of teams allowed to be in the server",
+                  "type": 4,
+                  "required": true
                 },
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "ctf_name",
+                  "description": "The name of the CTF to add the guild to",
+                  "type": 3,
+                  "required": true
                 }
               ]
             },
             {
-              "name" : "del",
-              "description" : "[A] Deletes a file attachment from the existing specified challenge.",
-              "type" : 1,
-              "options" : [
+              "name": "del",
+              "description": "[A] Removes the indicated team server from the indicated CTF",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "file_name",
-                  "description" : "The name of the attachment",
-                  "type" : 3,
-                  "required" : true
-                },
+                  "name": "name",
+                  "description": "The name of the team server",
+                  "type": 3,
+                  "required": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "set",
+          "description": "Change various aspects of the CTF",
+          "type": 2,
+          "options": [
+            {
+              "name": "name",
+              "description": "[A] Set the name of the CTF",
+              "type": 1,
+              "options": [
                 {
-                  "name" : "challenge_channel",
-                  "description" : "The challenge's current name",
-                  "type" : 7,
-                  "required" : false
+                  "name": "name",
+                  "description": "The desired name",
+                  "type": 3,
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "description",
+              "description": "[A] Set the description of the CTF",
+              "type": 1,
+              "options": [
+                {
+                  "name": "description",
+                  "description": "The desired description",
+                  "type": 3,
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "admin",
+              "description": "[A] Set the admin role for the CTF",
+              "type": 1,
+              "options": [
+                {
+                  "name": "admin_role",
+                  "description": "The desired role",
+                  "type": 8,
+                  "required": true
+                }
+              ]
+            },
+            {
+              "name": "start",
+              "description": "[A] Set the start date for the CTF. If no date is indicated, sets it to now",
+              "type": 1,
+              "options": [
+                {
+                  "name": "start_date",
+                  "description": "The desired start date in a 'May 26, 2002 06:24:00' format",
+                  "type": 3,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "end",
+              "description": "[A] Set the end date for the CTF. If no date is indicated, sets it to now",
+              "type": 1,
+              "options": [
+                {
+                  "name": "end_date",
+                  "description": "The desired end date in a 'May 26, 2002 06:24:00' format",
+                  "type": 3,
+                  "required": false
                 }
               ]
             }
@@ -829,45 +619,255 @@
       ]
     },
     {
-      "name" : "scoreboard",
-      "description" : "Scoreboard management",
-      "options" : [
+      "name": "scoreboard",
+      "description": "Scoreboard management",
+      "options": [
         {
-          "name" : "top",
-          "description" : "Lists the top 20 teams in the indicated category (or overall if no category is specified)",
-          "type" : 1,
-          "options" : [
+          "name": "standing",
+          "description": "Creates a scoreboard showing 9 teams above and below the indicated team overall.  If no team is indicated, it is based on the user's team",
+          "type": 1,
+          "options": [
             {
-              "name" : "category",
-              "description" : "The category to list teams in",
-              "type" : 3,
-              "required" : false
+              "name": "team_name",
+              "description": "The team to recieve info on",
+              "type": 3,
+              "required": false
             }
           ]
         },
         {
-          "name" : "team",
-          "description" : "Gives info about the indicated team including name, points, and members. If no team is indicated, it is based on the user's team",
-          "type" : 1,
-          "options" : [
+          "name": "team",
+          "description": "Gives info about the indicated team including name, points, and members. If no team is indicated, it is based on the user's team",
+          "type": 1,
+          "options": [
             {
-              "name" : "team_name",
-              "description" : "The team to recieve info on",
-              "type" : 3,
-              "required" : false
+              "name": "team_name",
+              "description": "The team to recieve info on",
+              "type": 3,
+              "required": false
             }
           ]
         },
         {
-          "name" : "standing",
-          "description" : "Creates a scoreboard showing 9 teams above and below the indicated team overall.  If no team is indicated, it is based on the user's team",
-          "type" : 1,
-          "options" : [
+          "name": "top",
+          "description": "Lists the top 20 teams in the indicated category (or overall if no category is specified)",
+          "type": 1,
+          "options": [
             {
-              "name" : "team_name",
-              "description" : "The team to recieve info on",
-              "type" : 3,
-              "required" : false
+              "name": "category",
+              "description": "The category to list teams in",
+              "type": 3,
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "team",
+      "description": "Team management commands",
+      "options": [
+        {
+          "name": "add",
+          "description": "[A] Creates an empty team in the indicated server (or current server if none is specified)",
+          "type": 1,
+          "options": [
+            {
+              "name": "name",
+              "description": "The team's name",
+              "type": 3,
+              "required": true
+            },
+            {
+              "name": "server_name",
+              "description": "The server to create the team on",
+              "type": 3,
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "del",
+          "description": "[A] Removes the indicated team from the CTF",
+          "type": 1,
+          "options": [
+            {
+              "name": "team_role",
+              "description": "The team to remove",
+              "type": 8,
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "get",
+          "description": "Returns a list of all teams currently in the CTF.",
+          "type": 1
+        },
+        {
+          "name": "invite",
+          "description": "Invites the indicated user to join your team. You must be Team Captain to do this.",
+          "type": 1,
+          "options": [
+            {
+              "name": "user",
+              "description": "The user to invite",
+              "type": 6,
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "join",
+          "description": "Sends a request to join the indicated team.",
+          "type": 1,
+          "options": [
+            {
+              "name": "team_name",
+              "description": "The team you wish to join",
+              "type": 3,
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "set",
+          "description": "Edit various aspects of a team",
+          "type": 2,
+          "options": [
+            {
+              "name": "name",
+              "descritpion": "Change the team name",
+              "type": 1,
+              "options": [
+                {
+                  "name": "name",
+                  "description": "The desired name",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "[A] The team to set the name of",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "description",
+              "descritpion": "Change the team description",
+              "type": 1,
+              "options": [
+                {
+                  "name": "description",
+                  "description": "The desired description",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "[A] The team to set the description of",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "color",
+              "descritpion": "Change the team's role color",
+              "type": 1,
+              "options": [
+                {
+                  "name": "color",
+                  "description": "The desired hex code in the format of \"AB121F\"",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "[A] The team to set the color of",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "server",
+              "descritpion": "[A] Change the server the team belongs to",
+              "type": 1,
+              "options": [
+                {
+                  "name": "server_name",
+                  "description": "The name of the server to add the team to",
+                  "type": 3,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "The team to move",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "user",
+          "description": "Team user management",
+          "type": 2,
+          "options": [
+            {
+              "name": "get",
+              "description": "Lists the users in the indicated team (the user's current team if not specifed)",
+              "type": 1,
+              "options": [
+                {
+                  "name": "team_role",
+                  "description": "The team to list the users of",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "add",
+              "description": "[A] Adds a user to the indicated team",
+              "type": 1,
+              "options": [
+                {
+                  "name": "user",
+                  "description": "The user to add",
+                  "type": 6,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "The team to add the user to",
+                  "type": 8,
+                  "required": false
+                }
+              ]
+            },
+            {
+              "name": "del",
+              "description": "[A] Removes a user from the indicated team",
+              "type": 1,
+              "options": [
+                {
+                  "name": "user",
+                  "description": "The user to remove",
+                  "type": 6,
+                  "required": true
+                },
+                {
+                  "name": "team_role",
+                  "description": "The team to remove the user from",
+                  "type": 8,
+                  "required": false
+                }
+              ]
             }
           ]
         }
