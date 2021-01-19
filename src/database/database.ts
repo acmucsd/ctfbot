@@ -14,4 +14,4 @@ schemas.forEach((schema) => {
   });
 });
 
-export default (text: string, params, callback) => pool.query(text, params, callback);
+export default (text: string, params?) => pool.query(text, params);
