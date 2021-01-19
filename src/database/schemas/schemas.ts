@@ -1,19 +1,19 @@
 const schemas = [
-  `CREATE TABLE IF NOT EXISTS ctf (
+  `CREATE TABLE IF NOT EXISTS ctfs (
     id serial,
-    guild_snowflake text,
     name text,
     description text,
     start_date date,
     end_date date,
-    admin_role text,
+    guild_snowflake text,
+    admin_role_snowflake text,
     announcements_channel_snowflake text,
     PRIMARY KEY( id )
   );`,
   `CREATE TABLE IF NOT EXISTS team_servers (
     id serial,
     guild_snowflake text,
-    ctf_id integer,
+    ctf_id integer REFERENCES ctfs,
     info_channel_snowflake text,
     team_category_snowflake text,
     name text,
@@ -23,14 +23,14 @@ const schemas = [
   `CREATE TABLE IF NOT EXISTS users (
     id serial,
     user_snowflake text,
-    team_id integer,
+    team_id integer REFERENCES teams,
     tos_accepted boolean,
     PRIMARY KEY( id )
   );`,
   `CREATE TABLE IF NOT EXISTS invites (
     id serial,
-    user_id integer,
-    team_id integer,
+    user_id integer REFERENCES users,
+    team_id integer REFERENCES teams,
     was_invited boolean,
     PRIMARY KEY( id )
   );`,
@@ -39,8 +39,8 @@ const schemas = [
     team_role_snowflake text,
     text_channel_snowflake text,
     voice_channel_snowflake text,
-    team_server_id integer,
-    captain__user_id integer,
+    team_server_id integer REFERENCES team_servers,
+    captain_user_id integer REFERENCES users,
     name text,
     description text,
     color text,
@@ -48,7 +48,7 @@ const schemas = [
   );`,
   `CREATE TABLE IF NOT EXISTS categories (
     id serial,
-    ctf_id integer,
+    ctf_id integer REFERENCES ctfs,
     name text,
     channel_category_snowflake text,
     description text,
@@ -57,7 +57,7 @@ const schemas = [
   'CREATE TYPE difficulty_level AS ENUM (\'baby\', \'easy\', \'medium\', \'hard\');',
   `CREATE TABLE IF NOT EXISTS challenges (
     id serial,
-    category_id integer,
+    category_id integer REFERENCES categories,
     channel_snowflake text,
     name text,
     author text,
@@ -67,14 +67,14 @@ const schemas = [
     point_decay integer,
     min_points integer,
     flag text,
-    first_blood_id integer,
+    first_blood_id integer REFERENCES users,
     publish_time date,
     PRIMARY KEY( id )
   );`,
   `CREATE TABLE IF NOT EXISTS attempts (
     id serial,
-    challenge_id integer,
-    user_id integer,
+    challenge_id integer REFERENCES challenges,
+    user_id integer REFERENCES users,
     attempted_flag text,
     successful boolean,
     timestamp date,
@@ -82,7 +82,7 @@ const schemas = [
   );`,
   `CREATE TABLE IF NOT EXISTS attachments (
     id serial,
-    challenge_id integer,
+    challenge_id integer REFERENCES challenges,
     name text,
     url text,
     PRIMARY KEY( id )
