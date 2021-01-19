@@ -1,2 +1,2 @@
-export { default as postgresConfig } from './postgresConfig';
-export { default as discordConfig } from './discordConfig';
+export { default as postgresConfig } from './postgres';
+export { default as discordConfig } from './discord';
