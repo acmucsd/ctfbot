@@ -38,6 +38,11 @@ export default class CTF {
     this.row.announcements_channel_snowflake = announcementsChannelSnowflake;
   }
 
+  async deleteCTF() {
+    // because of Foreign Key constraints, deletes all associated Team Servers, Teams, Categories, and Challenges
+    await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
+  }
+
   // builders
   static async fromID(id: number) {
     const { rows } = await query(`SELECT * FROM ctfs WHERE id = ${id}`);
