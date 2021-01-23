@@ -39,7 +39,6 @@ const schemas = [
     description text,
     PRIMARY KEY( id )
   );`,
-  'DROP TYPE IF EXISTS difficulty_level; CREATE TYPE difficulty_level AS ENUM (\'baby\', \'easy\', \'medium\', \'hard\');',
   `CREATE TABLE IF NOT EXISTS challenges (
     id serial,
     category_id integer REFERENCES categories ON DELETE CASCADE,
@@ -47,7 +46,7 @@ const schemas = [
     name text,
     author text,
     prompt text,
-    difficulty difficulty_level,
+    difficulty text,
     initial_points integer,
     point_decay integer,
     min_points integer,
