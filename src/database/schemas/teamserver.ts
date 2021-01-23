@@ -5,7 +5,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS team_servers (
     info_channel_snowflake text,
     team_category_snowflake text,
     name text,
-    limit integer,
+    team_limit integer,
     PRIMARY KEY( id )
   );`;
 
@@ -16,5 +16,5 @@ export interface TeamServerRow {
   info_channel_snowflake: string,
   team_category_snowflake: string,
   name: string,
-  limit: string
+  team_limit: string
 }

@@ -1,10 +1,22 @@
-// add schemas to this as we go
+import { Pool } from 'pg';
 import { schema as ctfSchema } from './ctf';
 import { schema as teamServerSchema } from './teamserver';
 
-export default [
+// add schemas to this as we go
+const schemas = [
   ctfSchema,
   teamServerSchema,
+  `CREATE TABLE IF NOT EXISTS teams (
+    id serial,
+    team_role_snowflake text,
+    text_channel_snowflake text,
+    voice_channel_snowflake text,
+    team_server_id integer REFERENCES team_servers ON DELETE SET NULL,
+    name text,
+    description text,
+    color text,
+    PRIMARY KEY( id )
+  );`,
   `CREATE TABLE IF NOT EXISTS users (
     id serial,
     user_snowflake text,
@@ -19,18 +31,6 @@ export default [
     was_invited boolean,
     PRIMARY KEY( id )
   );`,
-  `CREATE TABLE IF NOT EXISTS teams (
-    id serial,
-    team_role_snowflake text,
-    text_channel_snowflake text,
-    voice_channel_snowflake text,
-    team_server_id integer REFERENCES team_servers ON DELETE SET NULL,
-    captain_user_id integer REFERENCES users ON DELETE SET NULL,
-    name text,
-    description text,
-    color text,
-    PRIMARY KEY( id )
-  );`,
   `CREATE TABLE IF NOT EXISTS categories (
     id serial,
     ctf_id integer REFERENCES ctfs ON DELETE CASCADE,
@@ -39,7 +39,7 @@ export default [
     description text,
     PRIMARY KEY( id )
   );`,
-  'CREATE TYPE difficulty_level AS ENUM (\'baby\', \'easy\', \'medium\', \'hard\');',
+  'DROP TYPE IF EXISTS difficulty_level; CREATE TYPE difficulty_level AS ENUM (\'baby\', \'easy\', \'medium\', \'hard\');',
   `CREATE TABLE IF NOT EXISTS challenges (
     id serial,
     category_id integer REFERENCES categories ON DELETE CASCADE,
@@ -72,3 +72,11 @@ export default [
     url text,
     PRIMARY KEY( id )
   );`];
+
+// janky code that waits for each table to initialize before declaring the next one
+export default async (pool: Pool) => {
+  await schemas.reduce(async (promise, schema) => {
+    await promise;
+    await pool.query(schema);
+  }, Promise.resolve());
+};
