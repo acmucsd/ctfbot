@@ -28,11 +28,6 @@ export default class CTF {
     this.row.end_date = endDate;
   }
 
-  async setGuildSnowflake(guildSnowflake: string) {
-    await query(`UPDATE ctfs SET guild_snowflake = $1 WHERE id = ${this.row.id}`, [guildSnowflake]);
-    this.row.guild_snowflake = guildSnowflake;
-  }
-
   async setAdminRoleSnowflake(adminRoleSnowflake: string) {
     await query(`UPDATE ctfs SET admin_role_snowflake = $1 WHERE id = ${this.row.id}`, [adminRoleSnowflake]);
     this.row.admin_role_snowflake = adminRoleSnowflake;
@@ -51,6 +46,12 @@ export default class CTF {
 
   static async fromName(name: string) {
     const { rows } = await query('SELECT * FROM ctfs WHERE name = $1', [name]);
+    return new CTF(rows[0] as CTFRow);
+  }
+
+  // create a new CTF
+  static async createCTF(name: string, guildSnowflake: string) {
+    const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [name, guildSnowflake]);
     return new CTF(rows[0] as CTFRow);
   }
 }
