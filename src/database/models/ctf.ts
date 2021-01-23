@@ -51,6 +51,10 @@ export default class CTF {
 
   // create a new CTF
   static async createCTF(name: string, guildSnowflake: string) {
+    // check if a CTF already exists in this guild
+    const { rows: existingRows } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
+    if (existingRows && existingRows.length > 0) throw new Error('cannot create a second CTF in this guild');
+
     const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [name, guildSnowflake]);
     return new CTF(rows[0] as CTFRow);
   }
