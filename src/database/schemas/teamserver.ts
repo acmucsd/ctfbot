@@ -1,7 +1,7 @@
 export const schema = `CREATE TABLE IF NOT EXISTS team_servers (
     id serial,
     guild_snowflake text,
-    ctf_id integer REFERENCES ctfs,
+    ctf_id integer REFERENCES ctfs ON DELETE CASCADE,
     info_channel_snowflake text,
     team_category_snowflake text,
     name text,
