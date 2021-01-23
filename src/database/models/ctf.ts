@@ -24,7 +24,7 @@ interface CTFRow {
 }
 
 class CTF {
-  row : CTFRow;
+  row: CTFRow;
 
   constructor(row: CTFRow) {
     this.row = row;
@@ -39,7 +39,31 @@ class CTF {
     await query(`UPDATE ctfs SET description = $1 WHERE id = ${this.row.id}`, [description]);
     this.row.description = description;
   }
-  // etc more to come
+
+  async setStartDate(startDate: Date) {
+    await query(`UPDATE ctfs SET start_date = $1 WHERE id = ${this.row.id}`, [startDate]);
+    this.row.start_date = startDate;
+  }
+
+  async setEndDate(endDate: Date) {
+    await query(`UPDATE ctfs SET end_date = $1 WHERE id = ${this.row.id}`, [endDate]);
+    this.row.end_date = endDate;
+  }
+
+  async setGuildSnowflake(guildSnowflake: string) {
+    await query(`UPDATE ctfs SET guild_snowflake = $1 WHERE id = ${this.row.id}`, [guildSnowflake]);
+    this.row.guild_snowflake = guildSnowflake;
+  }
+
+  async setAdminRoleSnowflake(adminRoleSnowflake: string) {
+    await query(`UPDATE ctfs SET admin_role_snowflake = $1 WHERE id = ${this.row.id}`, [adminRoleSnowflake]);
+    this.row.admin_role_snowflake = adminRoleSnowflake;
+  }
+
+  async setAnnouncementsChannelSnowflake(announcementsChannelSnowflake: string) {
+    await query(`UPDATE ctfs SET announcements_channel_snowflake = $1 WHERE id = ${this.row.id}`, [announcementsChannelSnowflake]);
+    this.row.announcements_channel_snowflake = announcementsChannelSnowflake;
+  }
 }
 
 export async function fromID(id: number) {
