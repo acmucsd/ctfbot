@@ -1,17 +1,10 @@
 // add schemas to this as we go
 import { schema as ctfSchema } from './ctf';
+import { schema as teamServerSchema } from './teamserver';
 
-export default [ctfSchema,
-  `CREATE TABLE IF NOT EXISTS team_servers (
-    id serial,
-    guild_snowflake text,
-    ctf_id integer REFERENCES ctfs,
-    info_channel_snowflake text,
-    team_category_snowflake text,
-    name text,
-    limit integer,
-    PRIMARY KEY( id )
-  );`,
+export default [
+  ctfSchema,
+  teamServerSchema,
   `CREATE TABLE IF NOT EXISTS users (
     id serial,
     user_snowflake text,
