@@ -1,7 +1,7 @@
 import query from '../database';
 import { CTFRow } from '../schemas/ctf';
 
-class CTF {
+export default class CTF {
   row: CTFRow;
 
   constructor(row: CTFRow) {
@@ -42,14 +42,15 @@ class CTF {
     await query(`UPDATE ctfs SET announcements_channel_snowflake = $1 WHERE id = ${this.row.id}`, [announcementsChannelSnowflake]);
     this.row.announcements_channel_snowflake = announcementsChannelSnowflake;
   }
-}
 
-export async function fromID(id: number) {
-  const { rows } = await query(`SELECT * FROM ctfs WHERE id = ${id}`);
-  return new CTF(rows[0] as CTFRow);
-}
+  // builders
+  static async fromID(id: number) {
+    const { rows } = await query(`SELECT * FROM ctfs WHERE id = ${id}`);
+    return new CTF(rows[0] as CTFRow);
+  }
 
-export async function fromName(name: string) {
-  const { rows } = await query('SELECT * FROM ctfs WHERE name = $1', [name]);
-  return new CTF(rows[0] as CTFRow);
+  static async fromName(name: string) {
+    const { rows } = await query('SELECT * FROM ctfs WHERE name = $1', [name]);
+    return new CTF(rows[0] as CTFRow);
+  }
 }
