@@ -1,6 +1,7 @@
 import { Message } from 'discord.js';
 import { discordConfig } from '../../config';
-import { ping } from './commands';
+import { ctf, ping } from './commands';
+import logger from '../../log/logger';
 
 const { prefix } = discordConfig;
 
@@ -13,9 +14,16 @@ const messageEvent = (message: Message) => {
   switch (command) {
     case 'ping':
       ping(message);
-      return;
+      break;
+    case 'ctf':
+      ctf(message, prefix.length).catch((e: Error) => {
+        logger(`Error: ${e.message} from command "${message.content}"`);
+        void message.channel.send(`Error: ${e.message} from command "${message.content}"`);
+      });
+      break;
     default:
-      message.channel.send(`Command ${command} not recognized`).then(() => {}).catch(() => {});
+      void message.channel.send(`Command ${command} not recognized`);
+      break;
   }
 };
 

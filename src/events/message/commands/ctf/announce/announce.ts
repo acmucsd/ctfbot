@@ -1,5 +1,9 @@
 import { Message } from 'discord.js';
+import ctf from '../../../../../database/models/ctf';
 
-const announce = (message: Message, message: string) => { };
+const announce = async (message: Message, messageToSend: string) => {
+  const CTF:ctf = ctf.fromGuildSnowflake(message.guild.id);
+  await CTF.setDescription(messageToSend);
+};
 
 export default announce;

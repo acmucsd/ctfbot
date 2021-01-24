@@ -54,6 +54,10 @@ export default class CTF {
     return new CTF(rows[0] as CTFRow);
   }
 
+  static fromGuildSnowflake(snowflake: string) {
+    return new CTF(null);
+  }
+
   // create a new CTF
   static async createCTF(name: string, guildSnowflake: string) {
     // check if a CTF already exists in this guild
