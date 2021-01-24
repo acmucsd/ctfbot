@@ -8,11 +8,6 @@ export default class Categories {
     this.row = row;
   }
 
-  async setCTFId(ctf_id: number) {
-    await query(`UPDATE categories SET ctf_id = $1 WHERE id = ${this.row.id}`, [ctf_id]);
-    this.row.ctf_id = ctf_id;
-  }
-
   async setName(name: string) {
     await query(`UPDATE categories SET name = $1 WHERE id = ${this.row.id}`, [name]);
     this.row.name = name;

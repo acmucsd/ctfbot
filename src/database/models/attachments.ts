@@ -8,6 +8,11 @@ export default class Attachments {
     this.row = row;
   }
 
+  async setChallengeID(challenge_id: number) {
+    await query(`UPDATE attachments SET challenge_id = $1 WHERE id = ${this.row.id}`, [challenge_id]);
+    this.row.challenge_id = challenge_id;
+  }
+
   async setName(name: string) {
     await query(`UPDATE attachments SET name = $1 WHERE id = ${this.row.id}`, [name]);
     this.row.name = name;
@@ -16,11 +21,6 @@ export default class Attachments {
   async setURL(url: string) {
     await query(`UPDATE attachments SET url = $1 WHERE id = ${this.row.id}`, [url]);
     this.row.url = url;
-  }
-
-  async setChallengeID(challenge_id: number) {
-    await query(`UPDATE attachments SET challenge_id = $1 WHERE id = ${this.row.id}`, [challenge_id]);
-    this.row.challenge_id = challenge_id;
   }
 
   async deleteAttachment() {
