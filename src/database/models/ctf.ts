@@ -54,8 +54,9 @@ export default class CTF {
     return new CTF(rows[0] as CTFRow);
   }
 
-  static fromGuildSnowflake(snowflake: string) {
-    return new CTF(null);
+  static async fromGuildSnowflake(guild_snowflake: string) {
+    const { rows } = await query('SELECT * FROM ctfs WHERE guild_snowflake = $1', [guild_snowflake]);
+    return new CTF(rows[0] as CTFRow);
   }
 
   // create a new CTF
