@@ -151,6 +151,8 @@ Deletes the team indicated, or infers the team to delete, firstly from the curre
 
 Creates a new category with the provided name and description. This automatically creates a channel category with the same name in the main CTF guild.
 
+**Note**: Category names are **unique** per CTF.
+
 #### editing categories
 ```java
 /category set name NEW_NAME NAME
@@ -188,6 +190,8 @@ Creates a new CTF challenge. This also creates a challenge text channel in its c
 * **Flag** defaults to a randomly generated string resembling `flag{9a39mHrasu8MVZ32x4Kg}`.
 
 All of these settings can be changed in further commands.
+
+**Note**: Challenge names are **unique** per CTF.
 
 #### editing challenges
 ```java
