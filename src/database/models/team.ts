@@ -53,6 +53,13 @@ export default class Team {
     return new Invite(rows[0] as InviteRow);
   }
 
+  async makeUser(user_snowflake: string, tos_accepted: boolean) {
+    // Check
+
+    const { rows } = await query(`INSERT INTO users(user_snowflake, team_id, tos_accepted) VALUES ($1, ${this.row.id}, $2) RETURNING *`, [user_snowflake, tos_accepted]);
+    return new Invite(rows[0] as InviteRow);
+  }
+
   async deleteTeam() {
     await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
   }
