@@ -8,7 +8,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS attempts (
   PRIMARY KEY( id )
 );`;
 
-export interface AttemptsRow {
+export interface AttemptRow {
   id: number,
   challenge_id: number,
   user_id: number,

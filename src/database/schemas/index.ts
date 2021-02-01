@@ -1,13 +1,13 @@
 import { Pool } from 'pg';
 import { schema as ctfSchema } from './ctf';
 import { schema as teamServerSchema } from './teamserver';
-import { schema as teamsSchema } from './teams';
-import { schema as usersSchema } from './users';
-import { schema as invitesSchema } from './invites';
-import { schema as categoriesSchema } from './categories';
-import { schema as challengesSchema } from './challenges';
-import { schema as attemptsSchema } from './attempts';
-import { schema as attachmentsSchema } from './attachments';
+import { schema as teamsSchema } from './team';
+import { schema as usersSchema } from './user';
+import { schema as invitesSchema } from './invite';
+import { schema as categoriesSchema } from './category';
+import { schema as challengesSchema } from './challenge';
+import { schema as attemptsSchema } from './attempt';
+import { schema as attachmentsSchema } from './attachment';
 
 // add schemas to this as we go
 const schemas = [

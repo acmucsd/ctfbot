@@ -6,7 +6,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS invites (
   PRIMARY KEY( id )
 );`;
 
-export interface InvitesRow {
+export interface InviteRow {
   id: number,
   user_id: number,
   team_id: number,

@@ -10,7 +10,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS teams (
   PRIMARY KEY( id )
 );`;
 
-export interface TeamsRow {
+export interface TeamRow {
   id: number,
   team_role_snowflake: string,
   text_channel_snowflake: string,

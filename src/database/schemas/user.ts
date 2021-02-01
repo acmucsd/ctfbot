@@ -6,9 +6,9 @@ export const schema = `CREATE TABLE IF NOT EXISTS users (
   PRIMARY KEY( id )
 );`;
 
-export interface UsersRow {
-  is: number,
-  user_string: string,
+export interface UserRow {
+  id: number,
+  user_snowflake: string,
   team_id: string,
   tos_accepted: boolean
 }

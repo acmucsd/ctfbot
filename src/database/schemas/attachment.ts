@@ -6,7 +6,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS attachments (
   PRIMARY KEY( id )
 );`;
 
-export interface AttachmentsRow {
+export interface AttachmentRow {
   id: number,
   challenge_id: number,
   name: string,

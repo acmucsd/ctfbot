@@ -7,7 +7,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS categories (
   PRIMARY KEY( id )
 );`;
 
-export interface CategoriesRow {
+export interface CategoryRow {
   id: number,
   ctf_id: number,
   name: string,

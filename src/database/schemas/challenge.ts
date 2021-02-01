@@ -15,7 +15,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS challenges (
   PRIMARY KEY( id )
 );`;
 
-export interface ChallengesRow {
+export interface ChallengeRow {
   id: number,
   category_id: number,
   channel_snowflake: string,
