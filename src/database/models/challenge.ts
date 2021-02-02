@@ -1,7 +1,9 @@
 import query from '../database';
 import { AttachmentRow } from '../schemas/attachment';
+import { AttemptRow } from '../schemas/attempt';
 import { ChallengeRow } from '../schemas/challenge';
 import Attachment from './attachment';
+import Attempt from './attempt';
 
 export default class Challenge {
   row: ChallengeRow;
@@ -10,14 +12,14 @@ export default class Challenge {
     this.row = row;
   }
 
+  /** Challenge Creation / Deletion */
   // makeChallenge made in Category
 
-  // Unique per CTF, valid for CTF guild
-  async setChannelSnowflake(channel_snowflake: string) {
-    await query(`UPDATE attachments SET channel_snowflake = $1 WHERE id = ${this.row.id}`, [channel_snowflake]);
-    this.row.channel_snowflake = channel_snowflake;
+  async deleteChallenge() {
+    await query(`DELETE FROM challenges WHERE id = ${this.row.id}`);
   }
 
+  /** Challenge Setters */
   // Unique per CTF
   async setName(name: string) {
     await query(`UPDATE attachments SET name = $1 WHERE id = ${this.row.id}`, [name]);
@@ -70,10 +72,7 @@ export default class Challenge {
     this.row.publish_time = publish_time;
   }
 
-  async deleteChallenge() {
-    await query(`DELETE FROM challenges WHERE id = ${this.row.id}`);
-  }
-
+  /** Attachment Creation */
   async createAttachment(name: string, url: string) {
     // check if a attachment already exists with that name for the challenge
     const { rows: existingRows } = await query(`SELECT id FROM attachments WHERE name = $1 and challenge_id = ${this.row.id}`, [name]);
@@ -81,5 +80,22 @@ export default class Challenge {
 
     const { rows } = await query(`INSERT INTO attachments(challenge_id, name, url) VALUES (${this.row.id}, $1, $2) RETURNING *`, [name, url]);
     return new Attachment(rows[0] as AttachmentRow);
+  }
+
+  /** Attachment Retrieval */
+  async fromNameAttachment(name: string) {
+    const { rows } = await query(`SELECT * FROM attachments WHERE name = $1 and challenge_id = ${this.row.id}`, [name]);
+    return new Attachment(rows[0] as AttachmentRow);
+  }
+
+  async getAllAttachments() {
+    const { rows } = await query(`SELECT * FROM attachments WHERE challenge_id = ${this.row.id}`);
+    return rows.map((row) => new Attachment(row as AttachmentRow));
+  }
+
+  /** Attempt Getter */
+  async getAllAttempts() {
+    const { rows } = await query(`SELECT * FROM attempts WHERE challenge_id = ${this.row.id}`);
+    return rows.map((row) => new Attempt(row as AttemptRow));
   }
 }

@@ -12,5 +12,5 @@ export interface CategoryRow {
   ctf_id: number,
   name: string,
   channel_category_snowflake: string,
-  description: string
+  description: string | null
 }

@@ -13,8 +13,8 @@ export interface TeamServerRow {
   id: number,
   guild_snowflake: string,
   ctf_id: number,
-  info_channel_snowflake: string,
-  team_category_snowflake: string,
+  info_channel_snowflake: string | null,
+  team_category_snowflake: string | null,
   name: string,
-  team_limit: string
+  team_limit: number
 }

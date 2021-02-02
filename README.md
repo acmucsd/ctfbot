@@ -248,8 +248,8 @@ All users in the server are able to use these commands regardless of admin statu
 
 #### joining a team
 ```java
-/team invite [DISCORD_USERNAME]
-/team join [TEAM_NAME]
+/team invite DISCORD_USERNAME
+/team join TEAM_NAME
 ```
 
 Invite allows for the owner of a team to invite a user within the CTF to their current 
@@ -269,9 +269,9 @@ how to do it properly in the main server
 
 #### team management
 ```java
-/team set name [NAME]
-/team set description [DESCRIPTION]
-/team set color [COLOR]
+/team set name NAME
+/team set description DESCRIPTION
+/team set color COLOR
 ```
 
 Similar to the admin only commands, these take in no argument for team and will only affect
@@ -298,7 +298,7 @@ team will be inferred.
 
 #### challenges
 ```java
-/challenge submit [CHALLENGE_NAME] [FLAG]
+/challenge submit CHALLENGE_NAME FLAG
 ```
 
 Allows a user to submit a flag for a specified challenge, only counting the attempt as valid if the 

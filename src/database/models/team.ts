@@ -2,6 +2,8 @@ import Invite from './invite';
 import query from '../database';
 import { InviteRow } from '../schemas/invite';
 import { TeamRow } from '../schemas/team';
+import { UserRow } from '../schemas/user';
+import User from './user';
 
 export default class Team {
   row: TeamRow;
@@ -10,17 +12,28 @@ export default class Team {
     this.row = row;
   }
 
+  /** Team Creation / Deletion */
   // makeTeam made in TeamServer
 
-  // Valid Role in the TeamServer, unique among other Teams
-  async setTeamRoleSnowflake(team_role_snowflake: string) {
-    await query(`UPDATE teams SET team_role_snowflake = $1 WHERE id = ${this.row.id}`, [team_role_snowflake]);
-    this.row.team_role_snowflake = team_role_snowflake;
+  async deleteTeam() {
+    await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
   }
 
-  // Valid Channel in the TeamServer, unique among other Teams
-  async setTeamChannelSnowflake(text_channel_snowflake: string) {
-    await query(`UPDATE teams SET text_channel_snowflake = $1 WHERE id = ${this.row.id}`, [text_channel_snowflake]);
+  /** Team Setters */
+  // Valid Role in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
+  async setTeamRoleSnowflakeTeamServer(team_role_snowflake_team_server: string) {
+    await query(`UPDATE teams SET team_role_snowflake = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`);
+    this.row.team_role_snowflake_team_server = team_role_snowflake_team_server;
+  }
+
+  async setTeamRoleSnowflakeMain(team_role_snowflake_main: string) {
+    await query(`UPDATE teams SET team_role_snowflake_main = ${team_role_snowflake_main} WHERE id = ${this.row.id}`);
+    this.row.team_role_snowflake_main = team_role_snowflake_main;
+  }
+
+  // Valid Channel in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
+  async setTextChannelSnowflake(text_channel_snowflake: string) {
+    await query(`UPDATE teams SET text_channel_snowflake = ${text_channel_snowflake} WHERE id = ${this.row.id}`);
     this.row.text_channel_snowflake = text_channel_snowflake;
   }
 
@@ -45,22 +58,30 @@ export default class Team {
     this.row.color = color;
   }
 
-  async createInvite(user_id: number, was_invited: boolean) {
+  async setCaptain(captain_user_id: number) {
+    await query(`UPDATE teams SET captain_user_id = $1 WHERE id = ${this.row.id}`, [captain_user_id]);
+    this.row.captain_user_id = captain_user_id;
+  }
+
+  /** Invite Creation */
+  async createInvite(user_id: number) {
     const { rows: existingRows } = await query(`SELECT id FROM invites WHERE team_id = ${this.row.id} and user_id = $1`, [user_id]);
-    if (existingRows && existingRows.length > 0) throw new Error('invite already exists for this user');
+    if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
 
-    const { rows } = await query(`INSERT INTO categories(user_id, team_id, was_invited) VALUES ($1, ${this.row.id}, $2) RETURNING *`, [user_id, was_invited]);
+    const { rows } = await query(`INSERT INTO invites(user_id, team_id, was_invited) VALUES ($1, ${this.row.id}, true) RETURNING *`, [user_id]);
     return new Invite(rows[0] as InviteRow);
   }
 
-  async makeUser(user_snowflake: string, tos_accepted: boolean) {
-    // Check
-
-    const { rows } = await query(`INSERT INTO users(user_snowflake, team_id, tos_accepted) VALUES ($1, ${this.row.id}, $2) RETURNING *`, [user_snowflake, tos_accepted]);
+  /** Invite Retrieval */
+  async fromUserIDInvite(user_id: number) {
+    const { rows } = await query(`SELECT * FROM invites WHERE team_id = ${this.row.id} and user_id = $1`, [user_id]);
+    if (rows.length === 0) throw new Error('no invite for that user');
     return new Invite(rows[0] as InviteRow);
   }
 
-  async deleteTeam() {
-    await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
+  /** User Retrieval */
+  async getAllUsers() {
+    const { rows } = await query(`SELECT * FROM users WHERE team_id = ${this.row.id}`);
+    return rows.map((row) => new User(row as UserRow));
   }
 }

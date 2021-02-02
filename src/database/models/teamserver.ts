@@ -10,50 +10,55 @@ export default class TeamServer {
     this.row = row;
   }
 
+  /** TeamServer Creation / Deletion */
   // createTeamServer made in CTF
-
-  // Unique among ALL TeamServers
-  async setGuildSnowflake(guild_snowflake: string) {
-    await query(`UPDATE teamservers SET guild_snowflake = $1 WHERE id = ${this.row.id}`, [guild_snowflake]);
-    this.row.guild_snowflake = guild_snowflake;
-  }
-
-  async setCTFID(ctf_id: number) {
-    await query(`UPDATE teamservers SET ctf_id = $1 WHERE id = ${this.row.id}`, [ctf_id]);
-    this.row.ctf_id = ctf_id;
-  }
-
-  // Unique among other channels, valid for the TeamServer guild
-  async setInfoChannelSnowflake(info_channel_snowflake: string) {
-    await query(`UPDATE teamservers SET info_channel_snowflake = $1 WHERE id = ${this.row.id}`, [info_channel_snowflake]);
-    this.row.info_channel_snowflake = info_channel_snowflake;
-  }
-
-  // Unique among other channels, valid for the TeamServer guild
-  async setTeamCategorySnowflake(team_category_snowflake: string) {
-    await query(`UPDATE teamservers SET team_category_snowflake = $1 WHERE id = ${this.row.id}`, [team_category_snowflake]);
-    this.row.team_category_snowflake = team_category_snowflake;
-  }
-
-  // Unique per CTF
-  async setName(name: string) {
-    await query(`UPDATE teamservers SET name = $1 WHERE id = ${this.row.id}`, [name]);
-    this.row.name = name;
-  }
-
-  async setTeamLimit(team_limit: string) {
-    await query(`UPDATE teamservers SET team_limit = $1 WHERE id = ${this.row.id}`, [team_limit]);
-    this.row.team_limit = team_limit;
-  }
-
-  async makeTeam(team_role_snowflake: string, text_channel_snowflake: string, name: string, description: string, color: string) {
-    // Checks
-
-    const { rows } = await query(`INSERT INTO teams(team_role_snowflake, text_channel_snowflake, team_server_id, name, description, color) VALUES ($1, ${this.row.id}, $2, $3, $4, $5) RETURNING *`, [team_role_snowflake, text_channel_snowflake, name, description, color]);
-    return new Team(rows[0] as TeamRow);
-  }
 
   async deleteTeamServer() {
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
+  }
+
+  /** TeamServer Setters */
+  // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
+  async setInfoChannelSnowflake(info_channel_snowflake: string) {
+    await query(`UPDATE teamservers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
+    this.row.info_channel_snowflake = info_channel_snowflake;
+  }
+
+  // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
+  async setTeamCategorySnowflake(team_category_snowflake: string) {
+    await query(`UPDATE teamservers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`);
+    this.row.team_category_snowflake = team_category_snowflake;
+  }
+
+  /** Team Creation */
+  async makeTeam(name: string) {
+    // Checks
+
+    const { rows } = await query(`INSERT INTO teams(team_server_id, name) VALUES ($1, ${this.row.id}) RETURNING *`, [name]);
+    return new Team(rows[0] as TeamRow);
+  }
+
+  /** Team Retrieval */
+  async fromNameTeam(name: string) {
+    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and name = $1`, [name]);
+    if (rows.length === 0) throw new Error('no team with that name in this ctf');
+    return new Team(rows[0] as TeamRow);
+  }
+
+  static async fromRoleTeam(team_role_snowflake: string) {
+    const { rows } = await query('SELECT * FROM teams WHERE team_role_snowflake_main = $1 or team_role_snowflake_team_server = $1 ', [team_role_snowflake]);
+    if (rows.length === 0) throw new Error('no team with that role in this server');
+    return new Team(rows[0] as TeamRow);
+  }
+
+  static async fromChannelTeam(text_channel_snowflake: string) {
+    const { rows } = await query('SELECT * FROM teams WHERE  and text_channel_snowflake = $1', [text_channel_snowflake]);
+    if (rows.length === 0) throw new Error('no team associated with that channel');
+    return new Team(rows[0] as TeamRow);
+  }
+
+  async getAllTeams() {
+    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id}`);
+    return rows.map((row) => new Team(row as TeamRow));
   }
 }

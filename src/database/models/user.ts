@@ -1,7 +1,9 @@
 import query from '../database';
 import { AttemptRow } from '../schemas/attempt';
+import { InviteRow } from '../schemas/invite';
 import { UserRow } from '../schemas/user';
 import Attempt from './attempt';
+import Invite from './invite';
 
 export default class User {
   row: UserRow;
@@ -10,8 +12,14 @@ export default class User {
     this.row = row;
   }
 
-  // makeUser made in Team(?)
+  /** User Creation / Deletion */
+  // makeUser made in Team
 
+  async deleteUser() {
+    await query(`DELETE FROM users WHERE id = ${this.row.id}`);
+  }
+
+  /** User Setters */
   // Unique per CTF
   async setUserSnowflake(user_snowflake: string) {
     await query(`UPDATE users SET user_snowflake = $1 WHERE id = ${this.row.id}`, [user_snowflake]);
@@ -28,12 +36,31 @@ export default class User {
     this.row.tos_accepted = tos_accepted;
   }
 
+  /** Invite Creation */
+  async createInvite(team_id: number) {
+    const { rows: existingRows } = await query(`SELECT id FROM invites WHERE team_id = $1 and user_id = ${this.row.id}`, [team_id]);
+    if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
+
+    const { rows } = await query(`INSERT INTO invites(user_id, team_id, was_invited) VALUES (${this.row.id}, $1, false) RETURNING *`, [team_id]);
+    return new Invite(rows[0] as InviteRow);
+  }
+
+  /** Invite Retrieval */
+  async fromTeamIDInvite(team_id: number) {
+    const { rows } = await query(`SELECT * FROM invites WHERE user_id = ${this.row.id} and team_id = $1`, [team_id]);
+    if (rows.length === 0) throw new Error('no invite for that team');
+    return new Invite(rows[0] as InviteRow);
+  }
+
+  /** Attempt Creation */
   async createAttempt(challenge_id: number, attempted_flag: string, successful: boolean, timestamp: Date) {
     const { rows } = await query(`INSERT INTO attempts(challenge_id, user_id, attempted_flag, successful, timestamp) VALUES ($1, ${this.row.id}, $2, $3, $4) RETURNING *`, [challenge_id, attempted_flag, successful, timestamp]);
     return new Attempt(rows[0] as AttemptRow);
   }
 
-  async deleteUser() {
-    await query(`DELETE FROM users WHERE id = ${this.row.id}`);
+  /** Attempt Retrieval */
+  async getAllAttempts() {
+    const { rows } = await query(`SELECT * FROM attempts WHERE user_id = ${this.row.id}`);
+    return rows.map((row) => new Attempt(row as AttemptRow));
   }
 }

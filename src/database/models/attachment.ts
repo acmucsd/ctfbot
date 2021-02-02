@@ -8,8 +8,14 @@ export default class Attachment {
     this.row = row;
   }
 
+  /** Attachment Creation */
   // makeAttachment made in Challenge
 
+  async deleteAttachment() {
+    await query(`DELETE FROM attachmets WHERE id = ${this.row.id}`);
+  }
+
+  /** Attachment Setters */
   // Needed?
   async setChallengeID(challenge_id: number) {
     await query(`UPDATE attachments SET challenge_id = $1 WHERE id = ${this.row.id}`, [challenge_id]);
@@ -25,19 +31,5 @@ export default class Attachment {
   async setURL(url: string) {
     await query(`UPDATE attachments SET url = $1 WHERE id = ${this.row.id}`, [url]);
     this.row.url = url;
-  }
-
-  async deleteAttachment() {
-    await query(`DELETE FROM attachmets WHERE id = ${this.row.id}`);
-  }
-
-  static async fromID(id: number) {
-    const { rows } = await query(`SELECT * FROM attachments WHERE id = ${id}`);
-    return new Attachment(rows[0] as AttachmentRow);
-  }
-
-  static async fromChallengeByName(name: string) {
-    const { rows } = await query('SELECT * FROM attachments WHERE name = $1', [name]);
-    return new Attachment(rows[0] as AttachmentRow);
   }
 }
