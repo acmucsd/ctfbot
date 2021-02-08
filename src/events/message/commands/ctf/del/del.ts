@@ -2,7 +2,7 @@ import { Message } from 'discord.js';
 import ctf from '../../../../../database/models/ctf';
 
 const del = async (message: Message) => {
-  const CTF = ctf.fromGuildSnowflake(message.guild.id);
+  const CTF = await ctf.fromGuildSnowflakeCTF(message.guild.id);
   await CTF.deleteCTF();
 };
 
