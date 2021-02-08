@@ -8,9 +8,11 @@ export const schema = `CREATE TABLE IF NOT EXISTS teams (
   name text,
   description text,
   color text,
-  captain_user_id ingeger REFERENCES users
   PRIMARY KEY( id )
 );`;
+
+// no captain user yet due to an initialization error
+// captain_user_id integer REFERENCES users,
 
 export interface TeamRow {
   id: number,
