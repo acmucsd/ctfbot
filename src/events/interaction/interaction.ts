@@ -1,13 +1,15 @@
-import example from './example_interaction';
-import { Interaction } from './interaction_type';
+import { Client } from 'discord.js';
 import {
   category, challenge, ctf, scoreboard, team,
 } from './commands';
+import CommandInteraction from './compat/CommandInteraction';
+import log from '../../log';
+import { createCommand } from './compat/commands';
 
-const interactionEvent = (interaction: Interaction = example) => {
+export const interactionEvent = (interaction: CommandInteraction) => {
   if (interaction.type === 2) {
     // eslint-ignore-next-line
-    switch (interaction.data.name) {
+    switch (interaction.commandName) {
       case ('category'):
         // category(interaction);
         break;
@@ -24,10 +26,18 @@ const interactionEvent = (interaction: Interaction = example) => {
         // team(interaction);
         break;
       default:
-        console.log();
+        log('no interactions found');
         break;
     }
   }
 };
 
-export default interactionEvent;
+export const registerCommands = async (client: Client) => {
+  log('registering commands...');
+  await createCommand(client, {
+    name: 'ping',
+    description: 'sends a ping command',
+    options: [],
+  });
+  log('commands registered');
+};

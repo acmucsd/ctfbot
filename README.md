@@ -305,3 +305,9 @@ Allows a user to submit a flag for a specified challenge, only counting the atte
 challenge name is valid. If the name is a valid challenge, then the bot checks to assure the flag is
 correct, adjusting the user's attempts total accordingly with correct and incorrect attempts. If correct,
 first blood checks are done along with adjusting of points for that challenge.
+
+## notes
+
+A quick note about Slash Command support: We got tired of waiting for discord.js to support Slash Commands,
+so we've used [this PR](https://github.com/discordjs/discord.js/pull/5106/files) as a reference for creating
+our workarounds until it IS officially supported.
