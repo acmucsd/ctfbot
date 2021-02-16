@@ -1,7 +1,6 @@
 import {
   Channel, Client, Guild, GuildMember, Snowflake, User,
 } from 'discord.js';
-import { InteractionType } from './constants';
 import { InteractionData } from './types';
 
 export default class Interaction {
@@ -31,10 +30,10 @@ export default class Interaction {
 
     /**
      * Type of this interaction.
-     * @type {string}
+     * @type {number}
      * @readonly
      */
-    this.type = InteractionType[data.type];
+    this.type = data.type;
 
     /**
      * ID of this interaction.
@@ -55,14 +54,14 @@ export default class Interaction {
      * @type {?Channel}
      * @readonly
      */
-    this.channel = this.client.channels?.cache.get(data.channel_id) || null;
+    this.channel = this.client.channels?.cache.get(data.channel_id) ?? null;
 
     /**
      * If this interaction was sent in a DM, the user which sent it.
      * @type {?User}
      * @readonly
      */
-    this.user = this.client.users?.add(data.user, false) ?? null;
+    this.user = data.user ? this.client.users?.add(data.user, false) : null;
 
     /**
      * The guild this interaction was sent in, if any.
@@ -76,6 +75,6 @@ export default class Interaction {
      * @type {?GuildMember}
      * @readonly
      */
-    this.member = this.guild?.members.add(data.member, false) ?? null;
+    this.member = data.member ? this.guild?.members.add(data.member, false) : null;
   }
 }

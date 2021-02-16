@@ -1,7 +1,7 @@
-import { Message } from 'discord.js';
+import CommandInteraction from '../../compat/CommandInteraction';
 
-const ping = (message: Message) => {
-  message.channel.send('pong').then(() => {}).catch(() => {});
+const ping = (interaction: CommandInteraction) => {
+  void interaction.reply('pong');
 };
 
 export default ping;

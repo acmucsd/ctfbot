@@ -1,14 +1,14 @@
 import { Client } from 'discord.js';
 import {
-  category, challenge, ctf, scoreboard, team,
+  category, challenge, ctf, scoreboard, team, ping,
 } from './commands';
 import CommandInteraction from './compat/CommandInteraction';
 import log from '../../log';
 import { createCommand } from './compat/commands';
 
 export const interactionEvent = (interaction: CommandInteraction) => {
+  log(JSON.stringify(interaction));
   if (interaction.type === 2) {
-    // eslint-ignore-next-line
     switch (interaction.commandName) {
       case ('category'):
         // category(interaction);
@@ -25,6 +25,9 @@ export const interactionEvent = (interaction: CommandInteraction) => {
       case ('team'):
         // team(interaction);
         break;
+      case ('ping'):
+        ping(interaction);
+        break;
       default:
         log('no interactions found');
         break;
@@ -38,6 +41,6 @@ export const registerCommands = async (client: Client) => {
     name: 'ping',
     description: 'sends a ping command',
     options: [],
-  });
+  }, '808487147853447216');
   log('commands registered');
 };

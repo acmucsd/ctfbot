@@ -8,7 +8,7 @@ export default class CommandInteraction extends Interaction {
 
   commandName: string;
 
-  options: InteractionOptions;
+  options?: InteractionOptions;
 
   constructor(client: Client, data: CommandInteractionData) {
     super(client, data);
@@ -18,21 +18,21 @@ export default class CommandInteraction extends Interaction {
      * @type {Snowflake}
      * @readonly
      */
-    this.commandID = data.id;
+    this.commandID = data.data.id;
 
     /**
      * The name of the invoked command.
      * @type {string}
      * @readonly
      */
-    this.commandName = data.name;
+    this.commandName = data.data.name;
 
     /**
      * The options passed to the command.
      * @type {Object}
      * @readonly
      */
-    this.options = data.options;
+    this.options = data.data.options;
   }
   /* eslint-disable */
   async reply(content) {
@@ -40,7 +40,7 @@ export default class CommandInteraction extends Interaction {
     await this.client.api.interactions(this.id, this.token).callback.post({
       data: {
         type: InteractionResponseType.CHANNEL_MESSAGE,
-        data: content
+        data: { content }
       },
     });
   }

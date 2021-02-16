@@ -33,8 +33,7 @@ export function registerInteractionEvent(client: Client, listener) {
           type: InteractionResponseType.PONG,
         };
       case InteractionType.APPLICATION_COMMAND: {
-        logger('new command interaction', interaction)
-        listener(new CommandInteraction(this.client, interaction.data));
+        listener(new CommandInteraction(client, interaction));
       }
     }
   });

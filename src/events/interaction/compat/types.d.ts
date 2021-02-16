@@ -29,8 +29,11 @@ export interface InteractionData {
 }
 
 export interface CommandInteractionData extends InteractionData {
-  name: string,
-  options: InteractionOptions
+  data: {
+    id: string,
+    name: string,
+    options: InteractionOptions
+  }
 }
 
 export interface InteractionOptions {
