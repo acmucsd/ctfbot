@@ -31,8 +31,6 @@ export function registerInteractionEvent(client: Client, listener) {
           type: InteractionResponseType.PONG,
         };
       case InteractionType.APPLICATION_COMMAND: {
-        logger(interaction);
-        logger(JSON.stringify(interaction.data));
         listener(new CommandInteraction(client, interaction));
       }
     }

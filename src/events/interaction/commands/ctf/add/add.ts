@@ -1,5 +1,5 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandResponseOption } from '../../../compat/types';
+import { CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'add',
@@ -19,7 +19,7 @@ export default {
       required: false,
     },
   ],
-  execute(interaction: CommandInteraction, options: ApplicationCommandResponseOption) {
+  execute(interaction: CommandInteraction, options: CommandOptionMap) {
     return `this command (/ctf add) has not been implemented yet, but you provided ${JSON.stringify(options)}`;
   },
 };

@@ -1,5 +1,5 @@
 import CommandInteraction from '../../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandResponseOption } from '../../../../compat/types';
+import { ApplicationCommandDefinition, CommandOptionMap } from '../../../../compat/types';
 
 export default {
   name: 'end',
@@ -13,7 +13,7 @@ export default {
       required: false,
     },
   ],
-  execute(interaction: CommandInteraction, options: ApplicationCommandResponseOption) {
+  execute(interaction: CommandInteraction, options: CommandOptionMap) {
     return `this command (${interaction.commandID}) has not been implemented yet`;
   },
 } as ApplicationCommandDefinition;

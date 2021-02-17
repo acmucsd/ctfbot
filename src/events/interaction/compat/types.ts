@@ -24,8 +24,9 @@ export interface ApplicationCommandResponse {
 
 export interface ApplicationCommandDefinition extends ApplicationCommandRequest {
   type?: ApplicationCommandOptionType
-  execute?: (CommandInteraction, ApplicationCommandResponseOption) => Promise<string> | string | void
+  execute?: (CommandInteraction, CommandOptionMap) => Promise<string> | string | void
 }
+export interface CommandOptionMap { [key: string]: string | number }
 
 export interface RegisteredCommand extends ApplicationCommandRequest {
   id: string,
