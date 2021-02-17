@@ -1,8 +1,8 @@
-import CommandInteraction from '../../../../compat/CommandInteraction';
+import CommandInteraction from '../../../compat/CommandInteraction';
 import {
   ApplicationCommandDefinition,
   CommandOptionMap,
-} from '../../../../compat/types';
+} from '../../../compat/types';
 
 export default {
   name: 'start',

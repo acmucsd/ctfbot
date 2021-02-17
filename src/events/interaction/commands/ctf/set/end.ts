@@ -1,5 +1,5 @@
-import CommandInteraction from '../../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../../compat/types';
+import CommandInteraction from '../../../compat/CommandInteraction';
+import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'end',

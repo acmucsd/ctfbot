@@ -1,14 +1,14 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
 
 export default {
-  name: 'announce',
-  description: 'Posts the message provided to the official CTF #announcements channel',
+  name: 'name',
+  description: 'Set the name of the CTF',
   type: 1,
   options: [
     {
-      name: 'message',
-      description: 'The message to post to #announcements',
+      name: 'name',
+      description: 'The desired name',
       type: 3,
       required: true,
     },
@@ -16,4 +16,4 @@ export default {
   execute(interaction: CommandInteraction, options: CommandOptionMap) {
     return `this command (${interaction.commandID}) has not been implemented yet`;
   },
-};
+} as ApplicationCommandDefinition;
