@@ -1,11 +1,18 @@
-import { Message } from 'discord.js';
-
 import add from './add';
 import announce from './announce';
 import del from './del';
 import server from './server';
 import set from './set';
+import { ApplicationCommandDefinition } from '../../compat/types';
 
-const ctf = (message: Message) => { };
-
-export default ctf;
+export default {
+  name: 'ctf',
+  description: 'Add or manage aspects of CTFs',
+  options: [
+    add,
+    announce,
+    del,
+    server,
+    set,
+  ],
+} as ApplicationCommandDefinition;

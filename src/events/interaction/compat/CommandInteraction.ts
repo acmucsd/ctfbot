@@ -1,14 +1,13 @@
 import { Client } from 'discord.js';
 import Interaction from './Interaction';
-import { CommandInteractionData, InteractionOptions } from './types';
-import { InteractionResponseType } from './constants';
+import { ApplicationCommandOption, CommandInteractionData, InteractionResponseType } from './types';
 
 export default class CommandInteraction extends Interaction {
   commandID: string;
 
   commandName: string;
 
-  options?: InteractionOptions;
+  options?: ApplicationCommandOption[];
 
   constructor(client: Client, data: CommandInteractionData) {
     super(client, data);
@@ -35,12 +34,12 @@ export default class CommandInteraction extends Interaction {
     this.options = data.data.options;
   }
   /* eslint-disable */
-  async reply(content) {
+  async reply(data) {
     // @ts-ignore
     await this.client.api.interactions(this.id, this.token).callback.post({
       data: {
         type: InteractionResponseType.CHANNEL_MESSAGE,
-        data: { content }
+        data
       },
     });
   }

@@ -1,6 +1,5 @@
 import { Client, Snowflake } from 'discord.js';
-import { ApplicationCommandOptionType } from './constants';
-import { CommandOption, RegisteredCommand } from './types';
+import { ApplicationCommandOption, RegisteredCommand } from './types';
 
 export default class ApplicationCommand {
   client: Client;
@@ -15,7 +14,7 @@ export default class ApplicationCommand {
 
   description: string;
 
-  options: CommandOption[];
+  options: ApplicationCommandOption[];
 
   constructor(client: Client, data: RegisteredCommand, guildID: Snowflake) {
     /**
@@ -65,12 +64,11 @@ export default class ApplicationCommand {
      * @type {Object[]}
      * @readonly
      */
-    this.options = data.options?.map(function m(o):CommandOption {
+    this.options = data.options?.map(function m(o):ApplicationCommandOption {
       return {
-        type: ApplicationCommandOptionType[o.type],
+        type: o.type,
         name: o.name,
         description: o.description,
-        default: o.default,
         required: o.required,
         choices: o.choices,
         options: o.options?.map(m),

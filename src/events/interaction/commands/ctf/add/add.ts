@@ -1,5 +1,25 @@
-import { Message } from 'discord.js';
+import CommandInteraction from '../../../compat/CommandInteraction';
+import { ApplicationCommandResponseOption } from '../../../compat/types';
 
-const add = (message: Message, name: string, description?: string) => { };
-
-export default add;
+export default {
+  name: 'add',
+  description: 'Creates a new CTF in the current guild',
+  type: 1,
+  options: [
+    {
+      name: 'name',
+      description: 'The name of the CTF',
+      type: 3,
+      required: true,
+    },
+    {
+      name: 'description',
+      description: 'An optional description of the CTF',
+      type: 3,
+      required: false,
+    },
+  ],
+  execute(interaction: CommandInteraction, options: ApplicationCommandResponseOption) {
+    return `this command (/ctf add) has not been implemented yet, but you provided ${JSON.stringify(options)}`;
+  },
+};
