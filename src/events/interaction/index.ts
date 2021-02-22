@@ -1,1 +1,1 @@
-export { interactionEvent } from './interaction';
+export { interactionEvent as default } from './interaction';

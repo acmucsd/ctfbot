@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 import readyEvent from './ready';
 import messageEvent from './message';
-import { interactionEvent } from './interaction';
+import interactionEvent from './interaction';
 import { registerInteractionEvent } from './interaction/compat/commands';
 
 export default (client: Client) => {
