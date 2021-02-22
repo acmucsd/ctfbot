@@ -15,7 +15,7 @@ import {
 const commands: ApplicationCommandDefinition[] = [ping, ctf];
 
 // utility to help us access passed options more intuitively
-const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => options.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {});
+const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {});
 
 // recursive function to find the execute command that corresponds with this interaction
 const executeCommand = (interaction: CommandInteraction, response: ApplicationCommandResponse, subcommands: ApplicationCommandDefinition[]): Promise<string> | string | void => {
