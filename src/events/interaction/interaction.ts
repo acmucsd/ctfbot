@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import {
   category, challenge, ctf, ping, scoreboard, team,
 } from './commands';
@@ -33,9 +33,22 @@ const executeCommand = (interaction: CommandInteraction, response: ApplicationCo
 export const interactionEvent = async (interaction: CommandInteraction) => {
   if (interaction.type !== InteractionType.APPLICATION_COMMAND) return;
 
-  const response = await executeCommand(interaction, { name: interaction.commandName, options: interaction.options }, commands);
-  if (response) {
-    await interaction.reply({ content: response });
+  try {
+    const response = await executeCommand(interaction, { name: interaction.commandName, options: interaction.options }, commands);
+    if (response) {
+      await interaction.reply({ content: response });
+    }
+  } catch (_e) {
+    log(_e);
+    // pretty print errors B)
+    const e = (_e as Error);
+    const alert = new MessageEmbed()
+      .setTitle(e.name ?? 'Error')
+      .setColor('e74c3c')
+      .setDescription(e.message ?? 'Unknown cause')
+      .setTimestamp()
+      .setFooter(e.stack.split('\n')[1]);
+    await interaction.reply({ embeds: [alert.toJSON()] });
   }
 };
 
