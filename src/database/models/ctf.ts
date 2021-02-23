@@ -1,6 +1,6 @@
-import { Guild } from 'discord.js';
+import { Client, Guild } from 'discord.js';
 import {
-  Category, TeamServer, User,
+  Category, Team, TeamServer, User,
 } from '.';
 import {
   CategoryRow, CTFRow, TeamServerRow, UserRow,
@@ -127,8 +127,8 @@ export default class CTF {
     const { rows } = await query(`INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`, [guild.id, name, team_limit]);
     logger(`Created new team server "${name}" for ctf "${this.row.name}"`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
-    await teamServer.setInfoChannelSnowflake(await teamServer.makeChannel(guild.client, 'info'));
-    await teamServer.setTeamCategorySnowflake(await teamServer.makeCategory(guild.client, 'Teams'));
+    await teamServer.setInfoChannelSnowflake((await teamServer.makeChannel(guild.client, 'info')).id);
+    await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);
   }
 
   /* Team Server Retrieval */
@@ -159,11 +159,10 @@ export default class CTF {
 
   async printAllTeamServers() {
     const teamServers = await this.getAllTeamServers();
-    if (teamServers.length === 0) {
-      logger(`CTF "${this.row.name}" has no teams`);
-    }
+    const printString = (teamServers.length === 0) ? `CTF "${this.row.name}" has no team servers` : `CTF "${this.row.name}"'s Team Servers are : ${teamServers.map((server) => `${server.row.name}, `).toString().slice(0, -2)}`;
     // extra , in between????
-    logger(`CTF "${this.row.name}"'s Team Servers are : ${teamServers.map((server) => `${server.row.name}, `).toString().slice(0, -2)}`);
+    logger(printString);
+    return (printString);
   }
 
   /** User Creation */
@@ -192,5 +191,98 @@ export default class CTF {
       ctf = await CTF.fromCTFGuildSnowflakeCTF(guild_id);
     }
     return ctf;
+  }
+
+  async makeRole(client: Client, name: string) {
+    const ctfServerGuild = client.guilds.cache.find((guild) => guild.id === this.row.guild_snowflake);
+    const role = await ctfServerGuild.roles.create({ data: { name: `${name}` } });
+    logger(`Made new role "${name}" in CTF guild "${this.row.name}"`);
+    return role;
+  }
+
+  async deleteRole(client: Client, role_snowflake: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const roleToDelete = guild.roles.cache.find((role) => role.id === role_snowflake);
+    if (roleToDelete) {
+      await roleToDelete.delete();
+      logger(`Role with ${role_snowflake} found: deleted that role`);
+      return;
+    }
+    logger(`Role with ${role_snowflake} not found`);
+  }
+
+  async getTeamServerWithSpace() {
+    logger('Seeing what servers have space...');
+    // eslint-disable-next-line
+    const teamServer = (await this.getAllTeamServers()).find(async (server) => (await server.hasSpace()) === true);
+    if (!teamServer) {
+      throw new Error('all team servers are full');
+    }
+    return teamServer;
+  }
+
+  async fromRoleTeam(team_role_snowflake: string) {
+    const teamServers = await this.getAllTeamServers();
+    let team: Team;
+    // eslint-disable-next-line
+    for (let server of teamServers) {
+      try {
+        // eslint-disable-next-line
+        team = await server.fromRoleTeam(team_role_snowflake);
+        return team;
+      } catch {
+        // eslint-disable-next-line
+        continue;
+      }
+    }
+    throw new Error('that role doesn\'t belong to a team');
+  }
+
+  async fromUserTeam(user_snowflake: string) {
+    const teamServers = await this.getAllTeamServers();
+    let team: Team;
+    const teamID = (await this.fromUserSnowflakeUser(user_snowflake)).row.team_id;
+    // eslint-disable-next-line
+    for (const server of teamServers) {
+      // eslint-disable-next-line
+      try {
+        // eslint-disable-next-line
+        team = await server.fromIdTeam(teamID);
+        return team;
+      } catch {
+        // eslint-disable-next-line
+        continue;
+      }
+    }
+    throw new Error('no team associated with that user');
+  }
+
+  async fromChannelTeam(channel_snowflake: string) {
+    const teamServers = await this.getAllTeamServers();
+    let team: Team;
+    // eslint-disable-next-line
+    for (const server of teamServers) {
+      try {
+        // eslint-disable-next-line
+        team = await server.fromChannelTeam(channel_snowflake);
+        return team;
+      } catch {
+        // eslint-disable-next-line
+        continue;
+      }
+    }
+    throw new Error('no team asociated with that channel');
+  }
+
+  async fromUnspecifiedTeam(user_snowflake: string, channel_snowflake: string) {
+    try {
+      return await this.fromChannelTeam(channel_snowflake);
+    } catch {
+      try {
+        return await this.fromUserTeam(user_snowflake);
+      } catch {
+        throw new Error('no team can be found with the given info');
+      }
+    }
   }
 }

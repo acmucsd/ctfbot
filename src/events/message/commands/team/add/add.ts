@@ -7,7 +7,7 @@ const add = async (message: Message, name: string, server_name?: string) => {
   if ((await teamServer.getAllTeams()).length >= teamServer.row.team_limit) {
     // Too many teams
   }
-  const Team = await teamServer.makeTeam(name);
+  const Team = null; // await teamServer.makeTeam(name);
   logger(`Made new team "${name}" in "${teamServer.row.name}"`);
 
   const teamServerGuildSnowflake = teamServer.row.guild_snowflake;

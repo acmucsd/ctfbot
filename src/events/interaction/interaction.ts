@@ -12,13 +12,13 @@ import {
 } from './compat/types';
 
 // our canonical list of application definitions
-const commands: ApplicationCommandDefinition[] = [ping, ctf];
+const commands: ApplicationCommandDefinition[] = [ping, ctf, team];
 
 // utility to help us access passed options more intuitively
 const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {});
 
 // recursive function to find the execute command that corresponds with this interaction
-const executeCommand = (interaction: CommandInteraction, response: ApplicationCommandResponse, subcommands: ApplicationCommandDefinition[]): Promise<string> | string | void => {
+const executeCommand = (interaction: CommandInteraction, response: ApplicationCommandResponse, subcommands: ApplicationCommandDefinition[]): Promise<string> | Promise<void> | string | void => {
   const command = subcommands.find((com) => com.name === response.name);
   if (!command) return 'Command not recognized';
   // if this command definition contains a function, we should just execute it with the options we have
@@ -54,8 +54,8 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   log('registering commands...');
-  await setCommands(client, commands, 'guild_id');
-  await setCommands(client, commands, 'guild_id');
-  await setCommands(client, commands, 'guild_id');
+  await setCommands(client, commands, '810847000048173098');
+  await setCommands(client, commands, '811105603559882803');
+  await setCommands(client, commands, '811108082339676170');
   log('commands registered');
 };

@@ -1,4 +1,6 @@
-import { get, add, del } from '.';
+import add from './add';
+import del from './del';
+import get from './get';
 import { ApplicationCommandDefinition } from '../../../compat/types';
 
 export default {

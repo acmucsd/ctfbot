@@ -16,6 +16,6 @@ export default {
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await ((options) ? CTF.fromNameCTF(options.name as string) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
-    void ctf.printAllTeamServers();
+    return ctf.printAllTeamServers();
   },
 } as ApplicationCommandDefinition;

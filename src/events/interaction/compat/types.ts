@@ -1,3 +1,5 @@
+import { Channel, Role, User } from 'discord.js';
+
 export interface ApplicationCommandOption extends ApplicationCommandRequest {
   type: ApplicationCommandOptionType,
   required?: boolean,
@@ -26,7 +28,7 @@ export interface ApplicationCommandDefinition extends ApplicationCommandRequest 
   type?: ApplicationCommandOptionType
   execute?: (CommandInteraction, CommandOptionMap) => Promise<void> | Promise<string> | string | void
 }
-export interface CommandOptionMap { [key: string]: string | number }
+export interface CommandOptionMap { [key: string]: string | number | Role | boolean | User | Channel }
 
 export interface RegisteredCommand extends ApplicationCommandRequest {
   id: string,
