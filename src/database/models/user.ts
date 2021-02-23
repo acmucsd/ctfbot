@@ -1,9 +1,6 @@
+import { Attempt, Invite } from '.';
+import { AttemptRow, InviteRow, UserRow } from '../schemas';
 import query from '../database';
-import { AttemptRow } from '../schemas/attempt';
-import { InviteRow } from '../schemas/invite';
-import { UserRow } from '../schemas/user';
-import Attempt from './attempt';
-import Invite from './invite';
 
 export default class User {
   row: UserRow;
@@ -26,7 +23,7 @@ export default class User {
     this.row.user_snowflake = user_snowflake;
   }
 
-  async setTeamID(team_id: string) {
+  async setTeamID(team_id: number) {
     await query(`UPDATE users SET team_id = $1 WHERE id = ${this.row.id}`, [team_id]);
     this.row.team_id = team_id;
   }

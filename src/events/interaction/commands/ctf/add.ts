@@ -1,5 +1,6 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { CTF } from '../../../../database/models';
 
 export default {
   name: 'add',
@@ -10,7 +11,7 @@ export default {
       name: 'name',
       description: 'The name of the CTF',
       type: 3,
-      required: true,
+      required: false,
     },
     {
       name: 'description',
@@ -19,7 +20,10 @@ export default {
       required: false,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (/ctf add) has not been implemented yet, but you provided ${JSON.stringify(options)}`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const name = (options && options.name) ? options.name as string : interaction.guild.name;
+    const description = (options && options.description) ? options.description as string : '';
+    const newCTF = await CTF.createCTF(name, interaction.guild.id);
+    await newCTF.setDescription(description);
   },
-};
+} as ApplicationCommandDefinition;

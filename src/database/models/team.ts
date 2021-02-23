@@ -1,9 +1,6 @@
-import Invite from './invite';
+import { Invite, User } from '.';
+import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
-import { InviteRow } from '../schemas/invite';
-import { TeamRow } from '../schemas/team';
-import { UserRow } from '../schemas/user';
-import User from './user';
 
 export default class Team {
   row: TeamRow;
@@ -22,7 +19,7 @@ export default class Team {
   /** Team Setters */
   // Valid Role in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
   async setTeamRoleSnowflakeTeamServer(team_role_snowflake_team_server: string) {
-    await query(`UPDATE teams SET team_role_snowflake = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`);
+    await query(`UPDATE teams SET team_role_snowflake_team_server = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`);
     this.row.team_role_snowflake_team_server = team_role_snowflake_team_server;
   }
 
@@ -38,7 +35,11 @@ export default class Team {
   }
 
   async setTeamServerID(team_server_id: number) {
+    // Check for space
     await query(`UPDATE teams SET team_server_id = $1 WHERE id = ${this.row.id}`, [team_server_id]);
+    // Delete old text channel and team server role
+    // Make new text channel and team server role
+    // Invite all current users
     this.row.team_server_id = team_server_id;
   }
 

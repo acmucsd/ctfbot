@@ -28,3 +28,13 @@ export default async (pool: Pool) => {
     await pool.query(schema);
   }, Promise.resolve());
 };
+
+export { AttachmentRow } from './attachment';
+export { AttemptRow } from './attempt';
+export { CategoryRow } from './category';
+export { ChallengeRow } from './challenge';
+export { CTFRow } from './ctf';
+export { InviteRow } from './invite';
+export { TeamRow } from './team';
+export { TeamServerRow } from './teamserver';
+export { UserRow } from './user';

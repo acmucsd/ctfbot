@@ -1,9 +1,7 @@
-import name from './name';
-import description from './description';
-import admin from './admin';
-import start from './start';
-import end from './end';
 import { ApplicationCommandDefinition } from '../../../compat/types';
+import {
+  name, admin, description, end, start,
+} from '.';
 
 export default {
   name: 'set',

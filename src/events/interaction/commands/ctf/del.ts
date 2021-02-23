@@ -1,11 +1,13 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { CTF } from '../../../../database/models';
 
 export default {
   name: 'del',
   description: 'Causes the removal of the current guild\'s CTF and all associated Teams, Categories, and Challenges.',
   type: 1,
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    await ctf.deleteCTF();
   },
-};
+} as ApplicationCommandDefinition;

@@ -1,5 +1,6 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'get',
@@ -13,7 +14,8 @@ export default {
       required: false,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const ctf = await ((options) ? CTF.fromNameCTF(options.name as string) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+    void ctf.printAllTeamServers();
   },
 } as ApplicationCommandDefinition;

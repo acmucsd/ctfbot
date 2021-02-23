@@ -1,7 +1,8 @@
-import Team from './team';
+import { Client } from 'discord.js';
+import logger from '../../log';
+import { Team } from '.';
+import { TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
-import { TeamRow } from '../schemas/team';
-import { TeamServerRow } from '../schemas/teamserver';
 
 export default class TeamServer {
   row: TeamServerRow;
@@ -15,26 +16,49 @@ export default class TeamServer {
 
   async deleteTeamServer() {
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
+    logger(`Deleted "${this.row.name}" TeamServer`);
   }
 
   /** TeamServer Setters */
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
   async setInfoChannelSnowflake(info_channel_snowflake: string) {
-    await query(`UPDATE teamservers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
+    await query(`UPDATE team_servers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
     this.row.info_channel_snowflake = info_channel_snowflake;
+    logger(`Set info channel for "${this.row.name}" as ${info_channel_snowflake}`);
   }
 
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
   async setTeamCategorySnowflake(team_category_snowflake: string) {
-    await query(`UPDATE teamservers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`);
+    await query(`UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`);
     this.row.team_category_snowflake = team_category_snowflake;
+    logger(`Set info channel for "${this.row.name}" as ${team_category_snowflake}`);
+  }
+
+  async makeChannel(client: Client, name: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
+    if (!channel) {
+      logger(`${name} channel not found: creating ${name} channel...`);
+      channel = await guild.channels.create(`${name}`, { type: 'text' });
+    }
+    return channel.id;
+  }
+
+  async makeCategory(client: Client, name: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
+    if (!channel) {
+      logger(`${name} category not found: creating ${name} category...`);
+      channel = await guild.channels.create(`${name}`, { type: 'category' });
+    }
+    return channel.id;
   }
 
   /** Team Creation */
   async makeTeam(name: string) {
     // Checks
 
-    const { rows } = await query(`INSERT INTO teams(team_server_id, name) VALUES ($1, ${this.row.id}) RETURNING *`, [name]);
+    const { rows } = await query(`INSERT INTO teams(team_server_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [name]);
     return new Team(rows[0] as TeamRow);
   }
 

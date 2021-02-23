@@ -525,7 +525,7 @@
                   "name": "ctf_name",
                   "description": "The name of the CTF to add the guild to",
                   "type": 3,
-                  "required": true
+                  "required": false
                 }
               ]
             },
@@ -538,7 +538,13 @@
                   "name": "name",
                   "description": "The name of the team server",
                   "type": 3,
-                  "required": true
+                  "required": false
+                },
+                {
+                  "name": "ctf_name",
+                  "description": "The name of the CTF to remove the guild from",
+                  "type": 3,
+                  "required": false
                 }
               ]
             }

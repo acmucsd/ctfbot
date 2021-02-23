@@ -54,6 +54,8 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   log('registering commands...');
-  await setCommands(client, commands, '808487147853447216');
+  await setCommands(client, commands, 'guild_id');
+  await setCommands(client, commands, 'guild_id');
+  await setCommands(client, commands, 'guild_id');
   log('commands registered');
 };
