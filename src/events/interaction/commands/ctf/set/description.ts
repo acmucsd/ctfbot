@@ -18,6 +18,6 @@ export default {
     const description = options.description.toString() || '';
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     await ctf.setDescription(description);
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+    return `CTF description has been changed to **${description}**`;
   },
 } as ApplicationCommandDefinition;
