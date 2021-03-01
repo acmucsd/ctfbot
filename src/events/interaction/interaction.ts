@@ -15,7 +15,7 @@ import {
 const commands: ApplicationCommandDefinition[] = [ping, ctf, team];
 
 // utility to help us access passed options more intuitively
-const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {});
+const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => (options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {}) ?? {});
 
 // recursive function to find the execute command that corresponds with this interaction
 const executeCommand = (interaction: CommandInteraction, response: ApplicationCommandResponse, subcommands: ApplicationCommandDefinition[]): Promise<string> | Promise<void> | string | void => {
@@ -36,6 +36,7 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
   try {
     const response = await executeCommand(interaction, { name: interaction.commandName, options: interaction.options }, commands);
     if (response) {
+      log(response);
       await interaction.reply({ content: response });
     }
   } catch (_e) {
@@ -47,7 +48,7 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
       .setColor('e74c3c')
       .setDescription(e.message ?? 'Unknown cause')
       .setTimestamp()
-      .setFooter(e.stack.split('\n')[1]);
+      .setFooter(e.stack.split('\n')[1]); // get the first line of the stack trace
     await interaction.reply({ embeds: [alert.toJSON()] });
   }
 };
