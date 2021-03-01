@@ -16,9 +16,11 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    ctf.throwErrorUnlessAdmin(interaction);
+
     const date = parse(options.end_date?.toString() ?? '', 'yyyy MM dd HH:mm', new Date());
     if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     await ctf.setEndDate(date);
     return `CTF end date has been changed to **${date.toString()}**`;
   },

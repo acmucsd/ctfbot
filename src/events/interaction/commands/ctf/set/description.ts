@@ -15,8 +15,10 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const description = options.description.toString() || '';
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    ctf.throwErrorUnlessAdmin(interaction);
+
+    const description = options.description.toString() || '';
     await ctf.setDescription(description);
     return `CTF description has been changed to **${description}**`;
   },

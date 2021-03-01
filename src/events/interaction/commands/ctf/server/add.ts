@@ -28,8 +28,10 @@ export default {
 
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const name = (options.name) ? options.name as string : interaction.guild.name;
     const ctf = await ((options.ctf_name) ? CTF.fromNameCTF(options.ctf_name as string) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+    ctf.throwErrorUnlessAdmin(interaction);
+
+    const name = (options.name) ? options.name as string : interaction.guild.name;
     void ctf.createTeamServer(interaction.guild, name, options.limit as number);
   },
 } as ApplicationCommandDefinition;

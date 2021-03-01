@@ -15,8 +15,10 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const role = options.admin_role.toString();
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    ctf.throwErrorUnlessAdmin(interaction);
+
+    const role = options.admin_role.toString();
     await ctf.setAdminRoleSnowflake(role);
     return `CTF admin role has been set to <@${role}>`;
   },

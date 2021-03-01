@@ -15,8 +15,10 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const name = options.name.toString() || '';
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    ctf.throwErrorUnlessAdmin(interaction);
+
+    const name = options.name.toString() || '';
     const oldName = ctf.row.name;
     await ctf.setName(name);
     return `CTF name has been changed from **${oldName}** to **${name}**`;

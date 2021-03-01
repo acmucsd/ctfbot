@@ -1,4 +1,6 @@
-import { Client, Guild } from 'discord.js';
+import {
+  Client, Guild, GuildMember, User as DiscordUser,
+} from 'discord.js';
 import {
   Category, Team, TeamServer, User,
 } from '.';
@@ -7,6 +9,7 @@ import {
 } from '../schemas';
 import query from '../database';
 import logger from '../../log';
+import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
 
 export default class CTF {
   row: CTFRow;
@@ -191,6 +194,21 @@ export default class CTF {
       ctf = await CTF.fromCTFGuildSnowflakeCTF(guild_id);
     }
     return ctf;
+  }
+
+  throwErrorUnlessAdmin(interaction: CommandInteraction) {
+    // if the admin role isn't set, no check is performed
+    // otherwise, we need to check if the caller has admin
+    if (!this.row.admin_role_snowflake) return;
+
+    // if this was sent in the main guild, use the guild member
+    // otherwise, we need to resolve the guild member in the main guild
+    const member = this.row.guild_snowflake === interaction.guild.id
+      ? interaction.member
+      : interaction.guild.member(interaction.member.user);
+
+    if (member.roles.cache.has(this.row.admin_role_snowflake)) return;
+    throw new Error('You do not have permission to use this command');
   }
 
   async makeRole(client: Client, name: string) {
