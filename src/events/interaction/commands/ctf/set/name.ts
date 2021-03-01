@@ -1,5 +1,6 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'name',
@@ -13,7 +14,11 @@ export default {
       required: true,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const name = options.name.toString() || '';
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    const oldName = ctf.row.name;
+    await ctf.setName(name);
+    return `CTF name has been changed from **${oldName}** to **${name}**`;
   },
 } as ApplicationCommandDefinition;
