@@ -1,5 +1,6 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'admin',
@@ -13,7 +14,10 @@ export default {
       required: true,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const role = options.admin_role.toString();
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    await ctf.setAdminRoleSnowflake(role);
+    return `CTF admin role has been set to <@${role}>`;
   },
 } as ApplicationCommandDefinition;
