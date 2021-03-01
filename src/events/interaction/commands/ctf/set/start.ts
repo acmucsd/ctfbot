@@ -1,5 +1,8 @@
+import { parse } from 'date-fns';
+
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'start',
@@ -8,12 +11,16 @@ export default {
   options: [
     {
       name: 'start_date',
-      description: 'The desired start date in a \'May 26, 2002 06:24:00\' format',
+      description: 'The desired start date in a \'YYYY MM DD HH:mm\' format',
       type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const date = parse(options.start_date?.toString() ?? '', 'yyyy MM dd HH:mm', new Date());
+    if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    await ctf.setStartDate(date);
+    return `CTF start date has been changed to **${date.toString()}**`;
   },
 } as ApplicationCommandDefinition;
