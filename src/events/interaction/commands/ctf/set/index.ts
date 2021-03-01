@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { ApplicationCommandDefinition } from "../../../compat/types";
+import { ApplicationCommandDefinition, ApplicationCommandOptionType } from "../../../compat/types";
 
 import admin from './admin';
 import description from './description';
@@ -10,7 +10,7 @@ import start from './start';
 export default {
   name: 'set',
   description: 'Change various aspects of the CTF',
-  type: 2,
+  type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
   options: [
     name,
     description,

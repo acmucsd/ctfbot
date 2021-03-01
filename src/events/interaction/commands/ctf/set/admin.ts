@@ -1,15 +1,15 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'admin',
   description: 'Set the admin role for the CTF',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'admin_role',
       description: 'The desired role',
-      type: 8,
+      type: ApplicationCommandOptionType.ROLE,
       required: true,
     },
   ],

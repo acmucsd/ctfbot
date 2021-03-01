@@ -1,22 +1,22 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import { CTF } from '../../../../database/models';
 
 export default {
   name: 'add',
   description: 'Creates a new CTF in the current guild',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The name of the CTF',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
     {
       name: 'description',
       description: 'An optional description of the CTF',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],

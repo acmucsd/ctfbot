@@ -1,15 +1,15 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'description',
   description: 'Set the description of the CTF',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'description',
       description: 'The desired description',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: true,
     },
   ],

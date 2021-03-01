@@ -1,22 +1,22 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import { CTF, TeamServer } from '../../../../database/models';
 
 export default {
   name: 'add',
   description: 'Creates an empty team in the indicated server (or current server if none is specified)',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The team\'s name',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: true,
     },
     {
       name: 'server_name',
       description: 'The server to create the team on',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],

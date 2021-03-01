@@ -1,16 +1,16 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import { CTF, Team } from '../../../../database/models';
 
 export default {
   name: 'del',
   description: 'Removes the indicated team from the CTF',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'team_role',
       description: 'The team to remove',
-      type: 8,
+      type: ApplicationCommandOptionType.ROLE,
       required: false,
     },
   ],

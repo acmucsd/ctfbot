@@ -1,22 +1,22 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF, TeamServer } from '../../../../../database/models';
 
 export default {
   name: 'del',
   description: 'Removes the indicated team server from the indicated CTF',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The name of the team server',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
     {
       name: 'ctf_name',
       description: 'The name of the CTF to remove the guild from',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],

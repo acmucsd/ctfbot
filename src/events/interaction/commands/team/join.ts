@@ -1,16 +1,16 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import { CTF } from '../../../../database/models';
 
 export default {
   name: 'join',
   description: 'Sends a request to join the indicated team.',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'team_name',
       description: 'The team you wish to join',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: true,
     },
   ],

@@ -1,15 +1,15 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'start',
   description: 'Set the start date for the CTF. If no date is indicated, sets it to now',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'start_date',
       description: 'The desired start date in a \'May 26, 2002 06:24:00\' format',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],

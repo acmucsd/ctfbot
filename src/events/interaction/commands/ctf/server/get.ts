@@ -1,16 +1,16 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'get',
   description: 'Lists all of the team servers belonging to the indicated CTF (defaults to current guild\'s CTF)',
-  type: 1,
+  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The name of the CTF',
-      type: 3,
+      type: ApplicationCommandOptionType.STRING,
       required: false,
     },
   ],
