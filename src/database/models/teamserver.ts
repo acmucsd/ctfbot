@@ -29,7 +29,9 @@ export default class TeamServer {
 
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
   async setTeamCategorySnowflake(team_category_snowflake: string) {
-    await query(`UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`,
+    );
     this.row.team_category_snowflake = team_category_snowflake;
     logger(`Set info channel for "${this.row.name}" as ${team_category_snowflake}`);
   }
@@ -104,15 +106,28 @@ export default class TeamServer {
 
   async fromRoleTeam(team_role_snowflake: string) {
     logger(`looking for ${team_role_snowflake}`);
-    const { rows } = await query(`SELECT * FROM teams WHERE team_role_snowflake_team_server = $1 and team_server_id = ${this.row.id} `, [team_role_snowflake]);
-    const rows2 = (await query(`SELECT * FROM teams WHERE team_role_snowflake_main = $1 and team_server_id = ${this.row.id} `, [team_role_snowflake])).rows;
+    const {
+      rows,
+    } = await query(
+      `SELECT * FROM teams WHERE team_role_snowflake_team_server = $1 and team_server_id = ${this.row.id} `,
+      [team_role_snowflake],
+    );
+    const rows2 = (
+      await query(`SELECT * FROM teams WHERE team_role_snowflake_main = $1 and team_server_id = ${this.row.id} `, [
+        team_role_snowflake,
+      ])
+    ).rows;
     if (rows.length !== 0) return new Team(rows[0] as TeamRow);
     if (rows2.length !== 0) return new Team(rows2[0] as TeamRow);
     throw new Error('no team with that role in this server');
   }
 
   async fromChannelTeam(text_channel_snowflake: string) {
-    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`, [text_channel_snowflake]);
+    const {
+      rows,
+    } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`, [
+      text_channel_snowflake,
+    ]);
     if (rows.length === 0) throw new Error('no team associated with that channel');
     return new Team(rows[0] as TeamRow);
   }
@@ -142,7 +157,7 @@ export default class TeamServer {
   }
 
   async hasSpace() {
-    const hasSpace = (await (this.getAllTeams())).length < this.row.team_limit;
+    const hasSpace = (await this.getAllTeams()).length < this.row.team_limit;
     logger(`Team server ${this.row.name} has${hasSpace ? ' ' : ' no '}space`);
     return hasSpace;
   }

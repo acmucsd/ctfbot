@@ -1,56 +1,58 @@
 import { Channel, Role, User } from 'discord.js';
 
 export interface ApplicationCommandOption extends ApplicationCommandRequest {
-  type: ApplicationCommandOptionType,
-  required?: boolean,
-  choices?: ApplicationCommandOptionChoice[]
+  type: ApplicationCommandOptionType;
+  required?: boolean;
+  choices?: ApplicationCommandOptionChoice[];
 }
 export interface ApplicationCommandOptionChoice {
-  name: string,
-  value: string | number,
+  name: string;
+  value: string | number;
 }
 export interface ApplicationCommandRequest {
-  name: string,
-  description: string,
-  options?: ApplicationCommandOption[]
+  name: string;
+  description: string;
+  options?: ApplicationCommandOption[];
 }
 
 export interface ApplicationCommandResponseOption extends ApplicationCommandResponse {
-  type: ApplicationCommandOptionType,
-  value?: string | number
+  type: ApplicationCommandOptionType;
+  value?: string | number;
 }
 export interface ApplicationCommandResponse {
-  name: string,
-  options?: ApplicationCommandResponseOption[]
+  name: string;
+  options?: ApplicationCommandResponseOption[];
 }
 
 export interface ApplicationCommandDefinition extends ApplicationCommandRequest {
-  type?: ApplicationCommandOptionType
-  execute?: (CommandInteraction, CommandOptionMap) => Promise<void> | Promise<string> | string | void
+  type?: ApplicationCommandOptionType;
+  execute?: (CommandInteraction, CommandOptionMap) => Promise<void> | Promise<string> | string | void;
 }
-export interface CommandOptionMap { [key: string]: string | number | Role | boolean | User | Channel }
+export interface CommandOptionMap {
+  [key: string]: string | number | Role | boolean | User | Channel;
+}
 
 export interface RegisteredCommand extends ApplicationCommandRequest {
-  id: string,
-  application_id: string
+  id: string;
+  application_id: string;
 }
 
 export interface InteractionData {
-  id: string,
-  type: number,
-  token: string,
-  channel_id?: string,
-  user?: string,
-  guild_id?: string,
-  member?: string
+  id: string;
+  type: number;
+  token: string;
+  channel_id?: string;
+  user?: string;
+  guild_id?: string;
+  member?: string;
 }
 
 export interface CommandInteractionData extends InteractionData {
   data: {
-    id: string,
-    name: string,
-    options: ApplicationCommandOption[]
-  }
+    id: string;
+    name: string;
+    options: ApplicationCommandOption[];
+  };
 }
 
 export enum ApplicationCommandOptionType {

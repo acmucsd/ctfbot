@@ -10,7 +10,7 @@ export default {
   options: [
     {
       name: 'end_date',
-      description: 'The desired end date in a \'YYYY MM DD HH:mm\' format',
+      description: "The desired end date in a 'YYYY MM DD HH:mm' format",
       type: ApplicationCommandOptionType.STRING,
       required: false,
     },

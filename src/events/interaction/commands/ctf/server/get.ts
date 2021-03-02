@@ -4,7 +4,7 @@ import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'get',
-  description: 'Lists all of the team servers belonging to the indicated CTF (defaults to current guild\'s CTF)',
+  description: "Lists all of the team servers belonging to the indicated CTF (defaults to current guild's CTF)",
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
@@ -15,7 +15,9 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const ctf = await ((options) ? CTF.fromNameCTF(options.name as string) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+    const ctf = await (options
+      ? CTF.fromNameCTF(options.name as string)
+      : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
     return ctf.printAllTeamServers();
   },
 } as ApplicationCommandDefinition;

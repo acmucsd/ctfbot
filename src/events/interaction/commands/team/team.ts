@@ -10,11 +10,5 @@ import { ApplicationCommandDefinition } from '../../compat/types';
 export default {
   name: 'team',
   description: 'Team management commands',
-  options: [
-    add,
-    del,
-    get,
-    invite,
-    join,
-  ],
+  options: [add, del, get, invite, join],
 } as ApplicationCommandDefinition;

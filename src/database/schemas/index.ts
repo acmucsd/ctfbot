@@ -19,7 +19,8 @@ const schemas = [
   categoriesSchema,
   challengesSchema,
   attemptsSchema,
-  attachmentsSchema];
+  attachmentsSchema,
+];
 
 // janky code that waits for each table to initialize before declaring the next one
 export default async (pool: Pool) => {

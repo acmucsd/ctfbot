@@ -30,7 +30,9 @@ export default class Team {
   /** Team Setters */
   // Valid Role in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
   async setTeamRoleSnowflakeTeamServer(team_role_snowflake_team_server: string) {
-    await query(`UPDATE teams SET team_role_snowflake_team_server = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE teams SET team_role_snowflake_team_server = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`,
+    );
     this.row.team_role_snowflake_team_server = team_role_snowflake_team_server;
   }
 
@@ -49,8 +51,8 @@ export default class Team {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
     if (!(await newTeamServer.hasSpace())) throw new Error('team server is full');
 
-    if (this.row.team_server_id) /** If there is a previous team server */ {
-      // Delete old text channel and team server role
+    if (this.row.team_server_id) {
+      /** If there is a previous team server */ // Delete old text channel and team server role
       const oldTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
       await oldTeamServer.deleteChannel(client, this.row.text_channel_snowflake);
       await oldTeamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
@@ -93,10 +95,18 @@ export default class Team {
 
   /** Invite Creation */
   async createInvite(user_id: number) {
-    const { rows: existingRows } = await query(`SELECT id FROM invites WHERE team_id = ${this.row.id} and user_id = $1`, [user_id]);
+    const { rows: existingRows } = await query(
+      `SELECT id FROM invites WHERE team_id = ${this.row.id} and user_id = $1`,
+      [user_id],
+    );
     if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
 
-    const { rows } = await query(`INSERT INTO invites(user_id, team_id, was_invited) VALUES ($1, ${this.row.id}, true) RETURNING *`, [user_id]);
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO invites(user_id, team_id, was_invited) VALUES ($1, ${this.row.id}, true) RETURNING *`,
+      [user_id],
+    );
     return new Invite(rows[0] as InviteRow);
   }
 

@@ -11,12 +11,12 @@ export const schema = `CREATE TABLE IF NOT EXISTS ctfs (
   );`;
 
 export interface CTFRow {
-  id: number,
-  name: string,
-  description: string | null,
-  start_date: Date | null,
-  end_date: Date | null,
-  guild_snowflake: string,
-  admin_role_snowflake: string | null,
-  announcements_channel_snowflake: string | null
+  id: number;
+  name: string;
+  description: string | null;
+  start_date: Date | null;
+  end_date: Date | null;
+  guild_snowflake: string;
+  admin_role_snowflake: string | null;
+  announcements_channel_snowflake: string | null;
 }

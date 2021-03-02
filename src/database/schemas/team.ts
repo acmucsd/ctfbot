@@ -15,13 +15,13 @@ export const schema = `CREATE TABLE IF NOT EXISTS teams (
 // captain_user_id integer REFERENCES users,
 
 export interface TeamRow {
-  id: number,
-  team_role_snowflake_main: string | null,
-  team_role_snowflake_team_server: string | null,
-  text_channel_snowflake: string | null,
-  team_server_id: number,
-  name: string,
-  description: string | null,
-  color: string | null,
-  captain_user_id: number | null
+  id: number;
+  team_role_snowflake_main: string | null;
+  team_role_snowflake_team_server: string | null;
+  text_channel_snowflake: string | null;
+  team_server_id: number;
+  name: string;
+  description: string | null;
+  color: string | null;
+  captain_user_id: number | null;
 }

@@ -16,17 +16,17 @@ export const schema = `CREATE TABLE IF NOT EXISTS challenges (
 );`;
 
 export interface ChallengeRow {
-  id: number,
-  category_id: number,
-  channel_snowflake: string | null,
-  name: string,
-  author: string | null,
-  prompt: string | null,
-  difficulty: string | null,
-  initial_points: number | null,
-  point_decay: number | null,
-  min_points: number | null,
-  flag: string | null,
-  first_blood_id: number | null,
-  publish_time: Date | null
+  id: number;
+  category_id: number;
+  channel_snowflake: string | null;
+  name: string;
+  author: string | null;
+  prompt: string | null;
+  difficulty: string | null;
+  initial_points: number | null;
+  point_decay: number | null;
+  min_points: number | null;
+  flag: string | null;
+  first_blood_id: number | null;
+  publish_time: Date | null;
 }

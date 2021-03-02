@@ -1,6 +1,4 @@
-import {
-  Channel, Client, Guild, GuildMember, Snowflake, User,
-} from 'discord.js';
+import { Channel, Client, Guild, GuildMember, Snowflake, User } from 'discord.js';
 import { InteractionData } from './types';
 
 export default class Interaction {

@@ -8,9 +8,9 @@ export const schema = `CREATE TABLE IF NOT EXISTS categories (
 );`;
 
 export interface CategoryRow {
-  id: number,
-  ctf_id: number,
-  name: string,
-  channel_category_snowflake: string,
-  description: string | null
+  id: number;
+  ctf_id: number;
+  name: string;
+  channel_category_snowflake: string;
+  description: string | null;
 }

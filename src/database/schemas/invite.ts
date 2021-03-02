@@ -7,8 +7,8 @@ export const schema = `CREATE TABLE IF NOT EXISTS invites (
 );`;
 
 export interface InviteRow {
-  id: number,
-  user_id: number,
-  team_id: number,
-  was_invited: boolean
+  id: number;
+  user_id: number;
+  team_id: number;
+  was_invited: boolean;
 }

@@ -32,10 +32,17 @@ export default class Category {
   /** Challenge Creation */
   async createChallenge(name: string) {
     // check if this challenge already exists in this ctf
-    const { rows: existingRows } = await query(`SELECT id FROM challenges WHERE name = $1 and ctf_id = ${this.row.ctf_id}`, [name]);
+    const {
+      rows: existingRows,
+    } = await query(`SELECT id FROM challenges WHERE name = $1 and ctf_id = ${this.row.ctf_id}`, [name]);
     if (existingRows && existingRows.length > 0) throw new Error('cannot create a duplicate challenge in this ctf');
 
-    const { rows } = await query(`INSERT INTO ctfs(name, ctf_id, category_id) VALUES ($1, ${this.row.ctf_id}, $3) RETURNING *`, [name, this.row.id]);
+    const {
+      rows,
+    } = await query(`INSERT INTO ctfs(name, ctf_id, category_id) VALUES ($1, ${this.row.ctf_id}, $3) RETURNING *`, [
+      name,
+      this.row.id,
+    ]);
     return new Challenge(rows[0] as ChallengeRow);
   }
 
@@ -47,7 +54,11 @@ export default class Category {
   }
 
   async fromChannelSnowflakeChallenge(channel_snowflake: string) {
-    const { rows } = await query(`SELECT * FROM challenges WHERE channel_snowflake = $1 and ctf_id = ${this.row.ctf_id}`, [channel_snowflake]);
+    const {
+      rows,
+    } = await query(`SELECT * FROM challenges WHERE channel_snowflake = $1 and ctf_id = ${this.row.ctf_id}`, [
+      channel_snowflake,
+    ]);
     if (rows.length === 0) throw new Error('no challenge with that channel in this ctf');
     return new Challenge(rows[0] as ChallengeRow);
   }

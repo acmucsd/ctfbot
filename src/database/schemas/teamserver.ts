@@ -10,11 +10,11 @@ export const schema = `CREATE TABLE IF NOT EXISTS team_servers (
   );`;
 
 export interface TeamServerRow {
-  id: number,
-  guild_snowflake: string,
-  ctf_id: number,
-  info_channel_snowflake: string | null,
-  team_category_snowflake: string | null,
-  name: string,
-  team_limit: number
+  id: number;
+  guild_snowflake: string;
+  ctf_id: number;
+  info_channel_snowflake: string | null;
+  team_category_snowflake: string | null;
+  name: string;
+  team_limit: number;
 }

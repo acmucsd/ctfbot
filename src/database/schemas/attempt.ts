@@ -9,10 +9,10 @@ export const schema = `CREATE TABLE IF NOT EXISTS attempts (
 );`;
 
 export interface AttemptRow {
-  id: number,
-  challenge_id: number,
-  user_id: number,
-  attempted_flag: string,
-  successful: boolean,
-  timestamp: Date
+  id: number;
+  challenge_id: number;
+  user_id: number;
+  attempted_flag: string;
+  successful: boolean;
+  timestamp: Date;
 }

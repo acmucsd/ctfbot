@@ -1,12 +1,6 @@
-import {
-  Client, Guild, GuildMember, User as DiscordUser,
-} from 'discord.js';
-import {
-  Category, Team, TeamServer, User,
-} from '.';
-import {
-  CategoryRow, CTFRow, TeamServerRow, UserRow,
-} from '../schemas';
+import { Client, Guild, GuildMember, User as DiscordUser } from 'discord.js';
+import { Category, Team, TeamServer, User } from '.';
+import { CategoryRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
 import logger from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
@@ -24,7 +18,10 @@ export default class CTF {
     const { rows: existingRows } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
     if (existingRows && existingRows.length > 0) throw new Error('cannot create a second CTF in this guild');
 
-    const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [name, guildSnowflake]);
+    const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [
+      name,
+      guildSnowflake,
+    ]);
     logger(`Created new ctf "${name}"`);
     return new CTF(rows[0] as CTFRow);
   }
@@ -85,17 +82,25 @@ export default class CTF {
 
   // Valid channel in the CTF guild
   async setAnnouncementsChannelSnowflake(announcementsChannelSnowflake: string) {
-    await query(`UPDATE ctfs SET announcements_channel_snowflake = $1 WHERE id = ${this.row.id}`, [announcementsChannelSnowflake]);
+    await query(`UPDATE ctfs SET announcements_channel_snowflake = $1 WHERE id = ${this.row.id}`, [
+      announcementsChannelSnowflake,
+    ]);
     this.row.announcements_channel_snowflake = announcementsChannelSnowflake;
   }
 
   /* Category Creation */
   async createCategory(name: string) {
     // check if a category already exists with that name in this ctf
-    const { rows: existingRows } = await query(`SELECT id FROM categories WHERE name = $1 and ctf_id = ${this.row.id}`, [name]);
-    if (existingRows && existingRows.length > 0) throw new Error('cannot create a category with a duplicate name in this ctf');
+    const { rows: existingRows } = await query(
+      `SELECT id FROM categories WHERE name = $1 and ctf_id = ${this.row.id}`,
+      [name],
+    );
+    if (existingRows && existingRows.length > 0)
+      throw new Error('cannot create a category with a duplicate name in this ctf');
 
-    const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [name]);
+    const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [
+      name,
+    ]);
     return new Category(rows[0] as CategoryRow);
   }
 
@@ -107,7 +112,11 @@ export default class CTF {
   }
 
   async fromChannelCategorySnowflakeCategory(channel_category_snowflake: string) {
-    const { rows } = await query(`SELECT * FROM categories WHERE channel_category_snowflake = $1 and ctf_id = ${this.row.id}`, [channel_category_snowflake]);
+    const {
+      rows,
+    } = await query(`SELECT * FROM categories WHERE channel_category_snowflake = $1 and ctf_id = ${this.row.id}`, [
+      channel_category_snowflake,
+    ]);
     if (rows.length === 0) throw new Error('no category with that snowflake in this ctf');
     return new Category(rows[0] as CategoryRow);
   }
@@ -119,15 +128,23 @@ export default class CTF {
 
   /* Team Server Creation */
   async createTeamServer(guild: Guild, name: string, team_limit: number) {
-    const { rows: existingRows } = await query(`SELECT id FROM team_servers WHERE ctf_id = ${this.row.id} and name = $1`, [name]);
-    if (existingRows && existingRows.length > 0) throw new Error('cannot create a team server with a duplicate name in this ctf');
+    const {
+      rows: existingRows,
+    } = await query(`SELECT id FROM team_servers WHERE ctf_id = ${this.row.id} and name = $1`, [name]);
+    if (existingRows && existingRows.length > 0)
+      throw new Error('cannot create a team server with a duplicate name in this ctf');
 
     const { rows: existingRows2 } = await query('SELECT id FROM team_servers WHERE guild_snowflake = $1', [guild.id]);
     if (existingRows2 && existingRows2.length > 0) throw new Error('guilds are limited to a single teamserver');
 
     // Do a check to see if anything is using the team_category_snowflake or info_channel_snowflake?
 
-    const { rows } = await query(`INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`, [guild.id, name, team_limit]);
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`,
+      [guild.id, name, team_limit],
+    );
     logger(`Created new team server "${name}" for ctf "${this.row.name}"`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
     await teamServer.setInfoChannelSnowflake((await teamServer.makeChannel(guild.client, 'info')).id);
@@ -162,23 +179,36 @@ export default class CTF {
 
   async printAllTeamServers() {
     const teamServers = await this.getAllTeamServers();
-    const printString = (teamServers.length === 0) ? `CTF "${this.row.name}" has no team servers` : `CTF "${this.row.name}"'s Team Servers are : ${teamServers.map((server) => `${server.row.name}, `).toString().slice(0, -2)}`;
+    const printString =
+      teamServers.length === 0
+        ? `CTF "${this.row.name}" has no team servers`
+        : `CTF "${this.row.name}"'s Team Servers are : ${teamServers
+            .map((server) => `${server.row.name}, `)
+            .toString()
+            .slice(0, -2)}`;
     // extra , in between????
     logger(printString);
-    return (printString);
+    return printString;
   }
 
   /** User Creation */
   async createUser(user_snowflake: string) {
     // Check
 
-    const { rows } = await query(`INSERT INTO users(ctf_id, user_snowflake, tos_accepted) VALUES (${this.row.id}, $2, false) RETURNING *`, [user_snowflake]);
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO users(ctf_id, user_snowflake, tos_accepted) VALUES (${this.row.id}, $2, false) RETURNING *`,
+      [user_snowflake],
+    );
     return new User(rows[0] as UserRow);
   }
 
   /** User Retrieval */
   async fromUserSnowflakeUser(user_snowflake: string) {
-    const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [user_snowflake]);
+    const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
+      user_snowflake,
+    ]);
     if (rows.length === 0) throw new Error('that user is not in this ctf');
     return new User(rows[0] as UserRow);
   }
@@ -203,9 +233,10 @@ export default class CTF {
 
     // if this was sent in the main guild, use the guild member
     // otherwise, we need to resolve the guild member in the main guild
-    const member = this.row.guild_snowflake === interaction.guild.id
-      ? interaction.member
-      : interaction.guild.member(interaction.member.user);
+    const member =
+      this.row.guild_snowflake === interaction.guild.id
+        ? interaction.member
+        : interaction.guild.member(interaction.member.user);
 
     if (member.roles.cache.has(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
@@ -253,7 +284,7 @@ export default class CTF {
         continue;
       }
     }
-    throw new Error('that role doesn\'t belong to a team');
+    throw new Error("that role doesn't belong to a team");
   }
 
   async fromUserTeam(user_snowflake: string) {

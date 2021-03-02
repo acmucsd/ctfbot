@@ -11,7 +11,7 @@ export default {
   options: [
     {
       name: 'start_date',
-      description: 'The desired start date in a \'YYYY MM DD HH:mm\' format',
+      description: "The desired start date in a 'YYYY MM DD HH:mm' format",
       type: ApplicationCommandOptionType.STRING,
       required: false,
     },

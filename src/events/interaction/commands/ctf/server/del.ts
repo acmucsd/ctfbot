@@ -24,7 +24,9 @@ export default {
     let teamServer: TeamServer;
 
     if (options && options.name) {
-      const ctf = await ((options.ctf_name) ? CTF.fromNameCTF(options.ctf_name as string) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+      const ctf = await (options.ctf_name
+        ? CTF.fromNameCTF(options.ctf_name as string)
+        : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
       teamServer = await ctf.fromNameTeamServer(options.name as string);
     } else {
       teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);

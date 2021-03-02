@@ -21,8 +21,8 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const name = (options && options.name) ? options.name as string : interaction.guild.name;
-    const description = (options && options.description) ? options.description as string : '';
+    const name = options && options.name ? (options.name as string) : interaction.guild.name;
+    const description = options && options.description ? (options.description as string) : '';
     const newCTF = await CTF.createCTF(name, interaction.guild.id);
     await newCTF.setDescription(description);
   },

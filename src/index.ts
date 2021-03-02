@@ -6,4 +6,7 @@ import database from './database';
 const client = new Client();
 eventLoader(client);
 
-client.login(discordConfig.token).then(() => {}).catch(() => {});
+client
+  .login(discordConfig.token)
+  .then(() => {})
+  .catch(() => {});

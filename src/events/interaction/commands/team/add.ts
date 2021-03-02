@@ -9,7 +9,7 @@ export default {
   options: [
     {
       name: 'name',
-      description: 'The team\'s name',
+      description: "The team's name",
       type: ApplicationCommandOptionType.STRING,
       required: true,
     },
@@ -23,12 +23,14 @@ export default {
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     let teamServer: TeamServer;
-    if (options.server_name) /** Team server name is specified */ {
-      teamServer = await ctf.fromNameTeamServer(options.server_name as string);
+    if (options.server_name) {
+      /** Team server name is specified */ teamServer = await ctf.fromNameTeamServer(options.server_name as string);
     } else {
-      teamServer = (await ctf.getAllTeamServers()).find((server) => server.row.guild_snowflake === interaction.guild.id);
-      if (!teamServer || !(await teamServer.hasSpace())) /** Current guild is full or isn't a team server */ {
-        teamServer = await ctf.getTeamServerWithSpace();
+      teamServer = (await ctf.getAllTeamServers()).find(
+        (server) => server.row.guild_snowflake === interaction.guild.id,
+      );
+      if (!teamServer || !(await teamServer.hasSpace())) {
+        /** Current guild is full or isn't a team server */ teamServer = await ctf.getTeamServerWithSpace();
       }
       await teamServer.makeTeam(interaction.client, ctf, (options.name as string).trim());
     }

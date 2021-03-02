@@ -7,9 +7,5 @@ export default {
   name: 'server',
   description: 'Management for the team servers',
   type: 2,
-  options: [
-    get,
-    add,
-    del,
-  ],
+  options: [get, add, del],
 } as ApplicationCommandDefinition;

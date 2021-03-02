@@ -11,6 +11,6 @@ import pointdecay from './pointdecay';
 import flag from './flag';
 import publish from './publish';
 
-const set = (message: Message) => { };
+const set = (message: Message) => {};
 
 export default set;

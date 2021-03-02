@@ -75,10 +75,17 @@ export default class Challenge {
   /** Attachment Creation */
   async createAttachment(name: string, url: string) {
     // check if a attachment already exists with that name for the challenge
-    const { rows: existingRows } = await query(`SELECT id FROM attachments WHERE name = $1 and challenge_id = ${this.row.id}`, [name]);
+    const {
+      rows: existingRows,
+    } = await query(`SELECT id FROM attachments WHERE name = $1 and challenge_id = ${this.row.id}`, [name]);
     if (existingRows && existingRows.length > 0) throw new Error('cannot create an attachment with a duplicate name');
 
-    const { rows } = await query(`INSERT INTO attachments(challenge_id, name, url) VALUES (${this.row.id}, $1, $2) RETURNING *`, [name, url]);
+    const {
+      rows,
+    } = await query(`INSERT INTO attachments(challenge_id, name, url) VALUES (${this.row.id}, $1, $2) RETURNING *`, [
+      name,
+      url,
+    ]);
     return new Attachment(rows[0] as AttachmentRow);
   }
 

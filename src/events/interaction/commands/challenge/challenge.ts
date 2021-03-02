@@ -7,6 +7,6 @@ import get from './get';
 import set from './set';
 import submit from './submit';
 
-const challenge = (message: Message) => { };
+const challenge = (message: Message) => {};
 
 export default challenge;

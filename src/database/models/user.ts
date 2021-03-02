@@ -35,10 +35,18 @@ export default class User {
 
   /** Invite Creation */
   async createInvite(team_id: number) {
-    const { rows: existingRows } = await query(`SELECT id FROM invites WHERE team_id = $1 and user_id = ${this.row.id}`, [team_id]);
+    const { rows: existingRows } = await query(
+      `SELECT id FROM invites WHERE team_id = $1 and user_id = ${this.row.id}`,
+      [team_id],
+    );
     if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
 
-    const { rows } = await query(`INSERT INTO invites(user_id, team_id, was_invited) VALUES (${this.row.id}, $1, false) RETURNING *`, [team_id]);
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO invites(user_id, team_id, was_invited) VALUES (${this.row.id}, $1, false) RETURNING *`,
+      [team_id],
+    );
     return new Invite(rows[0] as InviteRow);
   }
 
@@ -51,7 +59,12 @@ export default class User {
 
   /** Attempt Creation */
   async createAttempt(challenge_id: number, attempted_flag: string, successful: boolean, timestamp: Date) {
-    const { rows } = await query(`INSERT INTO attempts(challenge_id, user_id, attempted_flag, successful, timestamp) VALUES ($1, ${this.row.id}, $2, $3, $4) RETURNING *`, [challenge_id, attempted_flag, successful, timestamp]);
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO attempts(challenge_id, user_id, attempted_flag, successful, timestamp) VALUES ($1, ${this.row.id}, $2, $3, $4) RETURNING *`,
+      [challenge_id, attempted_flag, successful, timestamp],
+    );
     return new Attempt(rows[0] as AttemptRow);
   }
 

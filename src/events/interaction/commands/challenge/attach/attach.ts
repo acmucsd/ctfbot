@@ -4,6 +4,6 @@ import get from './get';
 import add from './add';
 import del from './del';
 
-const attach = (message: Message) => { };
+const attach = (message: Message) => {};
 
 export default attach;

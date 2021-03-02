@@ -64,7 +64,7 @@ export default class ApplicationCommand {
      * @type {Object[]}
      * @readonly
      */
-    this.options = data.options?.map(function m(o):ApplicationCommandOption {
+    this.options = data.options?.map(function m(o): ApplicationCommandOption {
       return {
         type: o.type,
         name: o.name,

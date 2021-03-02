@@ -11,11 +11,5 @@ export default {
   name: 'set',
   description: 'Change various aspects of the CTF',
   type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
-  options: [
-    name,
-    description,
-    admin,
-    start,
-    end,
-  ],
+  options: [name, description, admin, start, end],
 } as ApplicationCommandDefinition;

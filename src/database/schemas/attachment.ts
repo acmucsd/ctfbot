@@ -7,8 +7,8 @@ export const schema = `CREATE TABLE IF NOT EXISTS attachments (
 );`;
 
 export interface AttachmentRow {
-  id: number,
-  challenge_id: number,
-  name: string,
-  url: string
+  id: number;
+  challenge_id: number;
+  name: string;
+  url: string;
 }
