@@ -1,8 +1,10 @@
-import { Message } from 'discord.js';
-
 import name from './name';
+import { ApplicationCommandOptionType } from '../../../compat/types';
 import description from './description';
 
-const set = (message: Message) => {};
-
-export default set;
+export default {
+  name: 'set',
+  description: 'Category info management',
+  type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
+  options: [name, description],
+};
