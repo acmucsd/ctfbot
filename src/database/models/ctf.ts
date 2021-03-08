@@ -15,8 +15,11 @@ export default class CTF {
   /* CTF Creation / Deletion */
   static async createCTF(name: string, guildSnowflake: string) {
     // check if a CTF already exists in this guild
-    const { rows: existingRows } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
-    if (existingRows && existingRows.length > 0) throw new Error('cannot create a second CTF in this guild');
+    const { rows: existingCTFs } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
+    if (existingCTFs && existingCTFs.length > 0) throw new Error('cannot create a second CTF in this guild');
+
+    const { rows: existingNames } = await query('SELECT id FROM ctfs WHERE name = $1', [name]);
+    if (existingNames && existingNames.length > 0) throw new Error('cannot create ctf with a duplicate name');
 
     const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [
       name,
@@ -54,6 +57,8 @@ export default class CTF {
   /* CTF Setters */
   // Unique among CTFs
   async setName(name: string) {
+    const { rows: existingNames } = await query('SELECT id FROM ctfs WHERE name = $1', [name]);
+    if (existingNames && existingNames.length > 0) throw new Error('cannot create ctf with a duplicate name');
     await query(`UPDATE ctfs SET name = $1 WHERE id = ${this.row.id}`, [name]);
     this.row.name = name;
   }
@@ -96,7 +101,7 @@ export default class CTF {
       [name],
     );
     if (existingRows && existingRows.length > 0)
-      throw new Error('cannot create a category with a duplicate name in this ctf');
+      throw new Error('cannot create a category with a duplicate name in this CTF');
 
     const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [
       name,
@@ -136,8 +141,6 @@ export default class CTF {
 
     const { rows: existingRows2 } = await query('SELECT id FROM team_servers WHERE guild_snowflake = $1', [guild.id]);
     if (existingRows2 && existingRows2.length > 0) throw new Error('guilds are limited to a single teamserver');
-
-    // Do a check to see if anything is using the team_category_snowflake or info_channel_snowflake?
 
     const {
       rows,
@@ -262,6 +265,8 @@ export default class CTF {
 
   async makeRole(client: Client, name: string) {
     const ctfServerGuild = client.guilds.cache.find((guild) => guild.id === this.row.guild_snowflake);
+    if (ctfServerGuild.roles.cache.find((role) => role.name === name))
+      throw new Error('Role with that name already exists');
     const role = await ctfServerGuild.roles.create({ data: { name: `${name}` } });
     logger(`Made new role "${name}" in CTF guild "${this.row.name}"`);
     return role;

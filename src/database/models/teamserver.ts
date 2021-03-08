@@ -95,7 +95,12 @@ export default class TeamServer {
 
   /** Team Creation */
   async makeTeam(client: Client, ctf: CTF, name: string) {
-    // Checks
+    const teams = (await ctf.getAllTeams()).filter(
+      (team) =>
+        team.row.name === name ||
+        team.row.name.toLowerCase().replace(' ', '-') === name.toLowerCase().replace(' ', '-'),
+    );
+    if (teams.length !== 0) throw new Error('a team with that name already exists');
 
     const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
@@ -146,6 +151,7 @@ export default class TeamServer {
   /** Misc */
   async makeRole(client: Client, name: string) {
     const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    if (guild.roles.cache.find((role) => role.name === name)) throw new Error('Role with that name already exists');
     const role = await guild.roles.create({ data: { name: `${name}` } });
     logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
     return role;
