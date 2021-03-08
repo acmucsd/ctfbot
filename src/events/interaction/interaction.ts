@@ -47,7 +47,7 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
     );
     if (response) {
       logger(response);
-      await interaction.reply({ embeds: [embedify(response, 'Command')] });
+      await interaction.reply({ embeds: [embedify(response, 'Command', '', '50c0bf')] });
     }
   } catch (_e) {
     logger(_e);
