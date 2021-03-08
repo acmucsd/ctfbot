@@ -22,15 +22,19 @@ export default {
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     let teamServer: TeamServer;
+    let ctf: CTF;
 
     if (options && options.name) {
-      const ctf = await (options.ctf_name
+      ctf = await (options.ctf_name
         ? CTF.fromNameCTF(options.ctf_name as string)
         : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
       teamServer = await ctf.fromNameTeamServer(options.name as string);
     } else {
       teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);
+      ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     }
+    ctf.throwErrorUnlessAdmin(interaction);
     void teamServer.deleteTeamServer();
+    return `Removed **${teamServer.row.name}** from CTf **${ctf.row.name}**`;
   },
 } as ApplicationCommandDefinition;

@@ -2,15 +2,15 @@ import { Pool } from 'pg';
 import { postgresConfig } from '../config';
 
 import initTables from './schemas';
-import log from '../log';
+import { logger } from '../log';
 
 const pool = new Pool(postgresConfig);
 
 // initialize each table
 initTables(pool)
-  .then(() => log('tables initialized'))
+  .then(() => logger('tables initialized'))
   .catch((err) => {
-    log('database initialization failed', err);
+    logger('database initialization failed', err);
     process.exit(1);
   });
 

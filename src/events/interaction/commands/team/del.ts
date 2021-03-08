@@ -18,11 +18,13 @@ export default {
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     let teamToDelete: Team;
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    if (options) {
+    ctf.throwErrorUnlessAdmin(interaction);
+    if (options?.team_role) {
       teamToDelete = await ctf.fromRoleTeam(options.team_role as string);
     } else {
       teamToDelete = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
     }
     await teamToDelete.deleteTeam(interaction.client);
+    return `Deleted team **${teamToDelete.row.name}** from CTF **${ctf.row.name}**`;
   },
 } as ApplicationCommandDefinition;

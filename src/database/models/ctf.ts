@@ -1,8 +1,8 @@
-import { Client, Guild, GuildMember, User as DiscordUser } from 'discord.js';
+import { Client, Guild } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
-import logger from '../../log';
+import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
 
 export default class CTF {
@@ -149,6 +149,7 @@ export default class CTF {
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
     await teamServer.setInfoChannelSnowflake((await teamServer.makeChannel(guild.client, 'info')).id);
     await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);
+    return teamServer;
   }
 
   /* Team Server Retrieval */
@@ -156,6 +157,23 @@ export default class CTF {
     const { rows } = await query(`SELECT * FROM team_servers WHERE name = $1 and ctf_id = ${this.row.id}`, [name]);
     if (rows.length === 0) throw new Error('no team server with that name in this ctf');
     return new TeamServer(rows[0] as TeamServerRow);
+  }
+
+  async getAllTeams() {
+    let teams: Team[] = [];
+    for (const teamServer of await this.getAllTeamServers()) {
+      teams = teams.concat(await teamServer.getAllTeams());
+    }
+    return teams;
+  }
+
+  async printAllTeams() {
+    const teams = await this.getAllTeams();
+    const printString =
+      teams.length == 0
+        ? `CTF **${this.row.name}** has no teams yet`
+        : `CTF **${this.row.name}**'s teams are: **${teams.map((team) => team.row.name).join('**, **')}**`;
+    return printString;
   }
 
   // Get either TeamServer or main ctf guild id and return the ctf
@@ -181,12 +199,10 @@ export default class CTF {
     const teamServers = await this.getAllTeamServers();
     const printString =
       teamServers.length === 0
-        ? `CTF "${this.row.name}" has no team servers`
-        : `CTF "${this.row.name}"'s Team Servers are : ${teamServers
-            .map((server) => `${server.row.name}, `)
-            .toString()
-            .slice(0, -2)}`;
-    // extra , in between????
+        ? `CTF **${this.row.name}** has no team servers`
+        : `CTF **${this.row.name}**'s Team Servers are : **${teamServers
+            .map((server) => server.row.name)
+            .join('**, **')}**`;
     logger(printString);
     return printString;
   }
@@ -226,6 +242,9 @@ export default class CTF {
     return ctf;
   }
 
+  /**
+   * Broken
+   */
   throwErrorUnlessAdmin(interaction: CommandInteraction) {
     // if the admin role isn't set, no check is performed
     // otherwise, we need to check if the caller has admin
@@ -236,9 +255,8 @@ export default class CTF {
     const member =
       this.row.guild_snowflake === interaction.guild.id
         ? interaction.member
-        : interaction.guild.member(interaction.member.user);
-
-    if (member.roles.cache.has(this.row.admin_role_snowflake)) return;
+        : interaction.client.guilds.cache.get(this.row.guild_snowflake).member(interaction.member.user); //.member(interaction.member.user);
+    if (member?.roles.cache.has(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
   }
 
@@ -258,6 +276,28 @@ export default class CTF {
       return;
     }
     logger(`Role with ${role_snowflake} not found`);
+  }
+
+  async setRoleColor(client: Client, role_snowflake: string, color: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    if (roleToChange) {
+      await roleToChange.setColor(color);
+      logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
+    } else {
+      throw new Error('role not found in ctf');
+    }
+  }
+
+  async setRoleName(client: Client, role_snowflake: string, new_name: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    if (roleToChange) {
+      await roleToChange.setName(new_name);
+      logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
+    } else {
+      throw new Error('role not found in ctf');
+    }
   }
 
   async getTeamServerWithSpace() {

@@ -2,7 +2,7 @@ import { Client } from 'discord.js';
 import { CTF, Invite, User } from '.';
 import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
-import logger from '../../log';
+import { logger } from '../../log';
 
 export default class Team {
   row: TeamRow;
@@ -73,19 +73,45 @@ export default class Team {
   }
 
   // Unique per CTF
-  async setName(name: string) {
-    await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [name]);
-    this.row.name = name;
+  async setName(client: Client, newName: string) {
+    const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+    const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
+    const oldName = this.row.name;
+
+    const teams = (await ctf.getAllTeams()).filter((team) => team.row.name === newName);
+    if (teams.length !== 0) throw new Error('a team with that name already exists');
+
+    await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [newName]);
+    this.row.name = newName;
+
+    await ctf.setRoleName(client, this.row.team_role_snowflake_main, newName);
+    if (this.row.team_role_snowflake_main !== this.row.team_role_snowflake_team_server) {
+      await teamServer.setRoleName(client, this.row.team_role_snowflake_team_server, newName);
+    }
+    await teamServer.renameChannel(client, this.row.text_channel_snowflake, newName);
+    return `Changed **${oldName}**'s name to **${newName}**`;
   }
 
   async setDescription(description: string) {
     await query(`UPDATE teams SET description = $1 WHERE id = ${this.row.id}`, [description]);
     this.row.description = description;
+    return `Changed **${this.row.name}**'s description to **${description}**`;
   }
 
-  async setColor(color: string) {
-    await query(`UPDATE teams SET color = $1 WHERE id = ${this.row.id}`, [color]);
+  async setColor(client: Client, color: string) {
+    if (!/^([0-9a-f]{6})$/i.test(color)) {
+      throw new Error('invalid color');
+    }
+    const oldColor = this.row.color?.toLowerCase();
+    await query(`UPDATE teams SET color = $1 WHERE id = ${this.row.id}`, [color.toLowerCase()]);
     this.row.color = color;
+    const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+    const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
+    await teamServer.setRoleColor(client, this.row.team_role_snowflake_team_server, color);
+    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
+      await ctf.setRoleColor(client, this.row.team_role_snowflake_main, color);
+    }
+    return `Changed **${this.row.name}**'s color ${oldColor != null ? `from **${oldColor}** ` : ''}to **${color}**`;
   }
 
   async setCaptain(captain_user_id: number) {

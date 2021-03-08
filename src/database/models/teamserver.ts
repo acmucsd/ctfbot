@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import logger from '../../log';
+import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
@@ -47,11 +47,23 @@ export default class TeamServer {
     let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
     if (channel) {
       await channel.delete();
-      logger(`${name} found: deleted ${name} channel`);
+      logger(`**${name}** found: deleted **${name}** channel`);
     }
     channel = await guild.channels.create(`${name}`, { type: 'text' });
-    logger(`Created ${name} channel`);
+    logger(`Created **${name}** channel`);
     return channel;
+  }
+
+  async renameChannel(client: Client, channel_snowflake: string, newName: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const channel = guild.channels.cache.find((c) => c.id === `${channel_snowflake}` && c.type === 'text');
+    if (channel) {
+      const oldName = channel.name;
+      await channel.setName(newName.toLowerCase().replace(' ', '-'));
+      logger(`Renamed **${oldName}** channel to **${newName}**`);
+    } else {
+      throw new Error('channel not found');
+    }
   }
 
   async deleteChannel(client: Client, channel_snowflake: string) {
@@ -88,13 +100,13 @@ export default class TeamServer {
     const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
-    logger(`Made new team "${name}" in "${this.row.name}"`);
 
     if (this.row.guild_snowflake !== ctf.row.guild_snowflake) {
       await team.setTeamRoleSnowflakeMain((await ctf.makeRole(client, name)).id);
     } else {
       await team.setTeamRoleSnowflakeMain(team.row.team_role_snowflake_team_server);
     }
+    return team;
   }
 
   /** Team Retrieval */
@@ -109,16 +121,10 @@ export default class TeamServer {
     const {
       rows,
     } = await query(
-      `SELECT * FROM teams WHERE team_role_snowflake_team_server = $1 and team_server_id = ${this.row.id} `,
+      `SELECT * FROM teams WHERE (team_role_snowflake_team_server = $1 or team_role_snowflake_main = $1) and team_server_id = ${this.row.id} `,
       [team_role_snowflake],
     );
-    const rows2 = (
-      await query(`SELECT * FROM teams WHERE team_role_snowflake_main = $1 and team_server_id = ${this.row.id} `, [
-        team_role_snowflake,
-      ])
-    ).rows;
     if (rows.length !== 0) return new Team(rows[0] as TeamRow);
-    if (rows2.length !== 0) return new Team(rows2[0] as TeamRow);
     throw new Error('no team with that role in this server');
   }
 
@@ -141,7 +147,7 @@ export default class TeamServer {
   async makeRole(client: Client, name: string) {
     const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
     const role = await guild.roles.create({ data: { name: `${name}` } });
-    logger(`Made new role "${name}" in TeamServer "${this.row.name}"`);
+    logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
     return role;
   }
 
@@ -150,10 +156,30 @@ export default class TeamServer {
     const roleToDelete = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
-      logger(`Role with ${role_snowflake} found: deleted that role`);
+      logger(`Role with snowflake **${role_snowflake}** found: deleted that role`);
       return;
     }
-    logger(`Role with ${role_snowflake} not found`);
+    logger(`Role with snowflake **${role_snowflake}** not found`);
+  }
+
+  async setRoleColor(client: Client, role_snowflake: string, color: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    if (roleToChange) {
+      await roleToChange.setColor(color);
+    }
+    logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
+  }
+
+  async setRoleName(client: Client, role_snowflake: string, new_name: string) {
+    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    if (roleToChange) {
+      await roleToChange.setName(new_name);
+      logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
+    } else {
+      throw new Error('role not found in ctf');
+    }
   }
 
   async hasSpace() {

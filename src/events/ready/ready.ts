@@ -1,8 +1,8 @@
-import log from '../../log';
+import { logger } from '../../log';
 import { registerCommands } from '../interaction/interaction';
 
 const readyEvent = (client) => {
-  log('Discord connected');
+  logger('Discord connected');
   void registerCommands(client);
 };
 

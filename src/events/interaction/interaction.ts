@@ -1,13 +1,14 @@
 import { Client, MessageEmbed } from 'discord.js';
-import {
-  category, challenge, ctf, ping, scoreboard, team,
-} from './commands';
+import { category, challenge, ctf, ping, scoreboard, team } from './commands';
 import CommandInteraction from './compat/CommandInteraction';
-import log from '../../log';
+import { logger, embedify } from '../../log';
 import { setCommands } from './compat/commands';
 import {
-  ApplicationCommandDefinition, ApplicationCommandOption,
-  ApplicationCommandResponse, ApplicationCommandResponseOption, CommandOptionMap,
+  ApplicationCommandDefinition,
+  ApplicationCommandOption,
+  ApplicationCommandResponse,
+  ApplicationCommandResponseOption,
+  CommandOptionMap,
   InteractionType,
 } from './compat/types';
 
@@ -15,10 +16,15 @@ import {
 const commands: ApplicationCommandDefinition[] = [ping, ctf, team];
 
 // utility to help us access passed options more intuitively
-const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap => (options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {}) ?? {});
+const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
+  options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {}) ?? {};
 
 // recursive function to find the execute command that corresponds with this interaction
-const executeCommand = (interaction: CommandInteraction, response: ApplicationCommandResponse, subcommands: ApplicationCommandDefinition[]): Promise<string> | Promise<void> | string | void => {
+const executeCommand = (
+  interaction: CommandInteraction,
+  response: ApplicationCommandResponse,
+  subcommands: ApplicationCommandDefinition[],
+): Promise<string> | Promise<void> | string | void => {
   const command = subcommands.find((com) => com.name === response.name);
   if (!command) return 'Command not recognized';
   // if this command definition contains a function, we should just execute it with the options we have
@@ -34,29 +40,30 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
   if (interaction.type !== InteractionType.APPLICATION_COMMAND) return;
 
   try {
-    const response = await executeCommand(interaction, { name: interaction.commandName, options: interaction.options }, commands);
+    const response = await executeCommand(
+      interaction,
+      { name: interaction.commandName, options: interaction.options },
+      commands,
+    );
     if (response) {
-      log(response);
-      await interaction.reply({ content: response });
+      logger(response);
+      await interaction.reply({ embeds: [embedify(response, 'Command')] });
     }
   } catch (_e) {
-    log(_e);
+    logger(_e);
     // pretty print errors B)
-    const e = (_e as Error);
-    const alert = new MessageEmbed()
-      .setTitle(e.name ?? 'Error')
-      .setColor('e74c3c')
-      .setDescription(e.message ?? 'Unknown cause')
-      .setTimestamp()
-      .setFooter(e.stack.split('\n')[1]); // get the first line of the stack trace
-    await interaction.reply({ embeds: [alert.toJSON()] });
+    const e = _e as Error;
+    await interaction.reply({
+      embeds: [embedify(e.message ?? 'Unknown cause', e.name ?? 'Error', e.stack.split('\n')[1])],
+    });
   }
 };
 
 export const registerCommands = async (client: Client) => {
-  log('registering commands...');
+  logger('registering commands...');
   await setCommands(client, commands, '810847000048173098');
   await setCommands(client, commands, '811105603559882803');
   await setCommands(client, commands, '811108082339676170');
-  log('commands registered');
+  await setCommands(client, commands, '808487147853447216');
+  logger('commands registered');
 };

@@ -22,6 +22,7 @@ export default {
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    ctf.throwErrorUnlessAdmin(interaction);
     let teamServer: TeamServer;
     if (options.server_name) {
       /** Team server name is specified */ teamServer = await ctf.fromNameTeamServer(options.server_name as string);
@@ -32,7 +33,8 @@ export default {
       if (!teamServer || !(await teamServer.hasSpace())) {
         /** Current guild is full or isn't a team server */ teamServer = await ctf.getTeamServerWithSpace();
       }
-      await teamServer.makeTeam(interaction.client, ctf, (options.name as string).trim());
     }
+    const team = await teamServer.makeTeam(interaction.client, ctf, (options.name as string).trim());
+    return `Made new team **${team.row.name}** in **${teamServer.row.name}**`;
   },
 } as ApplicationCommandDefinition;
