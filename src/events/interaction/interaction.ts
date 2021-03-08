@@ -13,7 +13,7 @@ import {
 } from './compat/types';
 
 // our canonical list of application definitions
-const commands: ApplicationCommandDefinition[] = [ping, ctf, team];
+const commands: ApplicationCommandDefinition[] = [ping, ctf, team, category];
 
 // utility to help us access passed options more intuitively
 const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
@@ -47,14 +47,28 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
     );
     if (response) {
       logger(response);
-      await interaction.reply({ embeds: [embedify(response, 'Command', '', '50c0bf')] });
+      await interaction.reply({
+        embeds: [
+          embedify({
+            description: response,
+            title: 'Command',
+            color: '50c0bf',
+          }),
+        ],
+      });
     }
   } catch (_e) {
     logger(_e);
     // pretty print errors B)
     const e = _e as Error;
     await interaction.reply({
-      embeds: [embedify(e.message ?? 'Unknown cause', e.name ?? 'Error', e.stack.split('\n')[1])],
+      embeds: [
+        embedify({
+          description: e.message ?? 'Unknown cause',
+          title: e.name ?? 'Error',
+          footer: e.stack.split('\n')[1],
+        }),
+      ],
     });
   }
 };
