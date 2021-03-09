@@ -4,24 +4,20 @@ import { CTF } from '../../../../database/models';
 
 export default {
   name: 'del',
-  description: 'Removes the provided category from the current CTF.',
+  description: 'Removes the indicated challenge. Otherwise, the challenge is inferred from the current channel',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
-      name: 'name',
-      description: 'The category name',
-      type: ApplicationCommandOptionType.STRING,
-      required: true,
+      name: 'challenge_channel',
+      description: "The challenge's current name",
+      type: ApplicationCommandOptionType.CHANNEL,
+      required: false,
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const name = options.name.toString();
-    const category = await ctf.fromNameCategory(name);
-    await category.deleteCategory(interaction.client);
-
-    return `Category **${name}** has been removed`;
+    return `This command has not been implemented yet`;
   },
 };

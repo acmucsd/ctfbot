@@ -13,7 +13,7 @@ import {
 } from './compat/types';
 
 // our canonical list of application definitions
-const commands: ApplicationCommandDefinition[] = [ping, ctf, team, category];
+const commands: ApplicationCommandDefinition[] = [ping, ctf, team, category, challenge];
 
 // utility to help us access passed options more intuitively
 const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
@@ -75,9 +75,9 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   logger('registering commands...');
-  await setCommands(client, commands, '810847000048173098');
-  await setCommands(client, commands, '811105603559882803');
-  await setCommands(client, commands, '811108082339676170');
+  // await setCommands(client, commands, '810847000048173098');
+  // await setCommands(client, commands, '811105603559882803');
+  // await setCommands(client, commands, '811108082339676170');
   await setCommands(client, commands, '808487147853447216');
   logger('commands registered');
 };

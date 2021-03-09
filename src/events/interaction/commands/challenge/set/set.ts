@@ -1,5 +1,3 @@
-import { Message } from 'discord.js';
-
 import name from './name';
 import author from './author';
 import prompt from './prompt';
@@ -10,7 +8,11 @@ import minimumpoints from './minimumpoints';
 import pointdecay from './pointdecay';
 import flag from './flag';
 import publish from './publish';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 
-const set = (message: Message) => {};
-
-export default set;
+export default {
+  name: 'set',
+  description: 'Challenge info management',
+  type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
+  options: [name, author, prompt, difficulty, points, initialpoints, minimumpoints, pointdecay, flag, publish],
+};

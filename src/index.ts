@@ -4,7 +4,7 @@ import eventLoader from './events';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import database from './database';
 
-const client = new Client();
+export const client = new Client();
 eventLoader(client);
 
 client

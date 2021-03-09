@@ -1,1 +1,1 @@
-export { default } from './get';
+export { default } from '../get';

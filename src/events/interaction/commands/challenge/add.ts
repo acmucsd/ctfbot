@@ -4,30 +4,29 @@ import { CTF } from '../../../../database/models';
 
 export default {
   name: 'add',
-  description: 'Creates a new category with the indicated name and description.',
+  description: 'Creates a new CTF challenge.',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
-      description: 'The desired category name',
+      description: "The challenge's name",
       type: ApplicationCommandOptionType.STRING,
       required: true,
     },
     {
-      name: 'description',
-      description: 'The desired category description',
+      name: 'category',
+      description: "The challenge's category",
       type: ApplicationCommandOptionType.STRING,
-      required: false,
+      required: true,
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const name = options.name.toString();
-    const category = await ctf.createCategory(interaction.client, name);
-    if (options.description) await category.setDescription(options.description.toString());
+    const category = await ctf.fromNameCategory(options.category.toString());
+    const challenge = await category.createChallenge(interaction.client, options.name.toString());
 
-    return `New category **${name}** has been created.`;
+    return `Challenge **${challenge.row.name}** has been created in category **${category.row.name}**.`;
   },
 };

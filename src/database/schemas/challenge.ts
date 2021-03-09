@@ -18,7 +18,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS challenges (
 export interface ChallengeRow {
   id: number;
   category_id: number;
-  channel_snowflake: string | null;
+  channel_snowflake: string;
   name: string;
   author: string | null;
   prompt: string | null;

@@ -94,7 +94,7 @@ export default class CTF {
   }
 
   /* Category Creation */
-  async createCategory(name: string) {
+  async createCategory(client: Client, name: string) {
     // check if a category already exists with that name in this ctf
     const { rows: existingRows } = await query(
       `SELECT id FROM categories WHERE name = $1 and ctf_id = ${this.row.id}`,
@@ -103,17 +103,24 @@ export default class CTF {
     if (existingRows && existingRows.length > 0)
       throw new Error('cannot create a category with a duplicate name in this CTF');
 
-    const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [
-      name,
-    ]);
-    return new Category(rows[0] as CategoryRow);
+    // create the channel category for this category
+    const guild = this.getGuild(client);
+    const category = await guild.channels.create(`${name}`, { type: 'category' });
+
+    const {
+      rows,
+    } = await query(
+      `INSERT INTO categories(ctf_id, name, channel_category_snowflake) VALUES (${this.row.id}, $1, $2) RETURNING *`,
+      [name, category.id],
+    );
+    return new Category(rows[0] as CategoryRow, this);
   }
 
   /* Category Retrieval */
   async fromNameCategory(name: string) {
     const { rows } = await query(`SELECT * FROM categories WHERE name = $1 and ctf_id = ${this.row.id}`, [name]);
     if (rows.length === 0) throw new Error('no category with that name in this ctf');
-    return new Category(rows[0] as CategoryRow);
+    return new Category(rows[0] as CategoryRow, this);
   }
 
   async fromChannelCategorySnowflakeCategory(channel_category_snowflake: string) {
@@ -123,12 +130,12 @@ export default class CTF {
       channel_category_snowflake,
     ]);
     if (rows.length === 0) throw new Error('no category with that snowflake in this ctf');
-    return new Category(rows[0] as CategoryRow);
+    return new Category(rows[0] as CategoryRow, this);
   }
 
   async getAllCategories() {
     const { rows } = await query(`SELECT * FROM categories WHERE ctf_id = ${this.row.id}`);
-    return rows.map((row) => new Category(row as CategoryRow));
+    return rows.map((row) => new Category(row as CategoryRow, this));
   }
 
   /* Team Server Creation */
@@ -245,6 +252,12 @@ export default class CTF {
     return ctf;
   }
 
+  getGuild(client: Client): Guild {
+    const guild = client.guilds.resolve(this.row.guild_snowflake);
+    if (!guild) throw Error('No guild corresponds with the current CTF id');
+    return guild;
+  }
+
   /**
    * Broken
    */
@@ -258,13 +271,13 @@ export default class CTF {
     const member =
       this.row.guild_snowflake === interaction.guild.id
         ? interaction.member
-        : interaction.client.guilds.cache.get(this.row.guild_snowflake).member(interaction.member.user); //.member(interaction.member.user);
+        : this.getGuild(interaction.client).member(interaction.member.user); //.member(interaction.member.user);
     if (member?.roles.cache.has(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
   }
 
   async makeRole(client: Client, name: string) {
-    const ctfServerGuild = client.guilds.cache.find((guild) => guild.id === this.row.guild_snowflake);
+    const ctfServerGuild = this.getGuild(client);
     if (ctfServerGuild.roles.cache.find((role) => role.name === name))
       throw new Error('Role with that name already exists');
     const role = await ctfServerGuild.roles.create({ data: { name: `${name}` } });
@@ -273,8 +286,8 @@ export default class CTF {
   }
 
   async deleteRole(client: Client, role_snowflake: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const roleToDelete = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const guild = this.getGuild(client);
+    const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
       logger(`Role with ${role_snowflake} found: deleted that role`);
@@ -284,8 +297,8 @@ export default class CTF {
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const guild = this.getGuild(client);
+    const roleToChange = guild.roles.resolve(role_snowflake);
     if (roleToChange) {
       await roleToChange.setColor(color);
       logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
@@ -295,8 +308,8 @@ export default class CTF {
   }
 
   async setRoleName(client: Client, role_snowflake: string, new_name: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const guild = this.getGuild(client);
+    const roleToChange = guild.roles.resolve(role_snowflake);
     if (roleToChange) {
       await roleToChange.setName(new_name);
       logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
@@ -325,7 +338,6 @@ export default class CTF {
         team = await server.fromRoleTeam(team_role_snowflake);
         return team;
       } catch {
-        // eslint-disable-next-line
         continue;
       }
     }

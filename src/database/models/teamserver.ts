@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, Guild } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { TeamRow, TeamServerRow } from '../schemas';
@@ -43,7 +43,7 @@ export default class TeamServer {
    * @param name
    */
   async makeChannel(client: Client, name: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const guild = this.getGuild(client);
     let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
     if (channel) {
       await channel.delete();
@@ -55,8 +55,8 @@ export default class TeamServer {
   }
 
   async renameChannel(client: Client, channel_snowflake: string, newName: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const channel = guild.channels.cache.find((c) => c.id === `${channel_snowflake}` && c.type === 'text');
+    const guild = this.getGuild(client);
+    const channel = guild.channels.resolve(channel_snowflake);
     if (channel) {
       const oldName = channel.name;
       await channel.setName(newName.toLowerCase().replace(' ', '-'));
@@ -67,8 +67,8 @@ export default class TeamServer {
   }
 
   async deleteChannel(client: Client, channel_snowflake: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const channel = guild.channels.cache.find((c) => c.id === channel_snowflake);
+    const guild = this.getGuild(client);
+    const channel = guild.channels.resolve(channel_snowflake);
     if (channel) {
       await channel.delete();
       logger(`Channel with ${channel_snowflake} found: deleted that channel`);
@@ -84,7 +84,7 @@ export default class TeamServer {
    * @param name
    */
   async makeCategory(client: Client, name: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const guild = this.getGuild(client);
     let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
     if (!category) {
       category = await guild.channels.create(`${name}`, { type: 'category' });
@@ -149,8 +149,14 @@ export default class TeamServer {
   }
 
   /** Misc */
+  getGuild(client: Client): Guild {
+    const guild = client.guilds.resolve(this.row.guild_snowflake);
+    if (guild) throw Error('No guild corresponds with the current CTF id');
+    return guild;
+  }
+
   async makeRole(client: Client, name: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const guild = this.getGuild(client);
     if (guild.roles.cache.find((role) => role.name === name)) throw new Error('Role with that name already exists');
     const role = await guild.roles.create({ data: { name: `${name}` } });
     logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
@@ -158,8 +164,8 @@ export default class TeamServer {
   }
 
   async deleteRole(client: Client, role_snowflake: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
-    const roleToDelete = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const guild = this.getGuild(client);
+    const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
       logger(`Role with snowflake **${role_snowflake}** found: deleted that role`);
@@ -169,7 +175,7 @@ export default class TeamServer {
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const guild = this.getGuild(client);
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setColor(color);
@@ -178,7 +184,7 @@ export default class TeamServer {
   }
 
   async setRoleName(client: Client, role_snowflake: string, new_name: string) {
-    const guild = client.guilds.cache.find((server) => server.id === this.row.guild_snowflake);
+    const guild = this.getGuild(client);
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setName(new_name);

@@ -3,25 +3,21 @@ import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 
 export default {
-  name: 'del',
-  description: 'Removes the provided category from the current CTF.',
+  name: 'get',
+  description: 'Gives info on the indicated challenge, and if none is specified returns all challenges in the CTF',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
-      name: 'name',
-      description: 'The category name',
+      name: 'challenge_name',
+      description: 'The challenge to get info on',
       type: ApplicationCommandOptionType.STRING,
-      required: true,
+      required: false,
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const name = options.name.toString();
-    const category = await ctf.fromNameCategory(name);
-    await category.deleteCategory(interaction.client);
-
-    return `Category **${name}** has been removed`;
+    return `This command has not been implemented yet`;
   },
 };

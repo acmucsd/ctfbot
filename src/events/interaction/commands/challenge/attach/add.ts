@@ -3,33 +3,33 @@ import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 
 export default {
-  name: 'name',
-  description: 'Changes the name of the indicated category',
+  name: 'add',
+  description: 'Adds a file attachment to the existing specified challenge',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
-      name: 'category_name',
-      description: 'The current category name',
+      name: 'file_name',
+      description: 'The name the file will be referred to',
       type: ApplicationCommandOptionType.STRING,
       required: true,
     },
     {
-      name: 'new_name',
-      description: 'The new category name',
+      name: 'file_url',
+      description: 'The download url for the file',
       type: ApplicationCommandOptionType.STRING,
       required: true,
+    },
+    {
+      name: 'challenge_channel',
+      description: "The challenge's current name",
+      type: ApplicationCommandOptionType.CHANNEL,
+      required: false,
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const category_name = options.category_name.toString();
-    const category = await ctf.fromNameCategory(category_name);
-    await category.setName(interaction.client, options.new_name.toString());
-
-    return `Category **${category_name}** name has been set to **${category.row.name}**.`;
-
-    return `This command has not yet been implemented`;
+    return `This command has not been implemented yet`;
   },
 };
