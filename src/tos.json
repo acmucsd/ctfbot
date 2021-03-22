@@ -1,0 +1,84 @@
+{
+  "content": "Below is everything you need to know to compete in San Diego CTF. You will need to react to this message to indicate you have read and understood the rules before the competition will become available to you. Please ensure your device supports embeds.",
+  "embeds": [
+    {
+      "title": "How to Play :soccer:",
+      "description": "A brief overview of how to compete in San Diego CTF. We also have a full video tutorial here: https://",
+      "color": 4700601,
+      "fields": [
+        {
+          "name": "Scoring Points",
+          "value": "Points are awarded"
+        },
+        {
+          "name": "Joining Teams",
+          "value": "TBD"
+        },
+        {
+          "name": "Submitting Flags",
+          "value": "TBD"
+        },
+        {
+          "name": "Tracking Progress",
+          "value": "TBD"
+        },
+        {
+          "name": "Determining Winners",
+          "value": "TBD"
+        }
+      ]
+    },
+    {
+      "title": "Competition Rules :notebook:",
+      "description": "You must meet the following terms and conditions and agree to them in order to participate in San Diego CTF.",
+      "color": 12145991,
+      "fields": [
+        {
+          "name": "Rule #1",
+          "value": "If you are under the age of 18, you will need your parent or guardian's consent to compete in this competition. If you are under the age of 13, you may not participate."
+        },
+        {
+          "name": "Rule #2",
+          "value": "Use of Internet resources used during the game is permitted and encouraged, but resources must be freely available to all players."
+        },
+        {
+          "name": "Rule #3",
+          "value": "Communicate respectfully and professionally. Threats, harassment, and disrespectful behavior will be met with swift ejection and disqualification."
+        },
+        {
+          "name": "Rule #4",
+          "value": "Discord's Terms of Service apply at all times. https://discord.com/terms"
+        },
+        {
+          "name": "Rule #5",
+          "value": "Collaboration and communication regarding the challenges with any persons outside your team is disallowed, and will result in the disqualification of all teams involved."
+        },
+        {
+          "name": "Rule #6",
+          "value": "You have express permission to passively examine all target systems, as well permission to perform offensive attacks on these systems when explicitly stated. Do not attack the infrastructure supporting the competition. Downtime, intentional or otherwise, will be rewarded with disqualification."
+        },
+        {
+          "name": "Rule #7",
+          "value": "**Do not run automated tools** on our targets unless given express permission. This includes disruptive software such as bruteforcers, fuzzers, and other software that may disrupt the competition for other players. **You will not require these tools**."
+        },
+        {
+          "name": "Rule #8",
+          "value": "No \"flag hoarding\". Submit flags as soon as they are discovered, do not save them until the last minute."
+        },
+        {
+          "name": "Rule #9",
+          "value": "Do not attack the systems of other players. Do not \"dox\" other players. **Do** be nice to one another."
+        },
+        {
+          "name": "Rule #10",
+          "value": "Please obey the internet laws in your jurisdiction, as well as the United States."
+        }
+      ]
+    },
+    {
+      "title": ":warning: You must agree to the terms and conditions :warning:",
+      "description": "React with :thumbsup: to indicate you have completed reading the above and consent to the terms and conditions outlined.",
+      "color": null
+    }
+  ]
+}

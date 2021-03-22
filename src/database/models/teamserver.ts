@@ -151,7 +151,7 @@ export default class TeamServer {
   /** Misc */
   getGuild(client: Client): Guild {
     const guild = client.guilds.resolve(this.row.guild_snowflake);
-    if (guild) throw Error('No guild corresponds with the current CTF id');
+    if (!guild) throw Error('No guild corresponds with the current CTF id');
     return guild;
   }
 

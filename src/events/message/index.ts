@@ -1,1 +1,1 @@
-export { default as MessageEvent } from './message';
+export { default } from './message';

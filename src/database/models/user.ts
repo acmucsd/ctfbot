@@ -1,6 +1,7 @@
 import { Attempt, Invite } from '.';
 import { AttemptRow, InviteRow, UserRow } from '../schemas';
 import query from '../database';
+import { logger } from '../../log';
 
 export default class User {
   row: UserRow;
@@ -17,20 +18,16 @@ export default class User {
   }
 
   /** User Setters */
-  // Unique per CTF
-  async setUserSnowflake(user_snowflake: string) {
-    await query(`UPDATE users SET user_snowflake = $1 WHERE id = ${this.row.id}`, [user_snowflake]);
-    this.row.user_snowflake = user_snowflake;
-  }
 
   async setTeamID(team_id: number) {
     await query(`UPDATE users SET team_id = $1 WHERE id = ${this.row.id}`, [team_id]);
     this.row.team_id = team_id;
   }
 
-  async setTOS(tos_accepted: boolean) {
-    await query(`UPDATE users SET tos_accepted = $1 WHERE id = ${this.row.id}`, [tos_accepted]);
-    this.row.tos_accepted = tos_accepted;
+  async acceptTOS() {
+    await query(`UPDATE users SET tos_accepted = true WHERE id = ${this.row.id}`);
+    this.row.tos_accepted = true;
+    logger(`**${this.row.user_snowflake}** has accepted TOS`);
   }
 
   /** Invite Creation */

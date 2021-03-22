@@ -1,7 +1,8 @@
-import { Client, Guild } from 'discord.js';
+import { Client, Guild, GuildMember, TextChannel } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
+import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
 
@@ -13,7 +14,7 @@ export default class CTF {
   }
 
   /* CTF Creation / Deletion */
-  static async createCTF(name: string, guildSnowflake: string) {
+  static async createCTF(client: Client, name: string, guildSnowflake: string) {
     // check if a CTF already exists in this guild
     const { rows: existingCTFs } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
     if (existingCTFs && existingCTFs.length > 0) throw new Error('cannot create a second CTF in this guild');
@@ -25,14 +26,57 @@ export default class CTF {
       name,
       guildSnowflake,
     ]);
-    logger(`Created new ctf "${name}"`);
+    logger(`Created new ctf **${name}**`);
+    const ctf = new CTF(rows[0] as CTFRow);
+    const info = await ctf.makeChannelCategory(client, 'Info');
+    await ctf.setInfoCategory(info.id);
+    const tos = await ctf.makeChannel(client, 'tos');
+    await ctf.setTOSChannel(tos.id);
+    await (tos as TextChannel).createWebhook('Terms of Service').then(async (webhook) => {
+      await webhook.send(TOSMessage);
+      await ctf.setTOSWebhook(webhook.id);
+    });
+    return ctf;
+  }
+
+  async deleteCTF(client: Client) {
+    // because of Foreign Key constraints, deletes all associated Team Servers, Teams, Categories, and Challenges
+    const teams = await this.getAllTeams();
+    logger(teams.toString());
+    for (const team of teams) {
+      await team.deleteTeam(client);
+    }
+    await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
+    logger(`Deleted ctf **${this.row.name}**`);
+  }
+  static async fromWebhookCTF(tos_webhook_snowflake: string) {
+    const { rows } = await query('SELECT * FROM ctfs WHERE tos_webhook_snowflake = $1', [tos_webhook_snowflake]);
+    if (rows.length === 0) throw new Error('no ctf associated with that webhook');
     return new CTF(rows[0] as CTFRow);
   }
 
-  async deleteCTF() {
-    // because of Foreign Key constraints, deletes all associated Team Servers, Teams, Categories, and Challenges
-    await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
-    logger(`Deleted ctf "${this.row.name}"`);
+  async setInfoCategory(info_category_snowflake: string) {
+    const { rows } = await query('SELECT id FROM ctfs WHERE info_category_snowflake = $1', [info_category_snowflake]);
+    if (rows && rows.length > 0) throw new Error('ctf already uses that category');
+    await query(`UPDATE ctfs SET info_category_snowflake = $1 WHERE id = ${this.row.id}`, [info_category_snowflake]);
+    this.row.info_category_snowflake = info_category_snowflake;
+    logger(`Set **${this.row.name}**'s info category to **${info_category_snowflake}**`);
+  }
+
+  async setTOSChannel(tos_channel_snowflake: string) {
+    const { rows } = await query('SELECT id FROM ctfs WHERE tos_channel_snowflake = $1', [tos_channel_snowflake]);
+    if (rows && rows.length > 0) throw new Error('ctf already uses that channel');
+    await query(`UPDATE ctfs SET tos_channel_snowflake = $1 WHERE id = ${this.row.id}`, [tos_channel_snowflake]);
+    this.row.tos_channel_snowflake = tos_channel_snowflake;
+    logger(`Set **${this.row.name}**'s TOS channel to **${tos_channel_snowflake}**`);
+  }
+
+  async setTOSWebhook(tos_webhook_snowflake: string) {
+    const { rows } = await query('SELECT id FROM ctfs WHERE tos_webhook_snowflake = $1', [tos_webhook_snowflake]);
+    if (rows && rows.length > 0) throw new Error('ctf already uses that webhook');
+    await query(`UPDATE ctfs SET tos_webhook_snowflake = $1 WHERE id = ${this.row.id}`, [tos_webhook_snowflake]);
+    this.row.tos_webhook_snowflake = tos_webhook_snowflake;
+    logger(`Set **${this.row.name}**'s TOS webhook to be **${tos_webhook_snowflake}**`);
   }
 
   /* CTF Retrieval */
@@ -157,8 +201,12 @@ export default class CTF {
     );
     logger(`Created new team server "${name}" for ctf "${this.row.name}"`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
-    await teamServer.setInfoChannelSnowflake((await teamServer.makeChannel(guild.client, 'info')).id);
+    const infoChannel = await teamServer.makeChannel(guild.client, 'info');
+    await teamServer.setInfoChannelSnowflake(infoChannel.id);
     await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);
+    if (this.row.id === teamServer.row.id) {
+      await infoChannel.setParent(this.row.info_category_snowflake);
+    }
     return teamServer;
   }
 
@@ -218,17 +266,24 @@ export default class CTF {
   }
 
   /** User Creation */
-  async createUser(user_snowflake: string) {
-    // Check
-
+  async createUser(member: GuildMember) {
     const {
       rows,
     } = await query(
-      `INSERT INTO users(ctf_id, user_snowflake, tos_accepted) VALUES (${this.row.id}, $2, false) RETURNING *`,
-      [user_snowflake],
+      `INSERT INTO users(ctf_id, user_snowflake, tos_accepted) VALUES (${this.row.id}, $1, false) RETURNING *`,
+      [member.user.id],
     );
+    logger(`Added new user **${member.displayName}** to **${this.row.name}**`);
     return new User(rows[0] as UserRow);
   }
+
+  // async deleteUser(member: GuildMember) {
+  //   const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
+  //     member.user.id,
+  //   ]);
+
+  //   logger(`Removed user ${member.displayName}`)
+  // }
 
   /** User Retrieval */
   async fromUserSnowflakeUser(user_snowflake: string) {
@@ -240,6 +295,11 @@ export default class CTF {
   }
 
   /** Misc Methods */
+  // async checkIfReturningUser(member: GuildMember) {
+  //   const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
+  //     member.user.id,
+  //   ]);
+  // }
   static async fromGuildSnowflakeCTF(guild_id: string) {
     let ctf: CTF;
     try {
@@ -258,9 +318,6 @@ export default class CTF {
     return guild;
   }
 
-  /**
-   * Broken
-   */
   throwErrorUnlessAdmin(interaction: CommandInteraction) {
     // if the admin role isn't set, no check is performed
     // otherwise, we need to check if the caller has admin
@@ -271,7 +328,7 @@ export default class CTF {
     const member =
       this.row.guild_snowflake === interaction.guild.id
         ? interaction.member
-        : this.getGuild(interaction.client).member(interaction.member.user); //.member(interaction.member.user);
+        : this.getGuild(interaction.client).member(interaction.member.user);
     if (member?.roles.cache.has(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
   }
@@ -348,15 +405,11 @@ export default class CTF {
     const teamServers = await this.getAllTeamServers();
     let team: Team;
     const teamID = (await this.fromUserSnowflakeUser(user_snowflake)).row.team_id;
-    // eslint-disable-next-line
     for (const server of teamServers) {
-      // eslint-disable-next-line
       try {
-        // eslint-disable-next-line
         team = await server.fromIdTeam(teamID);
         return team;
       } catch {
-        // eslint-disable-next-line
         continue;
       }
     }
@@ -390,5 +443,29 @@ export default class CTF {
         throw new Error('no team can be found with the given info');
       }
     }
+  }
+
+  async makeChannelCategory(client: Client, name: string) {
+    const guild = this.getGuild(client);
+    let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
+    if (!category) {
+      category = await guild.channels.create(`${name}`, { type: 'category' });
+      logger(`${name} category not found: created ${name} category`);
+    } else {
+      logger(`**${name}** category already found`);
+    }
+    return category;
+  }
+
+  async makeChannel(client: Client, name: string) {
+    const guild = this.getGuild(client);
+    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
+    if (channel) {
+      await channel.delete();
+      logger(`**${name}** found: deleted **${name}** channel`);
+    }
+    channel = await guild.channels.create(`${name}`, { type: 'text' });
+    logger(`Created **${name}** channel`);
+    return channel;
   }
 }

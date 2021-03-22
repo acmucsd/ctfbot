@@ -9,7 +9,7 @@ export default {
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
-    void ctf.deleteCTF();
+    void ctf.deleteCTF(interaction.client);
     return `Deleted CTF **${ctf.row.name}**`;
   },
 } as ApplicationCommandDefinition;
