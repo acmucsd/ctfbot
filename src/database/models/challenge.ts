@@ -1,15 +1,17 @@
 import query from '../database';
-import { AttachmentRow } from '../schemas/attachment';
-import { AttemptRow } from '../schemas/attempt';
-import { ChallengeRow } from '../schemas/challenge';
+import { AttachmentRow, AttemptRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
+import { Client } from 'discord.js';
+import CTF from './ctf';
 
 export default class Challenge {
   row: ChallengeRow;
+  ctf: CTF;
 
-  constructor(row: ChallengeRow) {
+  constructor(row: ChallengeRow, ctf: CTF) {
     this.row = row;
+    this.ctf = ctf;
   }
 
   /** Challenge Creation / Deletion */
@@ -21,8 +23,13 @@ export default class Challenge {
 
   /** Challenge Setters */
   // Unique per CTF
-  async setName(name: string) {
+  async setName(client: Client, name: string) {
     await query(`UPDATE attachments SET name = $1 WHERE id = ${this.row.id}`, [name]);
+
+    // rename the challenge channel on discord
+    const channel = this.getChannelChallenge(client);
+    await channel.setName(name);
+
     this.row.name = name;
   }
 
@@ -104,5 +111,12 @@ export default class Challenge {
   async getAllAttempts() {
     const { rows } = await query(`SELECT * FROM attempts WHERE challenge_id = ${this.row.id}`);
     return rows.map((row) => new Attempt(row as AttemptRow));
+  }
+
+  // misc
+  getChannelChallenge(client: Client) {
+    const channel = this.ctf.getGuild(client).channels.resolve(this.row.channel_snowflake);
+    if (!channel) throw new Error('No channel corresponding with this challenge id found.');
+    return channel;
   }
 }

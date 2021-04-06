@@ -53,32 +53,18 @@ export default class Category {
     const channel = await this.ctf.getGuild(client).channels.create(name);
     await channel.setParent(this.row.channel_category_snowflake);
 
-    const { rows } = await query(`INSERT INTO challenges (name, category_id) VALUES ($1, ${this.row.id}) RETURNING *`, [
-      name,
-    ]);
-    return new Challenge(rows[0] as ChallengeRow);
-  }
-
-  /** Challenge Retrieval */
-  async fromNameChallenge(name: string) {
-    const { rows } = await query(`SELECT * FROM challenges WHERE name = $1 and ctf_id = ${this.row.ctf_id}`, [name]);
-    if (rows.length === 0) throw new Error('no challenge with that name in this ctf');
-    return new Challenge(rows[0] as ChallengeRow);
-  }
-
-  async fromChannelSnowflakeChallenge(channel_snowflake: string) {
     const {
       rows,
-    } = await query(`SELECT * FROM challenges WHERE channel_snowflake = $1 and ctf_id = ${this.row.ctf_id}`, [
-      channel_snowflake,
-    ]);
-    if (rows.length === 0) throw new Error('no challenge with that channel in this ctf');
-    return new Challenge(rows[0] as ChallengeRow);
+    } = await query(
+      `INSERT INTO challenges (name, category_id, channel_snowflake) VALUES ($1, ${this.row.id}, ${channel.id}) RETURNING *`,
+      [name],
+    );
+    return new Challenge(rows[0] as ChallengeRow, this.ctf);
   }
 
   async getAllChallenges() {
     const { rows } = await query(`SELECT * FROM challenges WHERE category_id = ${this.row.id}`);
-    return rows.map((row) => new Challenge(row as ChallengeRow));
+    return rows.map((row) => new Challenge(row as ChallengeRow, this.ctf));
   }
 
   // misc

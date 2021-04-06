@@ -1,10 +1,11 @@
 import { Client, Guild, GuildMember, TextChannel } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
-import { CategoryRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
+import { CategoryRow, ChallengeRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
 import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
+import Challenge from './challenge';
 
 export default class CTF {
   row: CTFRow;
@@ -180,6 +181,20 @@ export default class CTF {
   async getAllCategories() {
     const { rows } = await query(`SELECT * FROM categories WHERE ctf_id = ${this.row.id}`);
     return rows.map((row) => new Category(row as CategoryRow, this));
+  }
+
+  /* Challenge Retrieval */
+  /** Challenge Retrieval */
+  // async fromNameChallenge(name: string) {
+  //   const { rows } = await query(`SELECT * FROM challenges WHERE name = $1 and ctf_id = ${this.row.id}`, [name]);
+  //   if (rows.length === 0) throw new Error('no challenge with that name in this ctf');
+  //   return new Challenge(rows[0] as ChallengeRow, this);
+  // }
+
+  async fromChannelSnowflakeChallenge(channel_snowflake: string) {
+    const { rows } = await query(`SELECT * FROM challenges WHERE channel_snowflake = $1`, [channel_snowflake]);
+    if (rows.length === 0) throw new Error('no challenge with that channel in this ctf');
+    return new Challenge(rows[0] as ChallengeRow, this);
   }
 
   /* Team Server Creation */
