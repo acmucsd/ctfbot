@@ -1,10 +1,12 @@
-import { Client, Guild, GuildMember, TextChannel } from 'discord.js';
+import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, PartialUser } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, ChallengeRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
 import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
+import { subscribedMessages } from '../../';
+import { NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 
 export default class CTF {
@@ -36,6 +38,16 @@ export default class CTF {
     await (tos as TextChannel).createWebhook('Terms of Service').then(async (webhook) => {
       await webhook.send(TOSMessage);
       await ctf.setTOSWebhook(webhook.id);
+      subscribedMessages.set(webhook.id, {
+        id: ctf.row.id,
+        callback: async (user: DiscordUser | PartialUser) => {
+          const userDB = await ctf.fromUserSnowflakeUser(user.id);
+          if (userDB.row.tos_accepted) {
+            return;
+          }
+          await userDB.acceptTOS();
+        },
+      });
     });
     return ctf;
   }
@@ -43,10 +55,15 @@ export default class CTF {
   async deleteCTF(client: Client) {
     // because of Foreign Key constraints, deletes all associated Team Servers, Teams, Categories, and Challenges
     const teams = await this.getAllTeams();
-    logger(teams.toString());
     for (const team of teams) {
       await team.deleteTeam(client);
     }
+    const webhook = await client.fetchWebhook(this.row.tos_webhook_snowflake);
+    await webhook.delete();
+    logger('Removed TOS webhook from the server');
+    const tos = client.channels.resolve(this.row.tos_channel_snowflake);
+    await tos.delete();
+    logger('Removed TOS channel');
     await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
     logger(`Deleted ctf **${this.row.name}**`);
   }
@@ -232,6 +249,14 @@ export default class CTF {
     return new TeamServer(rows[0] as TeamServerRow);
   }
 
+  async fromGuildSnowflakeTeamServer(guild_snowflake: string) {
+    const { rows } = await query(`SELECT * FROM team_servers WHERE guild_snowflake = $1 and ctf_id = ${this.row.id}`, [
+      guild_snowflake,
+    ]);
+    if (rows.length === 0) throw new Error('no team server with that snowflake in this ctf');
+    return new TeamServer(rows[0] as TeamServerRow);
+  }
+
   async getAllTeams() {
     let teams: Team[] = [];
     for (const teamServer of await this.getAllTeamServers()) {
@@ -305,7 +330,7 @@ export default class CTF {
     const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
       user_snowflake,
     ]);
-    if (rows.length === 0) throw new Error('that user is not in this ctf');
+    if (rows.length === 0) throw new NoUserError();
     return new User(rows[0] as UserRow);
   }
 
@@ -428,7 +453,7 @@ export default class CTF {
         continue;
       }
     }
-    throw new Error('no team associated with that user');
+    throw new NoTeamUserError();
   }
 
   async fromChannelTeam(channel_snowflake: string) {

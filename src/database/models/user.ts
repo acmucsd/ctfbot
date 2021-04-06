@@ -28,6 +28,7 @@ export default class User {
     await query(`UPDATE users SET tos_accepted = true WHERE id = ${this.row.id}`);
     this.row.tos_accepted = true;
     logger(`**${this.row.user_snowflake}** has accepted TOS`);
+    // TODO: Give them a team
   }
 
   /** Invite Creation */
