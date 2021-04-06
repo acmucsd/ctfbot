@@ -24,6 +24,14 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return `This command has not been implemented yet`;
+    const newDecay = options.decay as number;
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake)
+      throw new Error('could not determine challenge, try providing challenge_channel parameter');
+
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    await challenge.setPointDecay(newDecay);
+
+    return `Challenge point decay has been set to **${newDecay}**.`;
   },
 };

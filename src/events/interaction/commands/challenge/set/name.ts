@@ -25,13 +25,13 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const newName = options.new_name.toString();
-    const challengeChannelSnowflake = options.challenge_channel.toString() ?? interaction.channel.id;
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake)
       throw new Error('could not determine challenge, try providing challenge_channel parameter');
 
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.setName(interaction.client, newName);
 
-    return `Challenge name has been set to ${newName}.`;
+    return `Challenge name has been set to **${newName}**.`;
   },
 };

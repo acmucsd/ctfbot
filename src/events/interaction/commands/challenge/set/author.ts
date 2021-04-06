@@ -14,7 +14,7 @@ export default {
       required: true,
     },
     {
-      name: 'challenge_name',
+      name: 'challenge_channel',
       description: "The challenge's name",
       type: ApplicationCommandOptionType.CHANNEL,
       required: false,
@@ -24,6 +24,14 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return `This command has not been implemented yet`;
+    const newAuthor = options.author.toString();
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake)
+      throw new Error('could not determine challenge, try providing challenge_channel parameter');
+
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    await challenge.setAuthor(newAuthor);
+
+    return `Challenge author has been set to **${newAuthor}**.`;
   },
 };

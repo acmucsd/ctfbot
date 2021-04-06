@@ -15,19 +15,19 @@ export default {
       choices: [
         {
           name: 'Baby',
-          value: '0',
+          value: 'BABY',
         },
         {
           name: 'Easy',
-          value: '1',
+          value: 'EASY',
         },
         {
           name: 'Medium',
-          value: '2',
+          value: 'MEDIUM',
         },
         {
           name: 'Hard',
-          value: '3',
+          value: 'HARD',
         },
       ],
     },
@@ -42,6 +42,14 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return `This command has not been implemented yet`;
+    const difficulty = options.difficulty.toString();
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake)
+      throw new Error('could not determine challenge, try providing challenge_channel parameter');
+
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    await challenge.setDifficulty(difficulty);
+
+    return `Challenge difficulty has been set to **${difficulty}**.`;
   },
 };

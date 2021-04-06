@@ -24,7 +24,7 @@ export default class Challenge {
   /** Challenge Setters */
   // Unique per CTF
   async setName(client: Client, name: string) {
-    await query(`UPDATE attachments SET name = $1 WHERE id = ${this.row.id}`, [name]);
+    await query(`UPDATE challenges SET name = $1 WHERE id = ${this.row.id}`, [name]);
 
     // rename the challenge channel on discord
     const channel = this.getChannelChallenge(client);
@@ -34,48 +34,48 @@ export default class Challenge {
   }
 
   async setAuthor(author: string) {
-    await query(`UPDATE attachments SET channel_snowflake = $1 WHERE id = ${this.row.id}`, [author]);
+    await query(`UPDATE challenges SET author = $1 WHERE id = ${this.row.id}`, [author]);
     this.row.author = author;
   }
 
   async setPrompt(prompt: string) {
-    await query(`UPDATE attachments SET channel_snowflake = $1 WHERE id = ${this.row.id}`, [prompt]);
+    await query(`UPDATE challenges SET prompt = $1 WHERE id = ${this.row.id}`, [prompt]);
     this.row.prompt = prompt;
   }
 
   async setDifficulty(difficulty: string) {
-    await query(`UPDATE attachments SET channel_snowflake = $1 WHERE id = ${this.row.id}`, [difficulty]);
+    await query(`UPDATE challenges SET difficulty = $1 WHERE id = ${this.row.id}`, [difficulty]);
     this.row.difficulty = difficulty;
   }
 
   async setInitialPoints(initial_points: number) {
-    await query(`UPDATE attachments SET initial_points = $1 WHERE id = ${this.row.id}`, [initial_points]);
+    await query(`UPDATE challenges SET initial_points = $1 WHERE id = ${this.row.id}`, [initial_points]);
     this.row.initial_points = initial_points;
   }
 
   async setPointDecay(point_decay: number) {
-    await query(`UPDATE attachments SET point_decay = $1 WHERE id = ${this.row.id}`, [point_decay]);
+    await query(`UPDATE challenges SET point_decay = $1 WHERE id = ${this.row.id}`, [point_decay]);
     this.row.point_decay = point_decay;
   }
 
   async setMinPoints(min_points: number) {
-    await query(`UPDATE attachments SET min_points = $1 WHERE id = ${this.row.id}`, [min_points]);
+    await query(`UPDATE challenges SET min_points = $1 WHERE id = ${this.row.id}`, [min_points]);
     this.row.min_points = min_points;
   }
 
   async setFlag(flag: string) {
-    await query(`UPDATE attachments SET flag = $1 WHERE id = ${this.row.id}`, [flag]);
+    await query(`UPDATE challenges SET flag = $1 WHERE id = ${this.row.id}`, [flag]);
     this.row.flag = flag;
   }
 
   // Valid User in the CTF(?)
   async setFirstBlood(first_blood_id: number) {
-    await query(`UPDATE attachments SET first_blood_id = $1 WHERE id = ${this.row.id}`, [first_blood_id]);
+    await query(`UPDATE challenges SET first_blood_id = $1 WHERE id = ${this.row.id}`, [first_blood_id]);
     this.row.first_blood_id = first_blood_id;
   }
 
   async setPublishTime(publish_time: Date) {
-    await query(`UPDATE attachments SET publish_time = $1 WHERE id = ${this.row.id}`, [publish_time]);
+    await query(`UPDATE challenges SET publish_time = $1 WHERE id = ${this.row.id}`, [publish_time]);
     this.row.publish_time = publish_time;
   }
 
