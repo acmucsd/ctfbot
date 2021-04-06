@@ -1,9 +1,10 @@
 import query from '../database';
-import { AttachmentRow, AttemptRow, ChallengeRow } from '../schemas';
+import { AttachmentRow, AttemptRow, CategoryRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
 import { Client } from 'discord.js';
 import CTF from './ctf';
+import { Category } from './index';
 
 export default class Challenge {
   row: ChallengeRow;
@@ -111,6 +112,12 @@ export default class Challenge {
   async getAllAttempts() {
     const { rows } = await query(`SELECT * FROM attempts WHERE challenge_id = ${this.row.id}`);
     return rows.map((row) => new Attempt(row as AttemptRow));
+  }
+
+  // get challenge category
+  async getCategory() {
+    const { rows } = await query(`SELECT * FROM categories WHERE id = ${this.row.category_id}`);
+    return new Category(rows[0] as CategoryRow, this.ctf);
   }
 
   // misc
