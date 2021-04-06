@@ -1,20 +1,27 @@
 import { MessageReaction, PartialUser, User } from 'discord.js';
-import { logger } from '../../log';
+// import { logger } from '../../log';
 import { CTF } from '../../database/models';
+import { subscribedMessages, subscribedMessageCallback } from '../../';
 
 const messageReactionAddEvent = async (reaction: MessageReaction, discordUser: User | PartialUser) => {
-  if (reaction.message.webhookID) {
-    try {
-      const ctf = await CTF.fromWebhookCTF(reaction.message.webhookID);
-      const user = await ctf.fromUserSnowflakeUser(discordUser.id);
-      if (!user.row.tos_accepted) {
-        await user.acceptTOS();
-      } else {
-        logger(`${discordUser.username} has already accepted TOS`);
-      }
-    } catch (e) {
-      //empty
-    }
+  if (reaction.partial) {
+    await reaction.message.fetch();
+  }
+  if (reaction.partial) await reaction.fetch();
+  let key: string;
+  if (subscribedMessages.has(reaction.message.id)) {
+    key = reaction.message.id;
+  } else if (subscribedMessages.has(reaction.message.webhookID)) {
+    key = reaction.message.webhookID;
+  } else {
+    return;
+  }
+  // eslint-disable-next-line
+  const subscribedMessage = subscribedMessages.get(key) as subscribedMessageCallback;
+  const ctf = await CTF.fromIdCTF(subscribedMessage.id);
+  subscribedMessage.callback.call(ctf, discordUser);
+  if (!reaction.message.guild) {
+    subscribedMessages.delete(key);
   }
 };
 
