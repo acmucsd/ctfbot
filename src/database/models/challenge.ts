@@ -18,8 +18,12 @@ export default class Challenge {
   /** Challenge Creation / Deletion */
   // makeChallenge made in Category
 
-  async deleteChallenge() {
+  async deleteChallenge(client: Client) {
     await query(`DELETE FROM challenges WHERE id = ${this.row.id}`);
+
+    // delete the channel
+    const channel = this.getChannelChallenge(client);
+    await channel.delete();
   }
 
   /** Challenge Setters */
