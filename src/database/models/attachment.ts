@@ -12,7 +12,7 @@ export default class Attachment {
   // makeAttachment made in Challenge
 
   async deleteAttachment() {
-    await query(`DELETE FROM attachmets WHERE id = ${this.row.id}`);
+    await query(`DELETE FROM attachments WHERE id = ${this.row.id}`);
   }
 
   /** Attachment Setters */

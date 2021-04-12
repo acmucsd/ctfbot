@@ -24,6 +24,20 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return `This command has not been implemented yet`;
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake)
+      throw new Error('could not determine challenge, try providing challenge_channel parameter');
+
+    const fileName = options.file_name.toString();
+
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const attachments = await challenge.getAllAttachments();
+    const attachment = attachments.find((attach) => attach.row.name === fileName);
+
+    if (!attachment) throw new Error('could not find an attachment with that name');
+
+    await attachment.deleteAttachment();
+
+    return `Attachment **${fileName}** has been removed from challenge **${challenge.row.name}**`;
   },
 };

@@ -18,6 +18,21 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return `This command has not been implemented yet`;
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake)
+      throw new Error('could not determine challenge, try providing challenge_channel parameter');
+
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const attachments = await challenge.getAllAttachments();
+
+    await interaction.reply({
+      embeds: [
+        {
+          description: `Challenge **${challenge.row.name}** has ${attachments.length} attachments`,
+          fields: attachments.map((attach) => ({ name: attach.row.name, value: attach.row.url })),
+          timestamp: new Date(),
+        },
+      ],
+    });
   },
 };
