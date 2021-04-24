@@ -1,2 +1,2 @@
-export { NoTeamUserError } from './noTeamUserError';
+export { NoTeamUserError } from './NoTeamUserError';
 export { NoUserError } from './NoUserError';
