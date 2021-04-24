@@ -75,9 +75,8 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   logger('registering commands...');
-  await setCommands(client, commands, '810847000048173098');
-  await setCommands(client, commands, '811105603559882803');
-  await setCommands(client, commands, '811108082339676170');
-  // await setCommands(client, commands, '808487147853447216');
+  for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
+    await setCommands(client, commands, guildID);
+  }
   logger('commands registered');
 };
