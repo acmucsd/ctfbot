@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { parse } from 'date-fns';
+import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'publish',
@@ -26,9 +27,7 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
-    if (!challengeChannelSnowflake)
-      throw new Error('could not determine challenge, try providing challenge_channel parameter');
-
+    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const date = parse(options.publish_time?.toString() ?? '', 'yyyy MM dd HH:mm', new Date());
     if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
 

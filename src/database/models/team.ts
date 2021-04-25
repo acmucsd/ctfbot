@@ -3,6 +3,7 @@ import { CTF, Invite, User } from '.';
 import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
 import { logger } from '../../log';
+import { NoRoomError } from '../../errors';
 
 export default class Team {
   row: TeamRow;
@@ -17,14 +18,21 @@ export default class Team {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
     await teamServer.deleteChannel(client, this.row.text_channel_snowflake);
-    /** Remove every team member's team roles */
-    await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
+    /** TODO: Remove every team member's team roles */
+    await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+      /* Do nothing, because it means the team server already deleted*/
+    });
+    await ctf.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+      /* Do nothing, because it means the team server already deleted*/
+    });
     if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      await ctf.deleteRole(client, this.row.team_role_snowflake_main);
+      await ctf.deleteRole(client, this.row.team_role_snowflake_main).catch(() => {
+        /* Do nothing, because it means the team server part of the main server already deleted*/
+      });
     }
     await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
     logger(`Deleted team "${this.row.name}" from ctf "${ctf.row.name}`);
-    /** Make and assign each member a new team */
+    /** TODO: Make and assign each member a new team */
   }
 
   /** Team Setters */
@@ -47,9 +55,11 @@ export default class Team {
     this.row.text_channel_snowflake = text_channel_snowflake;
   }
 
+  async setTeamCaptain() {}
+
   async setTeamServerID(client: Client, team_server_id: number) {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
-    if (!(await newTeamServer.hasSpace())) throw new Error('team server is full');
+    if (!(await newTeamServer.hasSpace())) throw new NoRoomError();
 
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role
@@ -61,13 +71,27 @@ export default class Team {
     await query(`UPDATE teams SET team_server_id = $1 WHERE id = ${this.row.id}`, [team_server_id]);
     this.row.team_server_id = team_server_id;
 
+    // Make their team role
+    const role = await newTeamServer.makeRole(client, this.row.name);
+    await this.setTeamRoleSnowflakeTeamServer(role.id);
+
     // Make new text channel and team server role
     const textChannel = await newTeamServer.makeChannel(client, this.row.name.toLowerCase().replace(' ', '-'));
     await textChannel.setParent(newTeamServer.row.team_category_snowflake);
+    // Make sure only the team can see their channel
+    /** TODO: Do we want admins being able to see every channel? */
+    await textChannel.overwritePermissions([
+      {
+        id: textChannel.guild.roles.everyone,
+        deny: ['VIEW_CHANNEL'],
+      },
+      {
+        id: textChannel.guild.roles.resolve(this.row.team_role_snowflake_team_server),
+        allow: ['VIEW_CHANNEL'],
+      },
+    ]);
+    /*      */
     await this.setTextChannelSnowflake(textChannel.id);
-
-    const role = await newTeamServer.makeRole(client, this.row.name);
-    await this.setTeamRoleSnowflakeTeamServer(role.id);
     /** Give every team member the role */
     // Invite all current users
   }
@@ -148,4 +172,41 @@ export default class Team {
     const { rows } = await query(`SELECT * FROM users WHERE team_id = ${this.row.id}`);
     return rows.map((row) => new User(row as UserRow));
   }
+
+  async calculateAccuracy(category?: string) {
+    await new Promise(() => 7);
+    return 7;
+  }
+  async calculatePoints(category?: string) {
+    await new Promise(() => 7);
+    return 7;
+  }
+  async getMinimalTeam(category?: string) {
+    const team = {
+      name: this.row.name,
+      points: await this.calculatePoints(category),
+      accuracy: await this.calculateAccuracy(category),
+      id: this.row.id,
+    };
+    return team;
+  }
+  static teamCompare(a: minimalTeam, b: minimalTeam) {
+    const pointDiff = a.points - b.points;
+    if (pointDiff !== 0) {
+      return pointDiff;
+    }
+
+    const accDiff = a.accuracy - b.accuracy;
+    if (accDiff !== 0) {
+      return accDiff;
+    }
+
+    return a.name.localeCompare(b.name);
+  }
+}
+export interface minimalTeam {
+  name: string;
+  points: number;
+  accuracy: number;
+  id: number;
 }

@@ -3,6 +3,7 @@ import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
+import { DupeTeamError } from '../../errors';
 
 export default class TeamServer {
   row: TeamServerRow;
@@ -14,7 +15,25 @@ export default class TeamServer {
   /** TeamServer Creation / Deletion */
   // createTeamServer made in CTF
 
-  async deleteTeamServer() {
+  async deleteTeamServer(client: Client) {
+    // TODO: Does deleting a team server delete all of the associated teams just like with a ctf?
+    const teams = await this.getAllTeams();
+    const guild = client.guilds.resolve(this.row.guild_snowflake);
+
+    // Delete all team roles and channels
+    teams.forEach((team) => {
+      void guild.channels.resolve(team.row.text_channel_snowflake).delete();
+      // TODO: If main is a team server and we remove the team server part, do we want the roles removed still?
+      void guild.roles.resolve(team.row.team_role_snowflake_team_server).delete();
+    });
+    logger(`Deleted all team channels and roles.`);
+
+    // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
+    // Remove channels and categories made during creation
+    await guild.channels.resolve(this.row.info_channel_snowflake).delete();
+    await guild.channels.resolve(this.row.team_category_snowflake).delete();
+    logger('Deleted CTF-Related channels and categories');
+
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
     logger(`Deleted "${this.row.name}" TeamServer`);
   }
@@ -71,10 +90,10 @@ export default class TeamServer {
     const channel = guild.channels.resolve(channel_snowflake);
     if (channel) {
       await channel.delete();
-      logger(`Channel with ${channel_snowflake} found: deleted that channel`);
+      logger(`Channel with id ${channel_snowflake} found: deleted that channel`);
       return;
     }
-    logger(`Channel with ${channel_snowflake} not found`);
+    logger(`Channel with id ${channel_snowflake} not found`);
   }
 
   /**
@@ -100,14 +119,14 @@ export default class TeamServer {
         team.row.name === name ||
         team.row.name.toLowerCase().replace(' ', '-') === name.toLowerCase().replace(' ', '-'),
     );
-    if (teams.length !== 0) throw new Error('a team with that name already exists');
-
+    if (teams.length !== 0) throw new DupeTeamError();
     const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
 
     if (this.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      await team.setTeamRoleSnowflakeMain((await ctf.makeRole(client, name)).id);
+      const role = await ctf.makeRole(client, name);
+      await team.setTeamRoleSnowflakeMain(role.id);
     } else {
       await team.setTeamRoleSnowflakeMain(team.row.team_role_snowflake_team_server);
     }
@@ -194,9 +213,9 @@ export default class TeamServer {
     }
   }
 
-  async hasSpace() {
+  async hasSpace(print?: boolean) {
     const hasSpace = (await this.getAllTeams()).length < this.row.team_limit;
-    logger(`Team server ${this.row.name} has${hasSpace ? ' ' : ' no '}space`);
+    if (print) logger(`Team server ${this.row.name} has${hasSpace ? ' ' : ' no '}space`);
     return hasSpace;
   }
 

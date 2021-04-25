@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
+import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'flag',
@@ -26,9 +27,7 @@ export default {
 
     const newFlag = options.newFlag.toString();
     const challengeChannelSnowflake = options.challenge_channel.toString() ?? interaction.channel.id;
-    if (!challengeChannelSnowflake)
-      throw new Error('could not determine challenge, try providing challenge_channel parameter');
-
+    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.setFlag(newFlag);
 

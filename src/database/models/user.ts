@@ -1,7 +1,7 @@
 import { Attempt, Invite } from '.';
 import { AttemptRow, InviteRow, UserRow } from '../schemas';
 import query from '../database';
-import { logger } from '../../log';
+// import { logger } from '../../log';
 
 export default class User {
   row: UserRow;
@@ -22,13 +22,6 @@ export default class User {
   async setTeamID(team_id: number) {
     await query(`UPDATE users SET team_id = $1 WHERE id = ${this.row.id}`, [team_id]);
     this.row.team_id = team_id;
-  }
-
-  async acceptTOS() {
-    await query(`UPDATE users SET tos_accepted = true WHERE id = ${this.row.id}`);
-    this.row.tos_accepted = true;
-    logger(`**${this.row.user_snowflake}** has accepted TOS`);
-    // TODO: Give them a team
   }
 
   /** Invite Creation */

@@ -1,8 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="29601830-a8a9-4e40-8f76-f94841390639" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+    <list default="true" id="29601830-a8a9-4e40-8f76-f94841390639" name="Default Changelist" comment="User flow additions">
+      <change afterPath="$PROJECT_DIR$/src/errors/DupeChallengeError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/errors/DupeTeamError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/errors/InvalidDateError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/errors/NoRoomError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/errors/UnknownChallengeError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/events/ready/PopulateTOSMessages.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/typescript" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/models/category.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/category.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/models/ctf.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/ctf.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/models/team.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/team.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/models/teamserver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/teamserver.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/models/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/database/schemas/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/schemas/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/errors/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/errors/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/guildMemberAdd/guildMemberAdd.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/guildMemberAdd/guildMemberAdd.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/add.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/add.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/del.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/del.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/get.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/attach/get.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/del.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/del.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/get.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/get.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/author.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/author.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/difficulty.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/difficulty.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/flag.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/flag.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/initialpoints.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/initialpoints.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/minimumpoints.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/minimumpoints.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/name.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/name.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/pointdecay.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/pointdecay.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/points.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/points.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/prompt.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/prompt.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/publish.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/challenge/set/publish.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/commands/ctf/server/del.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/commands/ctf/server/del.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/messageReactionAdd/messageReactionAddEvent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/messageReactionAdd/messageReactionAddEvent.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/ready/ready.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/ready/ready.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,6 +44,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="076cad4a-bdbb-4a96-89cf-fdf8c44356f5" />
+        <option name="url" value="https://github.com/acmucsd/ctfbot.git" />
+      </UrlAndAccount>
+    </option>
   </component>
   <component name="ProjectId" id="1mfGZm1ETfLlegYa4hyuaufLhPj" />
   <component name="ProjectLevelVcsManager">
@@ -24,6 +65,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -31,11 +73,12 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.standard" value="" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
-    <property name="ts.external.directory.path" value="C:\Users\Owner\WebstormProjects\ctfbot\node_modules\typescript\lib" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected="npm.build">
+  <component name="RunManager" selected="npm.start">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -56,10 +99,14 @@
       <envs />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="npm.start" />
+      <item itemvalue="npm.build" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="npm.build" />
         <item itemvalue="npm.start" />
+        <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
   </component>
@@ -73,6 +120,7 @@
       <updated>1609877290372</updated>
       <workItem from="1609877291632" duration="2418000" />
       <workItem from="1610465249360" duration="8233000" />
+      <workItem from="1619302046078" duration="2319000" />
     </task>
     <task id="LOCAL-00001" summary="details for removing a user">
       <created>1609880141557</created>
@@ -133,7 +181,8 @@
     <MESSAGE value="typescript and eslint environment with hello world" />
     <MESSAGE value="structure and backbone" />
     <MESSAGE value="webstorm config files" />
-    <option name="LAST_COMMIT_MESSAGE" value="webstorm config files" />
+    <MESSAGE value="User flow additions" />
+    <option name="LAST_COMMIT_MESSAGE" value="User flow additions" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

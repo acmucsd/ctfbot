@@ -5,8 +5,8 @@ import query from '../database';
 import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
-import { subscribedMessages } from '../../';
-import { NoTeamUserError, NoUserError } from '../../errors';
+import { subscribedMessageCallback, subscribedMessages } from '../../';
+import { DupeTeamError, NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 
 export default class CTF {
@@ -30,24 +30,21 @@ export default class CTF {
       guildSnowflake,
     ]);
     logger(`Created new ctf **${name}**`);
+    // TODO: Fix ordering for channels
+    // TODO: Make a "Competititor" role for easier time giving people access to
+    //       social channels?
     const ctf = new CTF(rows[0] as CTFRow);
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
     const tos = await ctf.makeChannel(client, 'tos');
+    await tos.setParent(info.id);
+    await tos.updateOverwrite(tos.guild.roles.everyone, { SEND_MESSAGES: false, ADD_REACTIONS: false });
     await ctf.setTOSChannel(tos.id);
     await (tos as TextChannel).createWebhook('Terms of Service').then(async (webhook) => {
-      await webhook.send(TOSMessage);
-      await ctf.setTOSWebhook(webhook.id);
-      subscribedMessages.set(webhook.id, {
-        id: ctf.row.id,
-        callback: async (user: DiscordUser | PartialUser) => {
-          const userDB = await ctf.fromUserSnowflakeUser(user.id);
-          if (userDB.row.tos_accepted) {
-            return;
-          }
-          await userDB.acceptTOS();
-        },
+      await webhook.send(TOSMessage).then(async (message) => {
+        await message.react('👍');
       });
+      await ctf.setTOSWebhook(webhook.id);
     });
     return ctf;
   }
@@ -60,13 +57,48 @@ export default class CTF {
     }
     const webhook = await client.fetchWebhook(this.row.tos_webhook_snowflake);
     await webhook.delete();
+    subscribedMessages.delete(this.row.tos_webhook_snowflake);
     logger('Removed TOS webhook from the server');
     const tos = client.channels.resolve(this.row.tos_channel_snowflake);
     await tos.delete();
     logger('Removed TOS channel');
+    await client.channels.resolve(this.row.info_category_snowflake).delete();
+    (await this.getAllTeamServers()).forEach((server) => {
+      void server.deleteTeamServer(client);
+    });
     await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
     logger(`Deleted ctf **${this.row.name}**`);
   }
+
+  cacheTOS(TOScache: Map<string, subscribedMessageCallback>) {
+    TOScache.set(this.row.tos_webhook_snowflake, {
+      id: this.row.id,
+      callback: async (user: DiscordUser | PartialUser) => {
+        try {
+          await this.fromUserSnowflakeUser(user.id);
+        } catch (e) {
+          if (e instanceof NoUserError) {
+            logger(`**${user.username}** has accepted TOS`);
+            await this.createUser(user.client.guilds.resolve(this.row.guild_snowflake).members.resolve(user.id));
+          }
+        }
+      },
+    });
+  }
+
+  // No category supplied will give the top teams
+  async getScoreboard(category?: string) {
+    const { rows } = await query(`SELECT * FROM teams WHERE ctf_id = ${this.row.id}`);
+    const teams = rows.map(async (teamRow) => await new Team(teamRow).getMinimalTeam(category));
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const minimalTeams = (await Promise.all(teams)).sort(Team.teamCompare).slice(0, 20);
+    logger(minimalTeams.map((team) => `${team.name} has ${team.points} with ${team.accuracy}`).toString());
+  }
+
+  // async getCategoryScoreboard(category: Category) {}
+  //
+  // async getTeamScoreboard(team: Team) {}
+
   static async fromWebhookCTF(tos_webhook_snowflake: string) {
     const { rows } = await query('SELECT * FROM ctfs WHERE tos_webhook_snowflake = $1', [tos_webhook_snowflake]);
     if (rows.length === 0) throw new Error('no ctf associated with that webhook');
@@ -94,6 +126,7 @@ export default class CTF {
     if (rows && rows.length > 0) throw new Error('ctf already uses that webhook');
     await query(`UPDATE ctfs SET tos_webhook_snowflake = $1 WHERE id = ${this.row.id}`, [tos_webhook_snowflake]);
     this.row.tos_webhook_snowflake = tos_webhook_snowflake;
+    this.cacheTOS(subscribedMessages);
     logger(`Set **${this.row.name}**'s TOS webhook to be **${tos_webhook_snowflake}**`);
   }
 
@@ -236,7 +269,7 @@ export default class CTF {
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
     await teamServer.setInfoChannelSnowflake(infoChannel.id);
     await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);
-    if (this.row.id === teamServer.row.id) {
+    if (this.row.guild_snowflake === teamServer.row.guild_snowflake) {
       await infoChannel.setParent(this.row.info_category_snowflake);
     }
     return teamServer;
@@ -267,11 +300,9 @@ export default class CTF {
 
   async printAllTeams() {
     const teams = await this.getAllTeams();
-    const printString =
-      teams.length == 0
-        ? `CTF **${this.row.name}** has no teams yet`
-        : `CTF **${this.row.name}**'s teams are: **${teams.map((team) => team.row.name).join('**, **')}**`;
-    return printString;
+    return teams.length == 0
+      ? `CTF **${this.row.name}** has no teams yet`
+      : `CTF **${this.row.name}**'s teams are: **${teams.map((team) => team.row.name).join('**, **')}**`;
   }
 
   // Get either TeamServer or main ctf guild id and return the ctf
@@ -307,23 +338,53 @@ export default class CTF {
 
   /** User Creation */
   async createUser(member: GuildMember) {
-    const {
-      rows,
-    } = await query(
-      `INSERT INTO users(ctf_id, user_snowflake, tos_accepted) VALUES (${this.row.id}, $1, false) RETURNING *`,
-      [member.user.id],
-    );
+    // Make sure there is a team server first BEFORE making the user
+    // TODO: Determine how to handle a NoRoomError
+    const teamServer = await this.getTeamServerWithSpace();
+
+    // Add user to DB
+    const { rows } = await query(`INSERT INTO users(ctf_id, user_snowflake) VALUES (${this.row.id}, $1) RETURNING *`, [
+      member.user.id,
+    ]);
     logger(`Added new user **${member.displayName}** to **${this.row.name}**`);
+    let team: Team;
+
+    // Try to give them their given team name initially, but if it fails then keep going through numbers until there's
+    // one that isn't being used
+    let nameAvailable = false;
+    let iteration = 1;
+    const teamName = `Team ${member.displayName}`;
+    while (!nameAvailable) {
+      try {
+        team = await teamServer.makeTeam(member.client, this, `${teamName}${iteration > 1 ? ` ${iteration}` : ''}`);
+        nameAvailable = true;
+      } catch (e) {
+        if (e instanceof DupeTeamError) {
+          iteration++;
+        } else {
+          // Something bad happened so bubble up
+          throw e;
+        }
+      }
+    }
+
+    // Give them their roles on main and team server (if they're somehow on it)
+    let user: GuildMember;
+    if (this.row.guild_snowflake !== teamServer.row.guild_snowflake) {
+      user = member.client.guilds.resolve(teamServer.row.guild_snowflake).members.resolve(member.id);
+      // If user falsy, they're not in team server
+      if (user) {
+        await user.roles.add(team.row.team_role_snowflake_team_server);
+      }
+    }
+    user = member.client.guilds.resolve(this.row.guild_snowflake).members.resolve(member.id);
+    // TODO: Edge case that user is false
+    if (user) {
+      await user.roles.add(team.row.team_role_snowflake_main);
+    }
+
     return new User(rows[0] as UserRow);
   }
-
-  // async deleteUser(member: GuildMember) {
-  //   const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
-  //     member.user.id,
-  //   ]);
-
-  //   logger(`Removed user ${member.displayName}`)
-  // }
 
   /** User Retrieval */
   async fromUserSnowflakeUser(user_snowflake: string) {
@@ -335,11 +396,6 @@ export default class CTF {
   }
 
   /** Misc Methods */
-  // async checkIfReturningUser(member: GuildMember) {
-  //   const { rows } = await query(`SELECT * FROM users WHERE user_snowflake = $1 and ctf_id = ${this.row.id}`, [
-  //     member.user.id,
-  //   ]);
-  // }
   static async fromGuildSnowflakeCTF(guild_id: string) {
     let ctf: CTF;
     try {
@@ -387,10 +443,14 @@ export default class CTF {
     const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
-      logger(`Role with ${role_snowflake} found: deleted that role`);
+      logger(
+        `${
+          client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
+        } role found: deleted that role`,
+      );
       return;
     }
-    logger(`Role with ${role_snowflake} not found`);
+    logger(`${role_snowflake} role not found`);
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
@@ -398,7 +458,11 @@ export default class CTF {
     const roleToChange = guild.roles.resolve(role_snowflake);
     if (roleToChange) {
       await roleToChange.setColor(color);
-      logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
+      logger(
+        `Changed **${
+          client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
+        }** role to to color **${color}**`,
+      );
     } else {
       throw new Error('role not found in ctf');
     }
@@ -409,7 +473,11 @@ export default class CTF {
     const roleToChange = guild.roles.resolve(role_snowflake);
     if (roleToChange) {
       await roleToChange.setName(new_name);
-      logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
+      logger(
+        `Renamed **${
+          client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
+        }** role to to **${new_name}**`,
+      );
     } else {
       throw new Error('role not found in ctf');
     }
@@ -418,9 +486,9 @@ export default class CTF {
   async getTeamServerWithSpace() {
     logger('Seeing what servers have space...');
     // eslint-disable-next-line
-    const teamServer = (await this.getAllTeamServers()).find(async (server) => (await server.hasSpace()) === true);
+    const teamServer = (await this.getAllTeamServers()).find(async (server) => (await server.hasSpace(true)) === true);
     if (!teamServer) {
-      throw new Error('all team servers are full');
+      throw new NoRoomError();
     }
     return teamServer;
   }

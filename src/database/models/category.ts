@@ -1,9 +1,10 @@
 import query from '../database';
-import { CategoryRow } from '../schemas/category';
-import { ChallengeRow } from '../schemas/challenge';
+import { CategoryRow } from '../schemas';
+import { ChallengeRow } from '../schemas';
 import Challenge from './challenge';
 import CTF from './ctf';
 import { Client } from 'discord.js';
+import { DupeChallengeError } from '../../errors';
 
 export default class Category {
   row: CategoryRow;
@@ -47,7 +48,7 @@ export default class Category {
     const {
       rows: existingRows,
     } = await query(`SELECT id FROM challenges WHERE name = $1 and category_id = ${this.row.id}`, [name]);
-    if (existingRows && existingRows.length > 0) throw new Error('cannot create a duplicate challenge in this ctf');
+    if (existingRows && existingRows.length > 0) throw new DupeChallengeError();
 
     // create a text channel for this challenge
     const channel = await this.ctf.getGuild(client).channels.create(name);
