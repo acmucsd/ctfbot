@@ -31,7 +31,7 @@ export default class CTF {
     ]);
     logger(`Created new ctf **${name}**`);
     // TODO: Fix ordering for channels
-    // TODO: Make a "Competititor" role for easier time giving people access to
+    // TODO: Make a "Competitor" role for easier time giving people access to
     //       social channels?
     const ctf = new CTF(rows[0] as CTFRow);
     const info = await ctf.makeChannelCategory(client, 'Info');
@@ -110,7 +110,7 @@ export default class CTF {
     if (rows && rows.length > 0) throw new Error('ctf already uses that category');
     await query(`UPDATE ctfs SET info_category_snowflake = $1 WHERE id = ${this.row.id}`, [info_category_snowflake]);
     this.row.info_category_snowflake = info_category_snowflake;
-    logger(`Set **${this.row.name}**'s info category to **${info_category_snowflake}**`);
+    logger(`Set **${this.row.name}**'s info category`);
   }
 
   async setTOSChannel(tos_channel_snowflake: string) {
@@ -118,7 +118,7 @@ export default class CTF {
     if (rows && rows.length > 0) throw new Error('ctf already uses that channel');
     await query(`UPDATE ctfs SET tos_channel_snowflake = $1 WHERE id = ${this.row.id}`, [tos_channel_snowflake]);
     this.row.tos_channel_snowflake = tos_channel_snowflake;
-    logger(`Set **${this.row.name}**'s TOS channel to **${tos_channel_snowflake}**`);
+    logger(`Set **${this.row.name}**'s TOS channel`);
   }
 
   async setTOSWebhook(tos_webhook_snowflake: string) {
@@ -127,7 +127,7 @@ export default class CTF {
     await query(`UPDATE ctfs SET tos_webhook_snowflake = $1 WHERE id = ${this.row.id}`, [tos_webhook_snowflake]);
     this.row.tos_webhook_snowflake = tos_webhook_snowflake;
     this.cacheTOS(subscribedMessages);
-    logger(`Set **${this.row.name}**'s TOS webhook to be **${tos_webhook_snowflake}**`);
+    logger(`Set **${this.row.name}**'s TOS webhook`);
   }
 
   /* CTF Retrieval */
@@ -264,7 +264,7 @@ export default class CTF {
       `INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`,
       [guild.id, name, team_limit],
     );
-    logger(`Created new team server "${name}" for ctf "${this.row.name}"`);
+    logger(`Created new team server **${name}** for ctf **${this.row.name}**`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
     await teamServer.setInfoChannelSnowflake(infoChannel.id);
@@ -434,7 +434,7 @@ export default class CTF {
     if (ctfServerGuild.roles.cache.find((role) => role.name === name))
       throw new Error('Role with that name already exists');
     const role = await ctfServerGuild.roles.create({ data: { name: `${name}` } });
-    logger(`Made new role "${name}" in CTF guild "${this.row.name}"`);
+    logger(`Made new role **${name}** in CTF guild **${this.row.name}**`);
     return role;
   }
 
@@ -444,13 +444,13 @@ export default class CTF {
     if (roleToDelete) {
       await roleToDelete.delete();
       logger(
-        `${
+        `**${
           client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
-        } role found: deleted that role`,
+        }** role found: deleted that role`,
       );
       return;
     }
-    logger(`${role_snowflake} role not found`);
+    logger(`**${role_snowflake}** role not found`);
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
@@ -461,7 +461,7 @@ export default class CTF {
       logger(
         `Changed **${
           client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
-        }** role to to color **${color}**`,
+        }**'s role to to color **${color}**`,
       );
     } else {
       throw new Error('role not found in ctf');
@@ -474,7 +474,7 @@ export default class CTF {
     if (roleToChange) {
       await roleToChange.setName(new_name);
       logger(
-        `Renamed **${
+        `Renamed the **${
           client.guilds.resolve(this.row.guild_snowflake).roles.resolve(role_snowflake).name
         }** role to to **${new_name}**`,
       );
@@ -538,7 +538,7 @@ export default class CTF {
         continue;
       }
     }
-    throw new Error('no team asociated with that channel');
+    throw new Error('no team associated with that channel');
   }
 
   async fromUnspecifiedTeam(user_snowflake: string, channel_snowflake: string) {
@@ -558,7 +558,7 @@ export default class CTF {
     let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
     if (!category) {
       category = await guild.channels.create(`${name}`, { type: 'category' });
-      logger(`${name} category not found: created ${name} category`);
+      logger(`**${name}** category not found: created **${name}** category`);
     } else {
       logger(`**${name}** category already found`);
     }
@@ -570,7 +570,7 @@ export default class CTF {
     let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
     if (channel) {
       await channel.delete();
-      logger(`**${name}** found: deleted **${name}** channel`);
+      logger(`**${name}** channel found: deleted **${name}** channel`);
     }
     channel = await guild.channels.create(`${name}`, { type: 'text' });
     logger(`Created **${name}** channel`);

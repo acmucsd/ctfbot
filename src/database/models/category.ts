@@ -1,6 +1,5 @@
 import query from '../database';
-import { CategoryRow } from '../schemas';
-import { ChallengeRow } from '../schemas';
+import { CategoryRow, ChallengeRow } from '../schemas';
 import Challenge from './challenge';
 import CTF from './ctf';
 import { Client } from 'discord.js';
@@ -16,6 +15,7 @@ export default class Category {
   }
 
   /* Category Creation / Deletion */
+
   // makeCategory made in CTF
 
   async deleteCategory(client: Client) {

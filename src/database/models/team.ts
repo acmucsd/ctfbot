@@ -11,6 +11,21 @@ export default class Team {
   constructor(row: TeamRow) {
     this.row = row;
   }
+
+  static teamCompare(a: minimalTeam, b: minimalTeam) {
+    const pointDiff = a.points - b.points;
+    if (pointDiff !== 0) {
+      return pointDiff;
+    }
+
+    const accDiff = a.accuracy - b.accuracy;
+    if (accDiff !== 0) {
+      return accDiff;
+    }
+
+    return a.name.localeCompare(b.name);
+  }
+
   /** Team Creation / Deletion */
   // makeTeam made in TeamServer
 
@@ -31,7 +46,7 @@ export default class Team {
       });
     }
     await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
-    logger(`Deleted team "${this.row.name}" from ctf "${ctf.row.name}`);
+    logger(`Deleted team **${this.row.name}** from ctf **${ctf.row.name}**`);
     /** TODO: Make and assign each member a new team */
   }
 
@@ -177,10 +192,12 @@ export default class Team {
     await new Promise(() => 7);
     return 7;
   }
+
   async calculatePoints(category?: string) {
     await new Promise(() => 7);
     return 7;
   }
+
   async getMinimalTeam(category?: string) {
     const team = {
       name: this.row.name,
@@ -190,20 +207,8 @@ export default class Team {
     };
     return team;
   }
-  static teamCompare(a: minimalTeam, b: minimalTeam) {
-    const pointDiff = a.points - b.points;
-    if (pointDiff !== 0) {
-      return pointDiff;
-    }
-
-    const accDiff = a.accuracy - b.accuracy;
-    if (accDiff !== 0) {
-      return accDiff;
-    }
-
-    return a.name.localeCompare(b.name);
-  }
 }
+
 export interface minimalTeam {
   name: string;
   points: number;

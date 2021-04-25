@@ -35,7 +35,7 @@ export default class TeamServer {
     logger('Deleted CTF-Related channels and categories');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
-    logger(`Deleted "${this.row.name}" TeamServer`);
+    logger(`Deleted **${this.row.name}** TeamServer`);
   }
 
   /** TeamServer Setters */
@@ -43,7 +43,7 @@ export default class TeamServer {
   async setInfoChannelSnowflake(info_channel_snowflake: string) {
     await query(`UPDATE team_servers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
     this.row.info_channel_snowflake = info_channel_snowflake;
-    logger(`Set info channel for "${this.row.name}" as ${info_channel_snowflake}`);
+    logger(`Set info channel for **${this.row.name}** as ${info_channel_snowflake}`);
   }
 
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
@@ -52,7 +52,7 @@ export default class TeamServer {
       `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.team_category_snowflake = team_category_snowflake;
-    logger(`Set info channel for "${this.row.name}" as ${team_category_snowflake}`);
+    logger(`Set info channel for **${this.row.name}** as ${team_category_snowflake}`);
   }
 
   /**
@@ -107,7 +107,7 @@ export default class TeamServer {
     let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
     if (!category) {
       category = await guild.channels.create(`${name}`, { type: 'category' });
-      logger(`${name} category not found: created ${name} category`);
+      logger(`**${name}** category not found: created **${name}** category`);
     }
     return category;
   }
@@ -141,7 +141,7 @@ export default class TeamServer {
   }
 
   async fromRoleTeam(team_role_snowflake: string) {
-    logger(`looking for ${team_role_snowflake}`);
+    logger(`Looking for **${team_role_snowflake}**...`);
     const {
       rows,
     } = await query(
@@ -187,10 +187,10 @@ export default class TeamServer {
     const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
-      logger(`Role with snowflake **${role_snowflake}** found: deleted that role`);
+      logger(`**${roleToDelete.name}** role found and deleted`);
       return;
     }
-    logger(`Role with snowflake **${role_snowflake}** not found`);
+    logger(`**${roleToDelete.name}** role not found`);
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
@@ -198,8 +198,10 @@ export default class TeamServer {
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setColor(color);
+      logger(`**${roleToChange.name}**'s color is now **${color}**`);
+      return;
     }
-    logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
+    logger(`**${roleToChange.name}** role not found`);
   }
 
   async setRoleName(client: Client, role_snowflake: string, new_name: string) {
@@ -207,7 +209,7 @@ export default class TeamServer {
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setName(new_name);
-      logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
+      logger(`Renamed **${roleToChange.name}** role to **${new_name}**`);
     } else {
       throw new Error('role not found in ctf');
     }
@@ -215,7 +217,7 @@ export default class TeamServer {
 
   async hasSpace(print?: boolean) {
     const hasSpace = (await this.getAllTeams()).length < this.row.team_limit;
-    if (print) logger(`Team server ${this.row.name} has${hasSpace ? ' ' : ' no '}space`);
+    if (print) logger(`Team server **${this.row.name}** has${hasSpace ? ' ' : ' no '}space`);
     return hasSpace;
   }
 
