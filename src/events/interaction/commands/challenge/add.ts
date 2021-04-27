@@ -1,4 +1,7 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 
@@ -25,7 +28,10 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const category = await ctf.fromNameCategory(options.category.toString());
-    const challenge = await category.createChallenge(interaction.client, options.name.toString());
+    const challenge = await category.createChallenge(
+      interaction.client,
+      options.name.toString(),
+    );
 
     return `Challenge **${challenge.row.name}** has been created in category **${category.row.name}**.`;
   },

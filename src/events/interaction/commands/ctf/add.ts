@@ -1,5 +1,9 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import { CTF } from '../../../../database/models';
 
 export default {
@@ -21,9 +25,17 @@ export default {
     },
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const name = options && options.name ? (options.name as string) : interaction.guild.name;
-    const description = options && options.description ? (options.description as string) : '';
-    const newCTF = await CTF.createCTF(interaction.client, name, interaction.guild.id);
+    const name =
+      options && options.name
+        ? (options.name as string)
+        : interaction.guild.name;
+    const description =
+      options && options.description ? (options.description as string) : '';
+    const newCTF = await CTF.createCTF(
+      interaction.client,
+      name,
+      interaction.guild.id,
+    );
     void newCTF.setDescription(description);
     const printString = `Created new CTF **${newCTF.row.name}** with `;
     return printString

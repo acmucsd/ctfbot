@@ -1,5 +1,9 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import { CTF, TeamServer } from '../../../../../database/models';
 
 export default {
@@ -30,7 +34,9 @@ export default {
         : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
       teamServer = await ctf.fromNameTeamServer(options.name as string);
     } else {
-      teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);
+      teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(
+        interaction.guild.id,
+      );
       ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     }
     ctf.throwErrorUnlessAdmin(interaction);

@@ -1,5 +1,9 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import { CTF, Team } from '../../../../database/models';
 
 export default {
@@ -22,7 +26,10 @@ export default {
     if (options?.team_role) {
       teamToDelete = await ctf.fromRoleTeam(options.team_role as string);
     } else {
-      teamToDelete = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
+      teamToDelete = await ctf.fromUnspecifiedTeam(
+        interaction.member.id,
+        interaction.channel.id,
+      );
     }
     await teamToDelete.deleteTeam(interaction.client);
     return `Deleted team **${teamToDelete.row.name}** from CTF **${ctf.row.name}**`;

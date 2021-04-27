@@ -1,5 +1,9 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import { CTF, Team } from '../../../../../database/models';
 
 export default {
@@ -27,7 +31,10 @@ export default {
     if (options?.team_role) {
       team = await ctf.fromRoleTeam(options.team_role as string);
     } else {
-      team = await ctf.fromUnspecifiedTeam(interaction.user.id, interaction.channel.id);
+      team = await ctf.fromUnspecifiedTeam(
+        interaction.user.id,
+        interaction.channel.id,
+      );
     }
     const teamServer = ctf.fromNameTeamServer(options.server_name as string);
     await team.setTeamServerID(interaction.client, (await teamServer).row.id);

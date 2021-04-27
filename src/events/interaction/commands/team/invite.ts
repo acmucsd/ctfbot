@@ -1,10 +1,15 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import { CTF } from '../../../../database/models';
 
 export default {
   name: 'invite',
-  description: 'Invites the indicated user to join your team. You must be Team Captain to do this',
+  description:
+    'Invites the indicated user to join your team. You must be Team Captain to do this',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {

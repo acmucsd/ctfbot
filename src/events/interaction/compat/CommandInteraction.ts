@@ -1,6 +1,10 @@
 import { Client } from 'discord.js';
 import Interaction from './Interaction';
-import { ApplicationCommandOption, CommandInteractionData, InteractionResponseType } from './types';
+import {
+  ApplicationCommandOption,
+  CommandInteractionData,
+  InteractionResponseType,
+} from './types';
 
 export default class CommandInteraction extends Interaction {
   commandID: string;

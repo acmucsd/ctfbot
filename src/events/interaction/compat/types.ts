@@ -15,7 +15,8 @@ export interface ApplicationCommandRequest {
   options?: ApplicationCommandOption[];
 }
 
-export interface ApplicationCommandResponseOption extends ApplicationCommandResponse {
+export interface ApplicationCommandResponseOption
+  extends ApplicationCommandResponse {
   type: ApplicationCommandOptionType;
   value?: string | number;
 }
@@ -24,9 +25,13 @@ export interface ApplicationCommandResponse {
   options?: ApplicationCommandResponseOption[];
 }
 
-export interface ApplicationCommandDefinition extends ApplicationCommandRequest {
+export interface ApplicationCommandDefinition
+  extends ApplicationCommandRequest {
   type?: ApplicationCommandOptionType;
-  execute?: (CommandInteraction, CommandOptionMap) => Promise<void> | Promise<string> | string | void;
+  execute?: (
+    CommandInteraction,
+    CommandOptionMap,
+  ) => Promise<void> | Promise<string> | string | void;
 }
 export interface CommandOptionMap {
   [key: string]: string | number | Role | boolean | User | Channel;

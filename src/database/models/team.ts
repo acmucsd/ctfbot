@@ -18,7 +18,10 @@ export default class Team {
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
     await teamServer.deleteChannel(client, this.row.text_channel_snowflake);
     /** Remove every team member's team roles */
-    await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
+    await teamServer.deleteRole(
+      client,
+      this.row.team_role_snowflake_team_server,
+    );
     if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
       await ctf.deleteRole(client, this.row.team_role_snowflake_main);
     }
@@ -29,7 +32,9 @@ export default class Team {
 
   /** Team Setters */
   // Valid Role in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
-  async setTeamRoleSnowflakeTeamServer(team_role_snowflake_team_server: string) {
+  async setTeamRoleSnowflakeTeamServer(
+    team_role_snowflake_team_server: string,
+  ) {
     await query(
       `UPDATE teams SET team_role_snowflake_team_server = ${team_role_snowflake_team_server} WHERE id = ${this.row.id}`,
     );
@@ -37,32 +42,49 @@ export default class Team {
   }
 
   async setTeamRoleSnowflakeMain(team_role_snowflake_main: string) {
-    await query(`UPDATE teams SET team_role_snowflake_main = ${team_role_snowflake_main} WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE teams SET team_role_snowflake_main = ${team_role_snowflake_main} WHERE id = ${this.row.id}`,
+    );
     this.row.team_role_snowflake_main = team_role_snowflake_main;
   }
 
   // Valid Channel in the TeamServer, unique among other Teams <- taken care of because it's made, not specified
   async setTextChannelSnowflake(text_channel_snowflake: string) {
-    await query(`UPDATE teams SET text_channel_snowflake = ${text_channel_snowflake} WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE teams SET text_channel_snowflake = ${text_channel_snowflake} WHERE id = ${this.row.id}`,
+    );
     this.row.text_channel_snowflake = text_channel_snowflake;
   }
 
   async setTeamServerID(client: Client, team_server_id: number) {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
-    if (!(await newTeamServer.hasSpace())) throw new Error('team server is full');
+    if (!(await newTeamServer.hasSpace()))
+      throw new Error('team server is full');
 
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role
       const oldTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-      await oldTeamServer.deleteChannel(client, this.row.text_channel_snowflake);
-      await oldTeamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
+      await oldTeamServer.deleteChannel(
+        client,
+        this.row.text_channel_snowflake,
+      );
+      await oldTeamServer.deleteRole(
+        client,
+        this.row.team_role_snowflake_team_server,
+      );
     }
 
-    await query(`UPDATE teams SET team_server_id = $1 WHERE id = ${this.row.id}`, [team_server_id]);
+    await query(
+      `UPDATE teams SET team_server_id = $1 WHERE id = ${this.row.id}`,
+      [team_server_id],
+    );
     this.row.team_server_id = team_server_id;
 
     // Make new text channel and team server role
-    const textChannel = await newTeamServer.makeChannel(client, this.row.name.toLowerCase().replace(' ', '-'));
+    const textChannel = await newTeamServer.makeChannel(
+      client,
+      this.row.name.toLowerCase().replace(' ', '-'),
+    );
     await textChannel.setParent(newTeamServer.row.team_category_snowflake);
     await this.setTextChannelSnowflake(textChannel.id);
 
@@ -78,22 +100,40 @@ export default class Team {
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
     const oldName = this.row.name;
 
-    const teams = (await ctf.getAllTeams()).filter((team) => team.row.name === newName);
-    if (teams.length !== 0) throw new Error('a team with that name already exists');
+    const teams = (await ctf.getAllTeams()).filter(
+      (team) => team.row.name === newName,
+    );
+    if (teams.length !== 0)
+      throw new Error('a team with that name already exists');
 
-    await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [newName]);
+    await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [
+      newName,
+    ]);
     this.row.name = newName;
 
     await ctf.setRoleName(client, this.row.team_role_snowflake_main, newName);
-    if (this.row.team_role_snowflake_main !== this.row.team_role_snowflake_team_server) {
-      await teamServer.setRoleName(client, this.row.team_role_snowflake_team_server, newName);
+    if (
+      this.row.team_role_snowflake_main !==
+      this.row.team_role_snowflake_team_server
+    ) {
+      await teamServer.setRoleName(
+        client,
+        this.row.team_role_snowflake_team_server,
+        newName,
+      );
     }
-    await teamServer.renameChannel(client, this.row.text_channel_snowflake, newName);
+    await teamServer.renameChannel(
+      client,
+      this.row.text_channel_snowflake,
+      newName,
+    );
     return `Changed **${oldName}**'s name to **${newName}**`;
   }
 
   async setDescription(description: string) {
-    await query(`UPDATE teams SET description = $1 WHERE id = ${this.row.id}`, [description]);
+    await query(`UPDATE teams SET description = $1 WHERE id = ${this.row.id}`, [
+      description,
+    ]);
     this.row.description = description;
     return `Changed **${this.row.name}**'s description to **${description}**`;
   }
@@ -103,29 +143,43 @@ export default class Team {
       throw new Error('invalid color');
     }
     const oldColor = this.row.color?.toLowerCase();
-    await query(`UPDATE teams SET color = $1 WHERE id = ${this.row.id}`, [color.toLowerCase()]);
+    await query(`UPDATE teams SET color = $1 WHERE id = ${this.row.id}`, [
+      color.toLowerCase(),
+    ]);
     this.row.color = color;
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    await teamServer.setRoleColor(client, this.row.team_role_snowflake_team_server, color);
+    await teamServer.setRoleColor(
+      client,
+      this.row.team_role_snowflake_team_server,
+      color,
+    );
     if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
       await ctf.setRoleColor(client, this.row.team_role_snowflake_main, color);
     }
-    return `Changed **${this.row.name}**'s color ${oldColor != null ? `from **${oldColor}** ` : ''}to **${color}**`;
+    return `Changed **${this.row.name}**'s color ${
+      oldColor != null ? `from **${oldColor}** ` : ''
+    }to **${color}**`;
   }
 
   async setCaptain(captain_user_id: number) {
-    await query(`UPDATE teams SET captain_user_id = $1 WHERE id = ${this.row.id}`, [captain_user_id]);
+    await query(
+      `UPDATE teams SET captain_user_id = $1 WHERE id = ${this.row.id}`,
+      [captain_user_id],
+    );
     this.row.captain_user_id = captain_user_id;
   }
 
   /** Invite Creation */
   async createInvite(user_id: number) {
-    const { rows: existingRows } = await query(
+    const {
+      rows: existingRows,
+    } = await query(
       `SELECT id FROM invites WHERE team_id = ${this.row.id} and user_id = $1`,
       [user_id],
     );
-    if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
+    if (existingRows && existingRows.length > 0)
+      throw new Error('invite already exists');
 
     const {
       rows,
@@ -138,14 +192,21 @@ export default class Team {
 
   /** Invite Retrieval */
   async fromUserIDInvite(user_id: number) {
-    const { rows } = await query(`SELECT * FROM invites WHERE team_id = ${this.row.id} and user_id = $1`, [user_id]);
+    const {
+      rows,
+    } = await query(
+      `SELECT * FROM invites WHERE team_id = ${this.row.id} and user_id = $1`,
+      [user_id],
+    );
     if (rows.length === 0) throw new Error('no invite for that user');
     return new Invite(rows[0] as InviteRow);
   }
 
   /** User Retrieval */
   async getAllUsers() {
-    const { rows } = await query(`SELECT * FROM users WHERE team_id = ${this.row.id}`);
+    const { rows } = await query(
+      `SELECT * FROM users WHERE team_id = ${this.row.id}`,
+    );
     return rows.map((row) => new User(row as UserRow));
   }
 }

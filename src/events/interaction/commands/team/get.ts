@@ -1,5 +1,9 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import { CTF } from '../../../../database/models';
 
 export default {
@@ -10,6 +14,8 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    return await (await CTF.fromGuildSnowflakeCTF(interaction.guild.id)).printAllTeams();
+    return await (
+      await CTF.fromGuildSnowflakeCTF(interaction.guild.id)
+    ).printAllTeams();
   },
 } as ApplicationCommandDefinition;

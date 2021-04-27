@@ -17,7 +17,10 @@ export default class Invite {
 
   /** Invite Setter */
   async setWasInvited(was_invited: boolean) {
-    await query(`UPDATE invites SET was_invited = $1 WHERE id = ${this.row.id}`, [was_invited]);
+    await query(
+      `UPDATE invites SET was_invited = $1 WHERE id = ${this.row.id}`,
+      [was_invited],
+    );
     this.row.was_invited = was_invited;
   }
 }

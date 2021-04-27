@@ -1,9 +1,14 @@
 import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 
 export default {
   name: 'announce',
-  description: 'Posts the message provided to the official CTF #announcements channel',
+  description:
+    'Posts the message provided to the official CTF #announcements channel',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {

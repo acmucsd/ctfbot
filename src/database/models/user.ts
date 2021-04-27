@@ -20,12 +20,16 @@ export default class User {
   /** User Setters */
 
   async setTeamID(team_id: number) {
-    await query(`UPDATE users SET team_id = $1 WHERE id = ${this.row.id}`, [team_id]);
+    await query(`UPDATE users SET team_id = $1 WHERE id = ${this.row.id}`, [
+      team_id,
+    ]);
     this.row.team_id = team_id;
   }
 
   async acceptTOS() {
-    await query(`UPDATE users SET tos_accepted = true WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE users SET tos_accepted = true WHERE id = ${this.row.id}`,
+    );
     this.row.tos_accepted = true;
     logger(`**${this.row.user_snowflake}** has accepted TOS`);
     // TODO: Give them a team
@@ -33,11 +37,14 @@ export default class User {
 
   /** Invite Creation */
   async createInvite(team_id: number) {
-    const { rows: existingRows } = await query(
+    const {
+      rows: existingRows,
+    } = await query(
       `SELECT id FROM invites WHERE team_id = $1 and user_id = ${this.row.id}`,
       [team_id],
     );
-    if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
+    if (existingRows && existingRows.length > 0)
+      throw new Error('invite already exists');
 
     const {
       rows,
@@ -50,13 +57,23 @@ export default class User {
 
   /** Invite Retrieval */
   async fromTeamIDInvite(team_id: number) {
-    const { rows } = await query(`SELECT * FROM invites WHERE user_id = ${this.row.id} and team_id = $1`, [team_id]);
+    const {
+      rows,
+    } = await query(
+      `SELECT * FROM invites WHERE user_id = ${this.row.id} and team_id = $1`,
+      [team_id],
+    );
     if (rows.length === 0) throw new Error('no invite for that team');
     return new Invite(rows[0] as InviteRow);
   }
 
   /** Attempt Creation */
-  async createAttempt(challenge_id: number, attempted_flag: string, successful: boolean, timestamp: Date) {
+  async createAttempt(
+    challenge_id: number,
+    attempted_flag: string,
+    successful: boolean,
+    timestamp: Date,
+  ) {
     const {
       rows,
     } = await query(
@@ -68,7 +85,9 @@ export default class User {
 
   /** Attempt Retrieval */
   async getAllAttempts() {
-    const { rows } = await query(`SELECT * FROM attempts WHERE user_id = ${this.row.id}`);
+    const { rows } = await query(
+      `SELECT * FROM attempts WHERE user_id = ${this.row.id}`,
+    );
     return rows.map((row) => new Attempt(row as AttemptRow));
   }
 }

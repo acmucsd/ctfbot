@@ -1,5 +1,9 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
 
 export default {
@@ -32,8 +36,14 @@ export default {
       : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const name = options.name ? (options.name as string) : interaction.guild.name;
-    const server = await ctf.createTeamServer(interaction.guild, name, options.limit as number);
+    const name = options.name
+      ? (options.name as string)
+      : interaction.guild.name;
+    const server = await ctf.createTeamServer(
+      interaction.guild,
+      name,
+      options.limit as number,
+    );
     return `Added Team Server **${server.row.name}** to CTF **${ctf.row.name}** with limit **${server.row.team_limit}**`;
   },
 } as ApplicationCommandDefinition;

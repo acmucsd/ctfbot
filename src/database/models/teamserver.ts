@@ -22,9 +22,13 @@ export default class TeamServer {
   /** TeamServer Setters */
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
   async setInfoChannelSnowflake(info_channel_snowflake: string) {
-    await query(`UPDATE team_servers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
+    await query(
+      `UPDATE team_servers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`,
+    );
     this.row.info_channel_snowflake = info_channel_snowflake;
-    logger(`Set info channel for "${this.row.name}" as ${info_channel_snowflake}`);
+    logger(
+      `Set info channel for "${this.row.name}" as ${info_channel_snowflake}`,
+    );
   }
 
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
@@ -33,7 +37,9 @@ export default class TeamServer {
       `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.team_category_snowflake = team_category_snowflake;
-    logger(`Set info channel for "${this.row.name}" as ${team_category_snowflake}`);
+    logger(
+      `Set info channel for "${this.row.name}" as ${team_category_snowflake}`,
+    );
   }
 
   /**
@@ -44,7 +50,9 @@ export default class TeamServer {
    */
   async makeChannel(client: Client, name: string) {
     const guild = this.getGuild(client);
-    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
+    let channel = guild.channels.cache.find(
+      (c) => c.name === `${name}` && c.type === 'text',
+    );
     if (channel) {
       await channel.delete();
       logger(`**${name}** found: deleted **${name}** channel`);
@@ -54,7 +62,11 @@ export default class TeamServer {
     return channel;
   }
 
-  async renameChannel(client: Client, channel_snowflake: string, newName: string) {
+  async renameChannel(
+    client: Client,
+    channel_snowflake: string,
+    newName: string,
+  ) {
     const guild = this.getGuild(client);
     const channel = guild.channels.resolve(channel_snowflake);
     if (channel) {
@@ -85,7 +97,9 @@ export default class TeamServer {
    */
   async makeCategory(client: Client, name: string) {
     const guild = this.getGuild(client);
-    let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
+    let category = guild.channels.cache.find(
+      (c) => c.name === `${name}` && c.type === 'category',
+    );
     if (!category) {
       category = await guild.channels.create(`${name}`, { type: 'category' });
       logger(`${name} category not found: created ${name} category`);
@@ -98,26 +112,40 @@ export default class TeamServer {
     const teams = (await ctf.getAllTeams()).filter(
       (team) =>
         team.row.name === name ||
-        team.row.name.toLowerCase().replace(' ', '-') === name.toLowerCase().replace(' ', '-'),
+        team.row.name.toLowerCase().replace(' ', '-') ===
+          name.toLowerCase().replace(' ', '-'),
     );
-    if (teams.length !== 0) throw new Error('a team with that name already exists');
+    if (teams.length !== 0)
+      throw new Error('a team with that name already exists');
 
-    const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
+    const {
+      rows,
+    } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
 
     if (this.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      await team.setTeamRoleSnowflakeMain((await ctf.makeRole(client, name)).id);
+      await team.setTeamRoleSnowflakeMain(
+        (await ctf.makeRole(client, name)).id,
+      );
     } else {
-      await team.setTeamRoleSnowflakeMain(team.row.team_role_snowflake_team_server);
+      await team.setTeamRoleSnowflakeMain(
+        team.row.team_role_snowflake_team_server,
+      );
     }
     return team;
   }
 
   /** Team Retrieval */
   async fromNameTeam(name: string) {
-    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and name = $1`, [name]);
-    if (rows.length === 0) throw new Error('no team with that name in this ctf');
+    const {
+      rows,
+    } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and name = $1`,
+      [name],
+    );
+    if (rows.length === 0)
+      throw new Error('no team with that name in this ctf');
     return new Team(rows[0] as TeamRow);
   }
 
@@ -136,15 +164,19 @@ export default class TeamServer {
   async fromChannelTeam(text_channel_snowflake: string) {
     const {
       rows,
-    } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`, [
-      text_channel_snowflake,
-    ]);
-    if (rows.length === 0) throw new Error('no team associated with that channel');
+    } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`,
+      [text_channel_snowflake],
+    );
+    if (rows.length === 0)
+      throw new Error('no team associated with that channel');
     return new Team(rows[0] as TeamRow);
   }
 
   async getAllTeams() {
-    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id}`);
+    const { rows } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id}`,
+    );
     return rows.map((row) => new Team(row as TeamRow));
   }
 
@@ -157,7 +189,8 @@ export default class TeamServer {
 
   async makeRole(client: Client, name: string) {
     const guild = this.getGuild(client);
-    if (guild.roles.cache.find((role) => role.name === name)) throw new Error('Role with that name already exists');
+    if (guild.roles.cache.find((role) => role.name === name))
+      throw new Error('Role with that name already exists');
     const role = await guild.roles.create({ data: { name: `${name}` } });
     logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
     return role;
@@ -168,7 +201,9 @@ export default class TeamServer {
     const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
-      logger(`Role with snowflake **${role_snowflake}** found: deleted that role`);
+      logger(
+        `Role with snowflake **${role_snowflake}** found: deleted that role`,
+      );
       return;
     }
     logger(`Role with snowflake **${role_snowflake}** not found`);
@@ -176,19 +211,27 @@ export default class TeamServer {
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {
     const guild = this.getGuild(client);
-    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const roleToChange = guild.roles.cache.find(
+      (role) => role.id === role_snowflake,
+    );
     if (roleToChange) {
       await roleToChange.setColor(color);
     }
-    logger(`Changed role with snowflake **${role_snowflake}** to color **${color}**`);
+    logger(
+      `Changed role with snowflake **${role_snowflake}** to color **${color}**`,
+    );
   }
 
   async setRoleName(client: Client, role_snowflake: string, new_name: string) {
     const guild = this.getGuild(client);
-    const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
+    const roleToChange = guild.roles.cache.find(
+      (role) => role.id === role_snowflake,
+    );
     if (roleToChange) {
       await roleToChange.setName(new_name);
-      logger(`Renamed role with snowflake **${role_snowflake}** to **${new_name}**`);
+      logger(
+        `Renamed role with snowflake **${role_snowflake}** to **${new_name}**`,
+      );
     } else {
       throw new Error('role not found in ctf');
     }
@@ -201,8 +244,11 @@ export default class TeamServer {
   }
 
   async fromIdTeam(team_id: number) {
-    const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and id = ${team_id}`);
-    if (rows.length === 0) throw new Error('no team associated with that id in this server');
+    const { rows } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and id = ${team_id}`,
+    );
+    if (rows.length === 0)
+      throw new Error('no team associated with that id in this server');
     return new Team(rows[0] as TeamRow);
   }
 }

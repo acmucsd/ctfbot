@@ -4,7 +4,9 @@ import { eventLoader } from './events';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import database from './database';
 
-export const client = new Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+export const client = new Client({
+  partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+});
 export const subscribedMessages = new Map();
 export interface subscribedMessageCallback {
   id: number;

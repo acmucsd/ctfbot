@@ -1,10 +1,14 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import {
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../compat/types';
 import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 
 export default {
   name: 'add',
-  description: 'Creates a new category with the indicated name and description.',
+  description:
+    'Creates a new category with the indicated name and description.',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
@@ -26,7 +30,8 @@ export default {
 
     const name = options.name.toString();
     const category = await ctf.createCategory(interaction.client, name);
-    if (options.description) await category.setDescription(options.description.toString());
+    if (options.description)
+      await category.setDescription(options.description.toString());
 
     return `New category **${name}** has been created.`;
   },

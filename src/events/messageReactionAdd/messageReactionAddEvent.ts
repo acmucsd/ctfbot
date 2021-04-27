@@ -3,7 +3,10 @@ import { MessageReaction, PartialUser, User } from 'discord.js';
 import { CTF } from '../../database/models';
 import { subscribedMessages, subscribedMessageCallback } from '../../';
 
-const messageReactionAddEvent = async (reaction: MessageReaction, discordUser: User | PartialUser) => {
+const messageReactionAddEvent = async (
+  reaction: MessageReaction,
+  discordUser: User | PartialUser,
+) => {
   if (reaction.partial) {
     await reaction.message.fetch();
   }
