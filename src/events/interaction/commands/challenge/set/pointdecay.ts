@@ -1,11 +1,15 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'pointdecay',
-  description: 'Sets the challenges point decay (i.e. number of solves until the minimum point value is reached)',
+  description:
+    'Sets the challenges point decay (i.e. number of solves until the minimum point value is reached)',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
@@ -26,10 +30,13 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const newDecay = options.decay as number;
-    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    const challengeChannelSnowflake =
+      options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
 
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const challenge = await ctf.fromChannelSnowflakeChallenge(
+      challengeChannelSnowflake,
+    );
     await challenge.setPointDecay(newDecay);
 
     return `Challenge point decay has been set to **${newDecay}**.`;

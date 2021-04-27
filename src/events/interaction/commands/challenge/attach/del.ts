@@ -1,11 +1,15 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'del',
-  description: 'Deletes a file attachment from the existing specified challenge.',
+  description:
+    'Deletes a file attachment from the existing specified challenge.',
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
@@ -25,15 +29,21 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    const challengeChannelSnowflake =
+      options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const fileName = options.file_name.toString();
 
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const challenge = await ctf.fromChannelSnowflakeChallenge(
+      challengeChannelSnowflake,
+    );
     const attachments = await challenge.getAllAttachments();
-    const attachment = attachments.find((attach) => attach.row.name === fileName);
+    const attachment = attachments.find(
+      (attach) => attach.row.name === fileName,
+    );
 
-    if (!attachment) throw new Error('could not find an attachment with that name');
+    if (!attachment)
+      throw new Error('could not find an attachment with that name');
 
     await attachment.deleteAttachment();
 

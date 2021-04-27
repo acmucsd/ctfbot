@@ -28,7 +28,9 @@ export default class Category {
   /** Category Setters */
   // Unique per CTF
   async setName(client: Client, name: string) {
-    await query(`UPDATE categories SET name = $1 WHERE id = ${this.row.id}`, [name]);
+    await query(`UPDATE categories SET name = $1 WHERE id = ${this.row.id}`, [
+      name,
+    ]);
 
     // rename the category on discord
     const category = this.getChannelCategory(client);
@@ -38,7 +40,10 @@ export default class Category {
   }
 
   async setDescription(description: string) {
-    await query(`UPDATE categories SET description = $1 WHERE id = ${this.row.id}`, [description]);
+    await query(
+      `UPDATE categories SET description = $1 WHERE id = ${this.row.id}`,
+      [description],
+    );
     this.row.description = description;
   }
 
@@ -47,7 +52,10 @@ export default class Category {
     // check if this challenge already exists in this ctf
     const {
       rows: existingRows,
-    } = await query(`SELECT id FROM challenges WHERE name = $1 and category_id = ${this.row.id}`, [name]);
+    } = await query(
+      `SELECT id FROM challenges WHERE name = $1 and category_id = ${this.row.id}`,
+      [name],
+    );
     if (existingRows && existingRows.length > 0) throw new DupeChallengeError();
 
     // create a text channel for this challenge
@@ -64,14 +72,21 @@ export default class Category {
   }
 
   async getAllChallenges() {
-    const { rows } = await query(`SELECT * FROM challenges WHERE category_id = ${this.row.id}`);
+    const { rows } = await query(
+      `SELECT * FROM challenges WHERE category_id = ${this.row.id}`,
+    );
     return rows.map((row) => new Challenge(row as ChallengeRow, this.ctf));
   }
 
   // misc
   getChannelCategory(client: Client) {
-    const category = this.ctf.getGuild(client).channels.resolve(this.row.channel_category_snowflake);
-    if (!category) throw new Error('No channel category corresponding with this category id found.');
+    const category = this.ctf
+      .getGuild(client)
+      .channels.resolve(this.row.channel_category_snowflake);
+    if (!category)
+      throw new Error(
+        'No channel category corresponding with this category id found.',
+      );
     return category;
   }
 }

@@ -1,4 +1,7 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import {
+  ApplicationCommandOptionType,
+  CommandOptionMap,
+} from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
@@ -26,9 +29,12 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const newAuthor = options.author.toString();
-    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    const challengeChannelSnowflake =
+      options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const challenge = await ctf.fromChannelSnowflakeChallenge(
+      challengeChannelSnowflake,
+    );
     await challenge.setAuthor(newAuthor);
 
     return `Challenge author has been set to **${newAuthor}**.`;
