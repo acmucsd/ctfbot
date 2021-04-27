@@ -4,6 +4,6 @@ export default (...message: string[]) => {
     '[\u001b[34mctfbot\u001b[0m]\u001b[33m',
     new Date(),
     '\u001b[0m-',
-    ...message.map((msg) => msg.replace(/\*/g, '')),
+    ...message.map((msg) => msg.toString().replace(/\*/g, '')),
   );
 };
