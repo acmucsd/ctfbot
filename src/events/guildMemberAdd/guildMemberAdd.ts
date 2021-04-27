@@ -36,7 +36,6 @@ const guildMemberAddEvent = async (member: GuildMember) => {
     } catch (err) {
       if (err instanceof NoUserError) {
         // First time user joining the main ctf server
-        await ctf.createUser(member);
       } else if (err instanceof NoTeamUserError) {
         // TODO: User isn't a part of a team but is a part of the ctf
       } else {

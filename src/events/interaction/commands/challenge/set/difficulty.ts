@@ -1,9 +1,7 @@
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
+import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'difficulty',
@@ -46,16 +44,9 @@ export default {
     ctf.throwErrorUnlessAdmin(interaction);
 
     const difficulty = options.difficulty.toString();
-    const challengeChannelSnowflake =
-      options.challenge_channel?.toString() ?? interaction.channel.id;
-    if (!challengeChannelSnowflake)
-      throw new Error(
-        'could not determine challenge, try providing challenge_channel parameter',
-      );
-
-    const challenge = await ctf.fromChannelSnowflakeChallenge(
-      challengeChannelSnowflake,
-    );
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.setDifficulty(difficulty);
 
     return `Challenge difficulty has been set to **${difficulty}**.`;

@@ -1,9 +1,7 @@
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
+import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 
 export default {
   name: 'add',
@@ -33,18 +31,12 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const challengeChannelSnowflake =
-      options.challenge_channel?.toString() ?? interaction.channel.id;
-    if (!challengeChannelSnowflake)
-      throw new Error(
-        'could not determine challenge, try providing challenge_channel parameter',
-      );
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
 
     const fileName = options.file_name.toString();
     const fileURL = options.file_url.toString();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(
-      challengeChannelSnowflake,
-    );
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.createAttachment(fileName, fileURL);
 
     return `Attachment **${fileName}** has been added to challenge **${challenge.row.name}**`;

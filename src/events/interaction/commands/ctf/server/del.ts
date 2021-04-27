@@ -40,7 +40,7 @@ export default {
       ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     }
     ctf.throwErrorUnlessAdmin(interaction);
-    void teamServer.deleteTeamServer();
+    void teamServer.deleteTeamServer(interaction.client);
     return `Removed **${teamServer.row.name}** from CTf **${ctf.row.name}**`;
   },
 } as ApplicationCommandDefinition;
