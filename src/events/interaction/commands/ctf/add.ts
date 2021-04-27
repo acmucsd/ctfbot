@@ -35,8 +35,9 @@ export default {
       interaction.client,
       name,
       interaction.guild.id,
+      interaction.member,
     );
-    void newCTF.setDescription(description);
+    await newCTF.setDescription(description);
     const printString = `Created new CTF **${newCTF.row.name}** with `;
     return printString
       .concat(description ? `description **${description}**` : `no description`)

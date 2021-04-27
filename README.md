@@ -43,9 +43,9 @@ This creates a new CTF in the guild you're currently in. It will create all of t
 
 **Note**: there is a limit of one CTF per guild.
 
-**Note 2**: until you *publish* the CTF by setting the start date and end date, challenges cannot be submitted.
+**Note 2**: until you *publish* the CTF by setting the start date and end date, challenges cannot be submitted by players.
 
-**Note 3**: until you set an admin role (below), all commands (including administrative ones) can be executed by all roles.
+**Note 3**: creating a ctf will also create an Admin role that the calling user will be added to.
 
 #### editing a CTF
 ```java

@@ -35,7 +35,12 @@ export default class CTF {
   }
 
   /* CTF Creation / Deletion */
-  static async createCTF(client: Client, name: string, guildSnowflake: string) {
+  static async createCTF(
+    client: Client,
+    name: string,
+    guildSnowflake: string,
+    member: GuildMember,
+  ) {
     // check if a CTF already exists in this guild
     const {
       rows: existingCTFs,
@@ -62,8 +67,15 @@ export default class CTF {
     // TODO: Make a "Competitor" role for easier time giving people access to
     //       social channels?
     const ctf = new CTF(rows[0] as CTFRow);
+
+    // create an admin role and add the caller to it
+    const role = await ctf.makeRole(client, 'CTF Admin');
+    await ctf.setAdminRoleSnowflake(role.id);
+    await member.roles.add(role);
+
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
+
     const tos = await ctf.makeChannel(client, 'tos');
     await tos.setParent(info.id);
     await tos.updateOverwrite(tos.guild.roles.everyone, {

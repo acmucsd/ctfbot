@@ -4,7 +4,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS ctfs (
     description text,
     start_date date,
     end_date date,
-    guild_snowflake text,
+    guild_snowflake text NOT NULL,
     admin_role_snowflake text,
     announcements_channel_snowflake text,
     tos_channel_snowflake text,
