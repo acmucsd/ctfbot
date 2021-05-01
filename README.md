@@ -22,6 +22,56 @@ npm install # may require postgres to be installed
 npm start # run development mode, changes trigger a reload
 ```
 
+## user flow
+
+This section walks through the experience of a new user joining your discord-based CTF.
+
+### 1 - joining the main guild
+First, the hopeful player will join the **main guild** registered to the CTF.
+Nothing happens, but they get access to the **Terms of Service channel**, which is generated when a CTF is created.
+They will need to agree to these terms in order to participate.
+
+### 2 - accepting the terms of service
+Once the user reacts affirmatively to the **Terms of Service**, ctfbot will automatically grant that user:
+1. a **User** registration in the CTF
+2. a **Team** registration that contains only the user and is assigned to the least full Team Server
+3. the `@Competitor` role, that grants access to challenge channels and user commands
+4. a role that corresponds to the team server they have been added to, granting access to their team server channel
+5. a channel in that team server corresponding to their team
+
+### 3 - joining their team server
+When the user joins their team server, they will arrive in a landing channel with a short
+explanation on where to find challenges and how to change team servers.
+They will immediately be granted their team role and have access to their team channel, where they can submit challenges.
+
+If they join the wrong team server, they will be kicked and directed to their real team server.
+
+### 4 - adding people to their team
+The original member of a team can expand their team by using the `/team invite DISCORD_USER` command.
+You may only invite users that have already accepted TOS.
+The invited user will receive your invitation in their team chat, and they can accept by either reacting
+or using the command `/team join TEAM_NAME`.
+
+Once you have added a user to your team, they will be kicked out of their channels, chats, and roles and added to your team's resources.
+
+### 5 - submitting challenges
+The user can attempt a challenge by viewing the **challenge channel** in the **main guild**,
+and reacting to it to get the prompt sent to their team channel.
+
+Once the challenge is complete, they should submit the flag using the `/submit` command, preferably in their team channel.
+If they attempt to use this command in another channel, or if a flag is detected in any channel,
+the message will be deleted and the user will be warned.
+
+When a challenge is submitted, the solve will be announced,
+and the user may be granted access to an additional challenge channel, if another challenge was unlocked.
+
+### 6 - checking status
+The user can always view the leaderboard chats in the **main guild**. 
+There is a top-in-each-category leaderboard, and there is an overall leaderboard.
+These are updated every couple of minutes.
+
+The user can request their own standing in their team channel with `/scoreboard standing`.
+
 ## commands
 
 The bot is controlled primarily through [Slash Commands](https://discord.com/developers/docs/interactions/slash-commands). 
@@ -249,7 +299,7 @@ All users in the server are able to use these commands regardless of admin statu
 #### joining a team
 ```java
 /team invite DISCORD_USERNAME
-/team join TEAM_NAME
+/team join TEAM_NAME // NOT ADDED ATM
 ```
 
 Invite allows for the owner of a team to invite a user within the CTF to their current 
