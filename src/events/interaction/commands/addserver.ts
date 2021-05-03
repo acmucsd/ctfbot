@@ -1,11 +1,10 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
-import { CTF } from '../../../../../database/models';
+import CommandInteraction from '../compat/CommandInteraction';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
+import { CTF } from '../../../database/models';
 
 export default {
-  name: 'add',
+  name: 'addserver',
   description: 'Adds the current guild as a team server for the indicated CTF',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'limit',

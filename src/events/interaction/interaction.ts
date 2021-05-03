@@ -2,7 +2,6 @@ import { Client } from 'discord.js';
 import { category, challenge, ctf, ping, team } from './commands';
 import CommandInteraction from './compat/CommandInteraction';
 import { logger, embedify } from '../../log';
-import { setCommands } from './compat/commands';
 import {
   ApplicationCommandDefinition,
   ApplicationCommandResponse,
@@ -11,11 +10,15 @@ import {
   InteractionType,
 } from './compat/types';
 import { CTF } from '../../database/models';
+import addctf from './commands/addctf';
+import addserver from './commands/addserver';
+import { setCommands } from './compat/commands';
 
 // our canonical list of application definitions
+export const topLevelCommands: ApplicationCommandDefinition[] = [addctf, addserver];
 export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge];
 export const userCommands: ApplicationCommandDefinition[] = [ping];
-const commands: ApplicationCommandDefinition[] = [...userCommands, ...adminCommands];
+const commands: ApplicationCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
 // utility to help us access passed options more intuitively
 const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
@@ -77,6 +80,9 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   logger('registering commands...');
+  // first, register global commands
+  await setCommands(client, topLevelCommands);
+  logger(`registered global commands`);
   // register commands for all current guilds
   for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
     try {

@@ -78,7 +78,13 @@ The bot is controlled primarily through [Slash Commands](https://discord.com/dev
 
 There are two kinds of commands, administrative commands and user commands.
 
-Discord also makes a distinction between globally registered commands and per-guild commands. All commands provided are per-guild commands, the bot will not respond to commands outside of a guild with which it is registered.
+Discord also makes a distinction between globally registered commands and per-guild commands. Most commands provided are per-guild commands, the bot will not respond to commands outside of a guild with which it is registered.
+
+The only global commands are:
+1. `/addctf`
+2. `/addserver`
+
+Once these commands are run in a particular server, the remaining per-guild commands will be added.
 
 ### administrative commands
 
@@ -86,7 +92,7 @@ To use the commands detailed in this section, your Discord user needs to have th
 
 #### adding a new CTF
 ```java
-/ctf add NAME [DESCRIPTION]
+/addctf NAME [DESCRIPTION]
 ```
 
 This creates a new CTF in the guild you're currently in. It will create all of the channel categories it will add competition channels to, as well as some meta channels for announcements and logging. Avoid deleting these categories and channels, but you can otherwise name them / rearrange them freely.
@@ -126,14 +132,14 @@ This causes the removal of the current guild's CTF *and all associated Teams, Ca
 
 #### managing team servers
 ```java
+/addserver NAME LIMIT CTF_NAME
 /ctf server get [CTF_NAME]
-/ctf server add NAME LIMIT CTF_NAME
 /ctf server del NAME [CTF_NAME]
 ```
 
-The first command will list all of the team servers belonging to the indicated CTF. The current CTF will be inferred if you are already on the main CTF guild or a team server.
+The first command will add the current guild as a team server for the indicated CTF. Again, you must be an admin on the main CTF guild to run this command.
 
-The second command will add the current guild as a team server for the indicated CTF. Again, you must be an admin on the main CTF guild to run this command. 
+The second command will list all of the team servers belonging to the indicated CTF. The current CTF will be inferred if you are already on the main CTF guild or a team server.
 
 The third command will remove the indicated team server from the indicated CTF. The CTF can also be inferred by the guild you are on. 
 
@@ -319,8 +325,8 @@ how to do it properly in the main server
 
 #### team management
 ```java
-/teamname NAME
-/teamcolor COLOR
+/setname NAME
+/setcolor COLOR
 ```
 
 Similar to the admin only commands, these take in no argument for team and will only affect

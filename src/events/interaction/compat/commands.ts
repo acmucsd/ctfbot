@@ -1,6 +1,11 @@
 import { Client, Snowflake } from 'discord.js';
 import ApplicationCommand from './ApplicationCommand';
-import { ApplicationCommandRequest, InteractionResponseType, InteractionType } from './types';
+import {
+  ApplicationCommandDefinition,
+  ApplicationCommandRequest,
+  InteractionResponseType,
+  InteractionType,
+} from './types';
 import CommandInteraction from './CommandInteraction';
 
 function transformCommand(command: ApplicationCommandRequest) {
@@ -37,7 +42,7 @@ export function registerInteractionEvent(client: Client, listener) {
   });
 }
 
-export async function fetchCommands(client: Client, guildID: Snowflake) {
+export async function fetchCommands(client: Client, guildID?: Snowflake) {
   const clientID = (await client.fetchApplication()).id;
   // @ts-ignore
   let path = client.api.applications(clientID);
@@ -48,7 +53,13 @@ export async function fetchCommands(client: Client, guildID: Snowflake) {
   return commands.map((c) => new ApplicationCommand(client, c, guildID));
 }
 
-export async function setCommands(client: Client, commands: ApplicationCommandRequest[], guildID: Snowflake) {
+export async function setCommands(client: Client, commands: ApplicationCommandRequest[], guildID?: Snowflake) {
+  // if we're setting global commands, lets make sure we don't clobber whats already there
+  // TODO: patch if the command is defined
+  if(!guildID) {
+    const registeredCommands = await fetchCommands(client);
+    commands = commands.filter(com => !registeredCommands.find(regCom => regCom.name === com.name));
+  }
   return Promise.all(commands.map((command) => createCommand(client, command, guildID)));
 }
 
