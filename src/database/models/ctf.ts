@@ -38,7 +38,7 @@ export default class CTF {
     const ctf = new CTF(rows[0] as CTFRow);
 
     // create an admin role and add the caller to it
-    const role = await ctf.makeRole(client, 'CTF Admin');
+    const role = await ctf.makeRole(client, 'CTF Admin', true);
     await ctf.setAdminRoleSnowflake(role.id);
     await member.roles.add(role);
 
@@ -460,10 +460,15 @@ export default class CTF {
     throw new Error('You do not have permission to use this command');
   }
 
-  async makeRole(client: Client, name: string) {
+  // useExisting == true to use an existing role if its defined
+  async makeRole(client: Client, name: string, useExisting = false) {
     const ctfServerGuild = this.getGuild(client);
-    // change the role name if it already exists
-    while (ctfServerGuild.roles.cache.find((role) => role.name === name)) name += '_';
+    // use the existing role name if it already exists
+    const existingRole = ctfServerGuild.roles.cache.find((role) => role.name === name);
+    if (useExisting && existingRole) {
+      logger(`role ${name} already exists, using it`);
+      return existingRole;
+    }
     const role = await ctfServerGuild.roles.create({
       data: { name: `${name}` },
     });
