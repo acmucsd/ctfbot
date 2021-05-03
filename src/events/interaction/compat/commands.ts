@@ -17,6 +17,7 @@ function transformCommand(command: ApplicationCommandRequest) {
         options: o.options?.map(m),
       };
     }),
+    default_permission: command.default_permission,
   };
 }
 
@@ -44,11 +45,11 @@ export async function fetchCommands(client: Client, guildID: Snowflake) {
     path = path.guilds(guildID);
   }
   const commands = await path.commands.get();
-  return commands.map((c) => new ApplicationCommand(this, c, guildID));
+  return commands.map((c) => new ApplicationCommand(client, c, guildID));
 }
 
 export async function setCommands(client: Client, commands: ApplicationCommandRequest[], guildID: Snowflake) {
-  return await commands.map((command) => createCommand(client, command, guildID));
+  return Promise.all(commands.map((command) => createCommand(client, command, guildID)));
 }
 
 export async function createCommand(client: Client, command: ApplicationCommandRequest, guildID?: Snowflake) {
@@ -61,5 +62,5 @@ export async function createCommand(client: Client, command: ApplicationCommandR
   const c = await path.commands.post({
     data: transformCommand(command),
   });
-  return new ApplicationCommand(this, c, guildID);
+  return new ApplicationCommand(client, c, guildID);
 }
