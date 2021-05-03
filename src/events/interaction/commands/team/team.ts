@@ -11,4 +11,5 @@ export default {
   name: 'team',
   description: 'Team management commands',
   options: [add, del, get, invite, join, set],
+  default_permission: false,
 } as ApplicationCommandDefinition;

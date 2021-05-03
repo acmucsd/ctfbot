@@ -9,4 +9,5 @@ export default {
   name: 'ctf',
   description: 'Add or manage aspects of CTFs',
   options: [add, announce, del, server, set],
+  default_permission: false,
 } as ApplicationCommandDefinition;

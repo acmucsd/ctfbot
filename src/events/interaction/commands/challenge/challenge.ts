@@ -9,4 +9,5 @@ export default {
   name: 'challenge',
   description: 'Challenge management and submission',
   options: [add, attach, del, get, set, submit],
+  default_permission: false,
 };

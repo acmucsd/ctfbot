@@ -7,4 +7,5 @@ export default {
   name: 'category',
   description: 'Challenge category management',
   options: [add, del, get, set],
+  default_permission: false,
 };
