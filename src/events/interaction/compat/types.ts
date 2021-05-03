@@ -13,6 +13,7 @@ export interface ApplicationCommandRequest {
   name: string;
   description: string;
   options?: ApplicationCommandOption[];
+  default_permission?: boolean;
 }
 
 export interface ApplicationCommandResponseOption extends ApplicationCommandResponse {
