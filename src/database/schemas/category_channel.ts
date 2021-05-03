@@ -1,7 +1,7 @@
 export const schema = `CREATE TABLE IF NOT EXISTS category_channels (
     id serial,
     category_id integer REFERENCES categories ON DELETE CASCADE NOT NULL,
-    teamserver_id integer REFERENCES team_servers NOT NULL,
+    teamserver_id integer REFERENCES team_servers ON DELETE CASCADE NOT NULL,
     channel_snowflake text,
     PRIMARY KEY( id )
   );`;
