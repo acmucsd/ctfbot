@@ -248,9 +248,10 @@ export default class CTF {
     }
 
     // insert all new category channels into the db at once
-    await query(
-      `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
-    );
+    if (categoryChannels.length > 0)
+      await query(
+        `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
+      );
 
     return category;
   }
@@ -328,12 +329,14 @@ export default class CTF {
     }
 
     // commit new channels to the database at once
-    await query(
-      `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
-    );
-    await query(
-      `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
-    );
+    if (categoryChannels.length > 0)
+      await query(
+        `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
+      );
+    if (challengeChannels.length > 0)
+      await query(
+        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
+      );
 
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
     await teamServer.setInfoChannelSnowflake(infoChannel.id);

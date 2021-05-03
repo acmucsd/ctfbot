@@ -20,7 +20,7 @@ export default class Challenge {
 
   async deleteChallenge(client: Client) {
     // delete the channels
-    const channels = await this.getChallengeChannels(client);
+    const channels = await this.getChallengeGuildChannels(client);
     for (const channel of channels) {
       await channel.delete();
     }
@@ -36,7 +36,7 @@ export default class Challenge {
     await query(`UPDATE challenges SET name = $1 WHERE id = ${this.row.id}`, [name]);
 
     // rename the challenge channels on discord
-    const channels = await this.getChallengeChannels(client);
+    const channels = await this.getChallengeGuildChannels(client);
     for (const channel of channels) {
       await channel.setName(name);
     }
@@ -131,7 +131,7 @@ export default class Challenge {
   }
 
   // get the channels that correspond with this challenge
-  async getChallengeChannels(client: Client): Promise<GuildChannel[]> {
+  async getChallengeGuildChannels(client: Client) {
     const { rows } = await query(`SELECT * FROM challenge_channels WHERE challenge_id = ${this.row.id}`);
     if (!rows) throw new Error('No channels corresponding with this challenge id found.');
 
