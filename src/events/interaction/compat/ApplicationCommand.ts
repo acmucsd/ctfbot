@@ -79,10 +79,27 @@ export default class ApplicationCommand {
   /* eslint-disable */
   async delete() {
     // @ts-ignore
-    let path = this.client.api.applications('@me');
+    let path = this.client.api.applications(this.applicationID);
     if (this.guildID) {
       path = path.guilds(this.guildID);
     }
     await path.commands(this.id).delete();
+  }
+
+  // grants the provided role access to this command
+  async allowRole(role: Snowflake) {
+    // @ts-ignore
+    const endpoint = this.client.api.applications(this.applicationID).guilds(this.guildID).commands(this.id).permissions;
+    return await endpoint.put({
+      data: {
+        permissions: [
+          {
+            id: role,
+            type: 1,
+            permission: true
+          }
+        ]
+      }
+    });
   }
 }
