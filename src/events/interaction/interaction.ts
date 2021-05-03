@@ -1,19 +1,21 @@
-import { Client, MessageEmbed } from 'discord.js';
-import { category, challenge, ctf, ping, scoreboard, team } from './commands';
+import { Client } from 'discord.js';
+import { category, challenge, ctf, ping, team } from './commands';
 import CommandInteraction from './compat/CommandInteraction';
 import { logger, embedify } from '../../log';
 import { setCommands } from './compat/commands';
 import {
   ApplicationCommandDefinition,
-  ApplicationCommandOption,
   ApplicationCommandResponse,
   ApplicationCommandResponseOption,
   CommandOptionMap,
   InteractionType,
 } from './compat/types';
+import { CTF } from '../../database/models';
 
 // our canonical list of application definitions
-const commands: ApplicationCommandDefinition[] = [ping, ctf, team, category, challenge];
+export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge];
+export const userCommands: ApplicationCommandDefinition[] = [ping];
+const commands: ApplicationCommandDefinition[] = [...userCommands, ...adminCommands];
 
 // utility to help us access passed options more intuitively
 const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
@@ -75,8 +77,16 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
 
 export const registerCommands = async (client: Client) => {
   logger('registering commands...');
+  // register commands for all current guilds
   for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
-    await setCommands(client, commands, guildID);
+    try {
+      const ctf = await CTF.fromGuildSnowflakeCTF(guildID);
+      await ctf.registerCommands(client);
+      logger(`registered commands for guild ${guildID}`);
+    } catch (e) {
+      logger(e);
+      logger(`no ctf in guild ${guildID}`);
+    }
   }
   logger('commands registered');
 };

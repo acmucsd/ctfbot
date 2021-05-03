@@ -8,6 +8,8 @@ import CommandInteraction from '../../events/interaction/compat/CommandInteracti
 import { subscribedMessageCallback, subscribedMessages } from '../../';
 import { DupeTeamError, NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
+import { setCommands } from '../../events/interaction/compat/commands';
+import { adminCommands, userCommands } from '../../events/interaction/interaction';
 
 export default class CTF {
   row: CTFRow;
@@ -39,6 +41,9 @@ export default class CTF {
     const role = await ctf.makeRole(client, 'CTF Admin');
     await ctf.setAdminRoleSnowflake(role.id);
     await member.roles.add(role);
+
+    // register CTF commands now that this is a CTF
+    await ctf.registerCommands(client);
 
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
@@ -94,6 +99,20 @@ export default class CTF {
         }
       },
     });
+  }
+
+  // registers ctf commands and grants access to appropriate roles
+  async registerCommands(client: Client) {
+    const applicationAdminCommands = await setCommands(client, adminCommands, this.row.guild_snowflake);
+    // ensure only admins can use admin commands
+    for (const com of applicationAdminCommands) {
+      await com.allowRole(this.row.admin_role_snowflake);
+    }
+    const applicationUserCommands = await setCommands(client, userCommands, this.row.guild_snowflake);
+    // ensure only users can use user commands
+    // for (const com of applicationUserCommands) {
+    //   await com.allowRole(this.row.admin_role_snowflake);
+    // }
   }
 
   // No category supplied will give the top teams
@@ -443,8 +462,8 @@ export default class CTF {
 
   async makeRole(client: Client, name: string) {
     const ctfServerGuild = this.getGuild(client);
-    if (ctfServerGuild.roles.cache.find((role) => role.name === name))
-      throw new Error('Role with that name already exists');
+    // change the role name if it already exists
+    while (ctfServerGuild.roles.cache.find((role) => role.name === name)) name += '_';
     const role = await ctfServerGuild.roles.create({
       data: { name: `${name}` },
     });
