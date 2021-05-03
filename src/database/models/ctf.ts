@@ -227,19 +227,25 @@ export default class CTF {
     if (existingRows && existingRows.length > 0)
       throw new Error('cannot create a category with a duplicate name in this CTF');
 
-    // create the channel category for this category
-    const guild = this.getGuild(client);
-    const category = await guild.channels.create(`${name}`, {
-      type: 'category',
-    });
+    const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [
+      name,
+    ]);
+    const category = new Category(rows[0] as CategoryRow, this);
 
-    const {
-      rows,
-    } = await query(
-      `INSERT INTO categories(ctf_id, name, channel_category_snowflake) VALUES (${this.row.id}, $1, $2) RETURNING *`,
-      [name, category.id],
+    // create the category channels for this category
+    const teamServers = await this.getAllTeamServers();
+    const categoryChannels: string[] = [];
+    for (const teamServer of teamServers) {
+      const channel = await teamServer.getGuild(client).channels.create(name, { type: 'category' });
+      categoryChannels.push(`(${category.row.id}, ${teamServer.row.id}, ${channel.id})`);
+    }
+
+    // insert all new category channels into the db at once
+    await query(
+      `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
     );
-    return new Category(rows[0] as CategoryRow, this);
+
+    return category;
   }
 
   /* Category Retrieval */

@@ -1,8 +1,8 @@
 import query from '../database';
-import { CategoryRow, ChallengeRow } from '../schemas';
+import { CategoryChannelRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Challenge from './challenge';
 import CTF from './ctf';
-import { Client } from 'discord.js';
+import { Client, GuildChannel } from 'discord.js';
 import { DupeChallengeError } from '../../errors';
 
 export default class Category {
@@ -19,9 +19,16 @@ export default class Category {
   // makeCategory made in CTF
 
   async deleteCategory(client: Client) {
+    // delete the category channels associated
+    const channels = await this.getCategoryChannels(client);
+    for (const channel of channels) {
+      await channel.delete();
+    }
+
+    // lastly, delete the database entry itself
+    // (should cascade to delete category channels)
     await query(`DELETE FROM categories WHERE id = ${this.row.id}`);
-    // delete the channel category associated
-    await this.getChannelCategory(client).delete();
+
     return `The category **${this.row.name}** has been deleted.`;
   }
 
@@ -31,8 +38,10 @@ export default class Category {
     await query(`UPDATE categories SET name = $1 WHERE id = ${this.row.id}`, [name]);
 
     // rename the category on discord
-    const category = this.getChannelCategory(client);
-    await category.setName(name.toLowerCase());
+    const channels = await this.getCategoryChannels(client);
+    for (const channel of channels) {
+      await channel.setName(name.toLowerCase());
+    }
 
     this.row.name = name;
   }
@@ -50,17 +59,29 @@ export default class Category {
     } = await query(`SELECT id FROM challenges WHERE name = $1 and category_id = ${this.row.id}`, [name]);
     if (existingRows && existingRows.length > 0) throw new DupeChallengeError();
 
-    // create a text channel for this challenge
-    const channel = await this.ctf.getGuild(client).channels.create(name);
-    await channel.setParent(this.row.channel_category_snowflake);
+    // insert new challenge row
+    const { rows } = await query(`INSERT INTO challenges (name, category_id) VALUES ($1, ${this.row.id}) RETURNING *`, [
+      name,
+    ]);
+    const challenge = new Challenge(rows[0] as ChallengeRow, this.ctf);
 
-    const {
-      rows,
-    } = await query(
-      `INSERT INTO challenges (name, category_id, channel_snowflake) VALUES ($1, ${this.row.id}, ${channel.id}) RETURNING *`,
-      [name],
+    const categoryChannels = await this.getCategoryChannels(client);
+    const challengeChannels: string[] = [];
+
+    // create a text channel for this challenge and add to the category
+    for (const categoryChannel of categoryChannels) {
+      const channel = await categoryChannel.guild.channels.create(name);
+      await channel.setParent(categoryChannel.id);
+      // build the VALUES query as we go
+      challengeChannels.push(`(${challenge.row.id}, ${channel.guild.id}, ${channel.id})`);
+    }
+
+    // insert all new challenge channels into the db at once
+    await query(
+      `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
     );
-    return new Challenge(rows[0] as ChallengeRow, this.ctf);
+
+    return challenge;
   }
 
   async getAllChallenges() {
@@ -69,9 +90,14 @@ export default class Category {
   }
 
   // misc
-  getChannelCategory(client: Client) {
-    const category = this.ctf.getGuild(client).channels.resolve(this.row.channel_category_snowflake);
-    if (!category) throw new Error('No channel category corresponding with this category id found.');
-    return category;
+  async getCategoryChannels(client: Client) {
+    const { rows } = await query(`SELECT * FROM category_channels WHERE category_id = ${this.row.id}`);
+    if (!rows) throw new Error('No channels corresponding with this category id found.');
+
+    return await Promise.all(
+      rows
+        .map((row) => row as CategoryChannelRow)
+        .map((channel) => client.channels.resolve(channel.channel_snowflake) as GuildChannel),
+    );
   }
 }

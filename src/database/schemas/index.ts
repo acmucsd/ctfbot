@@ -5,7 +5,9 @@ import { schema as teamsSchema } from './team';
 import { schema as usersSchema } from './user';
 import { schema as invitesSchema } from './invite';
 import { schema as categoriesSchema } from './category';
+import { schema as categoryChannelsSchema } from './category_channel';
 import { schema as challengesSchema } from './challenge';
+import { schema as challengeChannelsSchema } from './challenge_channel';
 import { schema as attemptsSchema } from './attempt';
 import { schema as attachmentsSchema } from './attachment';
 
@@ -17,7 +19,9 @@ const schemas = [
   usersSchema,
   invitesSchema,
   categoriesSchema,
+  categoryChannelsSchema,
   challengesSchema,
+  challengeChannelsSchema,
   attemptsSchema,
   attachmentsSchema,
 ];
@@ -33,7 +37,9 @@ export default async (pool: Pool) => {
 export { AttachmentRow } from './attachment';
 export { AttemptRow } from './attempt';
 export { CategoryRow } from './category';
+export { CategoryChannelRow } from './category_channel';
 export { ChallengeRow } from './challenge';
+export { ChallengeChannelRow } from './challenge_channel';
 export { CTFRow } from './ctf';
 export { InviteRow } from './invite';
 export { TeamRow } from './team';

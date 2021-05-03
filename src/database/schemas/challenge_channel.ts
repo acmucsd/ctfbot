@@ -1,0 +1,14 @@
+export const schema = `CREATE TABLE IF NOT EXISTS challenge_channels (
+    id serial,
+    challenge_id integer REFERENCES challenges ON DELETE CASCADE NOT NULL,
+    teamserver_id integer REFERENCES team_servers NOT NULL,
+    channel_snowflake text,
+    PRIMARY KEY( id )
+  );`;
+
+export interface ChallengeChannelRow {
+  id: number;
+  challenge_id: number;
+  teamserver_id: number;
+  channel_snowflake: string;
+}
