@@ -38,7 +38,7 @@ export default class CommandInteraction extends Interaction {
     // @ts-ignore
     await this.client.api.interactions(this.id, this.token).callback.post({
       data: {
-        type: InteractionResponseType.CHANNEL_MESSAGE,
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data
       },
     });
