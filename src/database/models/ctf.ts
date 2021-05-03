@@ -61,8 +61,7 @@ export default class CTF {
       });
       await ctf.setTOSWebhook(webhook.id);
     });
-    const participantRole = await ctf.makeRole(client, 'Participant', true);
-    await ctf.setParticipantRole(participantRole.id);
+    await ctf.setParticipantRole(await ctf.makeRole(client, 'Participant', true));
     return ctf;
   }
 
@@ -130,8 +129,9 @@ export default class CTF {
   //
   // async getTeamScoreboard(team: Team) {}
 
-  async setParticipantRole(roleID: string) {
-    await query(`UPDATE ctfs SET participant_role_snowflake = ${roleID} WHERE id = ${this.row.id}`);
+  async setParticipantRole(role: Role) {
+    await query(`UPDATE ctfs SET participant_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
+    this.row.participant_role_snowflake = role.id;
     logger(`Set **${this.row.name}**'s participant role`);
   }
 
