@@ -1,7 +1,4 @@
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 
@@ -27,9 +24,7 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const category = await ctf.fromNameCategory(
-      options.category_name.toString(),
-    );
+    const category = await ctf.fromNameCategory(options.category_name.toString());
     await category.setDescription(options.description.toString());
 
     return `Category **${category.row.name}** description has been set to **${category.row.description}**.`;

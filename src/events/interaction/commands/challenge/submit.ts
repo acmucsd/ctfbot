@@ -1,7 +1,4 @@
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 
@@ -31,9 +28,7 @@ export default {
 
     const flag = options.flag.toString();
     const challengeChannelSnowflake = options.challenge_channel.toString();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(
-      challengeChannelSnowflake,
-    );
+    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     const user = await ctf.fromUserSnowflakeUser(interaction.user.id);
 
     if (challenge.row.flag !== flag) {

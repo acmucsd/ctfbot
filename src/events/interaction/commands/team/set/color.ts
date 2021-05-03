@@ -1,9 +1,5 @@
 import CommandInteraction from '../../../compat/CommandInteraction';
-import {
-  ApplicationCommandDefinition,
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../../compat/types';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF, Team } from '../../../../../database/models';
 
 export default {
@@ -32,10 +28,7 @@ export default {
       team = await ctf.fromRoleTeam(options.team_role as string);
     } else {
       // Check if user is a member of the team whose channel they're in
-      team = await ctf.fromUnspecifiedTeam(
-        interaction.member.id,
-        interaction.channel.id,
-      );
+      team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
     }
     return await team.setColor(interaction.client, options.color as string);
   },

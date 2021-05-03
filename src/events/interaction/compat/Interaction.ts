@@ -1,11 +1,4 @@
-import {
-  Channel,
-  Client,
-  Guild,
-  GuildMember,
-  Snowflake,
-  User,
-} from 'discord.js';
+import { Channel, Client, Guild, GuildMember, Snowflake, User } from 'discord.js';
 import { InteractionData } from './types';
 
 export default class Interaction {
@@ -80,8 +73,6 @@ export default class Interaction {
      * @type {?GuildMember}
      * @readonly
      */
-    this.member = data.member
-      ? this.guild?.members.add(data.member, false)
-      : null;
+    this.member = data.member ? this.guild?.members.add(data.member, false) : null;
   }
 }

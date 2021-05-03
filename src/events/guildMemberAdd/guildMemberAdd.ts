@@ -23,10 +23,7 @@ const guildMemberAddEvent = async (member: GuildMember) => {
     teamServer = null;
   }
   // Check to see if it's a main server: either not a team server or a team server with same id as main
-  if (
-    !teamServer ||
-    ctf.row.guild_snowflake === teamServer.row.guild_snowflake
-  ) {
+  if (!teamServer || ctf.row.guild_snowflake === teamServer.row.guild_snowflake) {
     try {
       // Try to resolve the user
       await ctf.fromUserSnowflakeUser(member.user.id);

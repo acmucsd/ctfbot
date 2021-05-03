@@ -1,7 +1,4 @@
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 

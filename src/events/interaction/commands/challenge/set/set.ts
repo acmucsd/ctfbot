@@ -8,25 +8,11 @@ import minimumpoints from './minimumpoints';
 import pointdecay from './pointdecay';
 import flag from './flag';
 import publish from './publish';
-import {
-  ApplicationCommandOptionType,
-  CommandOptionMap,
-} from '../../../compat/types';
+import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 
 export default {
   name: 'set',
   description: 'Challenge info management',
   type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
-  options: [
-    name,
-    author,
-    prompt,
-    difficulty,
-    points,
-    initialpoints,
-    minimumpoints,
-    pointdecay,
-    flag,
-    publish,
-  ],
+  options: [name, author, prompt, difficulty, points, initialpoints, minimumpoints, pointdecay, flag, publish],
 };

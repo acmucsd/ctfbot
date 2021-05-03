@@ -13,18 +13,10 @@ import {
 } from './compat/types';
 
 // our canonical list of application definitions
-const commands: ApplicationCommandDefinition[] = [
-  ping,
-  ctf,
-  team,
-  category,
-  challenge,
-];
+const commands: ApplicationCommandDefinition[] = [ping, ctf, team, category, challenge];
 
 // utility to help us access passed options more intuitively
-const mapToCommandOptionMap = (
-  options: ApplicationCommandResponseOption[],
-): CommandOptionMap =>
+const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
   options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {}) ?? {};
 
 // recursive function to find the execute command that corresponds with this interaction
@@ -37,10 +29,7 @@ const executeCommand = (
   if (!command) return 'Command not recognized';
   // if this command definition contains a function, we should just execute it with the options we have
   if (command.execute) {
-    return command.execute(
-      interaction,
-      mapToCommandOptionMap(response.options),
-    );
+    return command.execute(interaction, mapToCommandOptionMap(response.options));
   }
   // if function not found yet, traverse further down the tree
   return executeCommand(interaction, response.options[0], command.options);

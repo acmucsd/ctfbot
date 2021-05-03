@@ -1,10 +1,6 @@
 import { Client, Snowflake } from 'discord.js';
 import ApplicationCommand from './ApplicationCommand';
-import {
-  ApplicationCommandRequest,
-  InteractionResponseType,
-  InteractionType,
-} from './types';
+import { ApplicationCommandRequest, InteractionResponseType, InteractionType } from './types';
 import CommandInteraction from './CommandInteraction';
 
 function transformCommand(command: ApplicationCommandRequest) {
