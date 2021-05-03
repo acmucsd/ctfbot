@@ -6,6 +6,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS ctfs (
     end_date date,
     guild_snowflake text NOT NULL,
     admin_role_snowflake text,
+    participant_role_snowflake text,
     announcements_channel_snowflake text,
     tos_channel_snowflake text,
     tos_webhook_snowflake text,
@@ -21,6 +22,7 @@ export interface CTFRow {
   end_date: Date | null;
   guild_snowflake: string;
   admin_role_snowflake: string | null;
+  participant_role_snowflake: string | null;
   announcements_channel_snowflake: string | null;
   tos_channel_snowflake: string | null;
   tos_webhook_snowflake: string | null;

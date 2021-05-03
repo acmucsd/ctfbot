@@ -1,4 +1,4 @@
-import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, PartialUser } from 'discord.js';
+import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, PartialUser, Role } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, ChallengeRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
@@ -61,6 +61,8 @@ export default class CTF {
       });
       await ctf.setTOSWebhook(webhook.id);
     });
+    const participantRole = await ctf.makeRole(client, 'Participant', true);
+    await ctf.setParticipantRole(participantRole.id);
     return ctf;
   }
 
@@ -127,6 +129,11 @@ export default class CTF {
   // async getCategoryScoreboard(category: Category) {}
   //
   // async getTeamScoreboard(team: Team) {}
+
+  async setParticipantRole(roleID: string) {
+    await query(`UPDATE ctfs SET participant_role_snowflake = ${roleID} WHERE id = ${this.row.id}`);
+    logger(`Set **${this.row.name}**'s participant role`);
+  }
 
   static async fromWebhookCTF(tos_webhook_snowflake: string) {
     const { rows } = await query('SELECT * FROM ctfs WHERE tos_webhook_snowflake = $1', [tos_webhook_snowflake]);
@@ -418,6 +425,7 @@ export default class CTF {
     // TODO: Edge case that user is false
     if (user) {
       await user.roles.add(team.row.team_role_snowflake_main);
+      await user.roles.add(this.row.participant_role_snowflake);
     }
 
     return new User(rows[0] as UserRow);
