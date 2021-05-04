@@ -158,28 +158,50 @@ export default class Team {
     this.row.captain_user_id = captain_user_id;
   }
 
-  /** Invite Creation */
-  async createInvite(user_id: number) {
-    const { rows: existingRows } = await query(
-      `SELECT id FROM invites WHERE team_id = ${this.row.id} and user_id = $1`,
-      [user_id],
-    );
-    if (existingRows && existingRows.length > 0) throw new Error('invite already exists');
-
-    const {
-      rows,
-    } = await query(
-      `INSERT INTO invites(user_id, team_id, was_invited) VALUES ($1, ${this.row.id}, true) RETURNING *`,
-      [user_id],
-    );
-    return new Invite(rows[0] as InviteRow);
-  }
-
   /** Invite Retrieval */
   async fromUserIDInvite(user_id: number) {
     const { rows } = await query(`SELECT * FROM invites WHERE team_id = ${this.row.id} and user_id = $1`, [user_id]);
     if (rows.length === 0) throw new Error('no invite for that user');
     return new Invite(rows[0] as InviteRow);
+  }
+
+  // remove user from team
+  // if team is empty, it is deleted
+  async removeUser(client: Client, user: User) {
+    if (await user.isAlone()) return this.deleteTeam(client);
+
+    // otherwise, we'll need to be more precise about their removal
+    // TODO
+  }
+
+  // add user to team
+  async addUser(client: Client, user: User) {
+    const isUserAlone = await user.isAlone();
+    if (!isUserAlone) throw new Error('User has already joined a team');
+
+    const oldTeam = await user.getTeam();
+    const oldTeamServer = await CTF.fromIdTeamServer(oldTeam.row.team_server_id);
+    const oldTeamServerGuild = oldTeamServer.getGuild(client);
+    await oldTeam.deleteTeam(client);
+
+    await user.setTeamID(this.row.id);
+
+    // role granting
+    const guildMember = oldTeamServerGuild.member(user.row.user_snowflake);
+
+    // main guild
+    const mainGuildMember = oldTeamServer.ctf.getGuild(client).member(user.row.user_snowflake);
+    await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
+
+    // IF the user is already on the right TeamServer, grant new roles
+    // TODO maybe? Check if this team server is also the main server?
+    if (oldTeamServer.row.id === this.row.team_server_id)
+      await guildMember.roles.add(this.row.team_role_snowflake_team_server);
+
+    // otherwise, just defer to when they join the new teamserver
+    // TODO
+
+    logger(`User **${user.row.user_snowflake}** has joined team **${this.row.name} (${this.row.id})**`);
   }
 
   /** User Retrieval */
@@ -206,6 +228,12 @@ export default class Team {
       id: this.row.id,
     };
     return team;
+  }
+
+  static async fromID(id: number): Promise<Team> {
+    const { rows } = await query(`SELECT * FROM teams WHERE id = ${id}`);
+    if (rows.length === 0) throw new Error('no team found (ILLEGAL STATE)');
+    return new Team(rows[0] as TeamRow);
   }
 }
 

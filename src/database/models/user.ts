@@ -1,8 +1,7 @@
 import { Attempt, Invite, Team } from '.';
 import { AttemptRow, InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
-import { Client, GuildChannel, MessageEmbed, TextChannel } from 'discord.js';
-import { logger } from '../../log';
+import { Client } from 'discord.js';
 
 export default class User {
   row: UserRow;
@@ -33,32 +32,19 @@ export default class User {
     );
     if (existingRows && existingRows.length > 0) throw new Error('invite for that user already exists');
 
-    // send to chat
-    const currentTeam = await this.getTeam();
-    const currentTeamChannel = (await client.channels.fetch(currentTeam.row.text_channel_snowflake)) as TextChannel;
-
-    const message = new MessageEmbed();
-    message.color = 15158332;
-    message.title = `You have been invited to join **Team ${team.row.name}**`;
-    message.description = 'You can accept this invite if you ***react to this message*** with :+1:.';
-    message.description += '\n\nYour team chat will be deleted and you will be added to their team chats.';
-    message.description += '\n\n**You may also need to join their team server if they are in a different region.**';
-    message.description += '\nIf so, look for your new team server chat in the Main Guild.';
-    message.addField(
-      '⚠️  WARNING  ⚠️',
-      'If you join a team, you will not be able to leave it or join another.\\n\\n***Make sure this is the team you would like to join.***',
-    );
-
-    const sentMessage = await currentTeamChannel.send(message);
-    await sentMessage.react('👍');
-
+    // create invite
     const {
       rows,
     } = await query(
       `INSERT INTO invites(user_id, team_id, was_invited) VALUES (${this.row.id}, $1, true) RETURNING *`,
       [team.row.id],
     );
-    return new Invite(rows[0] as InviteRow);
+    const invite = new Invite(rows[0] as InviteRow);
+
+    // send to chat
+    await invite.sendInviteMessage(client, this, team);
+
+    return invite;
   }
 
   /** Invite Retrieval */
@@ -96,5 +82,17 @@ export default class User {
     const { rows } = await query(`SELECT * FROM teams WHERE id = ${this.row.team_id}`);
     if (rows.length === 0) throw new Error('no team for this user (ILLEGAL STATE)');
     return new Team(rows[0] as TeamRow);
+  }
+
+  // returns true if this user is the only person on their team
+  async isAlone() {
+    const { rows } = await query(`SELECT COUNT(*) FROM users WHERE team_id = ${this.row.team_id}`);
+    return rows && rows[0] && rows[0] <= 1;
+  }
+
+  static async fromID(id: number): Promise<User> {
+    const { rows } = await query(`SELECT * FROM users WHERE id = ${id}`);
+    if (rows.length === 0) throw new Error('no user with that ID found (ILLEGAL STATE)');
+    return new User(rows[0] as UserRow);
   }
 }
