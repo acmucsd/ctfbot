@@ -45,6 +45,7 @@ export const interactionEvent = async (interaction: CommandInteraction) => {
   if (interaction.type !== InteractionType.APPLICATION_COMMAND) return;
 
   try {
+    await interaction.sendLoading();
     const response = await executeCommand(
       interaction,
       { name: interaction.commandName, options: interaction.options },

@@ -34,13 +34,20 @@ export default class CommandInteraction extends Interaction {
     this.options = data.data.options;
   }
   /* eslint-disable */
-  async reply(data) {
+  async sendLoading() {
     // @ts-ignore
     await this.client.api.interactions(this.id, this.token).callback.post({
       data: {
-        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-        data
+        type: InteractionResponseType.ACKNOWLEDGE_WITH_SOURCE
       },
+    });
+  }
+
+  async reply(data) {
+    const { id } = await this.client.fetchApplication();
+    // @ts-ignore
+    await this.client.api.webhooks(id, this.token).messages('@original').patch({
+      data
     });
   }
 }
