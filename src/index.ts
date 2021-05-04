@@ -6,6 +6,7 @@ import database from './database';
 
 export const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+  fetchAllMembers: true,
 });
 export const subscribedMessages = new Map();
 export interface subscribedMessageCallback {
