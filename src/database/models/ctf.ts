@@ -369,6 +369,22 @@ export default class CTF {
     if (this.row.guild_snowflake === teamServer.row.guild_snowflake) {
       await infoChannel.setParent(this.row.info_category_snowflake);
     }
+    await teamServer.setServerInvite(guild.client);
+    // TODO: Check if on main server and ignore process if so
+    await teamServer.setServerRole(await this.makeRole(guild.client, `${teamServer.row.name}`));
+    await this.makeChannel(guild.client, `${teamServer.row.name}`).then(async (channel) => {
+      await channel.updateOverwrite(channel.guild.roles.everyone, {
+        SEND_MESSAGES: false,
+        ADD_REACTIONS: false,
+        VIEW_CHANNEL: false,
+      });
+      await channel.updateOverwrite(channel.guild.roles.resolve(this.row.admin_role_snowflake), { VIEW_CHANNEL: true });
+      await channel.updateOverwrite(channel.guild.roles.resolve(teamServer.row.invite_role_snowflake), {
+        VIEW_CHANNEL: true,
+      });
+      await teamServer.setInviteChannelSnowflake(channel.id);
+      await (channel as TextChannel).send(`Placeholder text!\n https://discord.gg/${teamServer.row.server_invite}`);
+    });
     return teamServer;
   }
 
@@ -483,6 +499,7 @@ export default class CTF {
     if (user) {
       await user.roles.add(team.row.team_role_snowflake_main);
       await user.roles.add(this.row.participant_role_snowflake);
+      await user.roles.add(teamServer.row.invite_role_snowflake);
     }
 
     return new User(rows[0] as UserRow);

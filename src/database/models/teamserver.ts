@@ -52,6 +52,34 @@ export default class TeamServer {
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
     logger(`Deleted **${this.row.name}** TeamServer`);
   }
+  async setServerRole(role: Role) {
+    await query(`UPDATE team_servers SET invite_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
+    this.row.invite_role_snowflake = role.id;
+    logger(`Made a role for **${this.row.name}**`);
+  }
+
+  async setServerInvite(client: Client) {
+    if (!this.row.info_channel_snowflake) {
+      // TODO: Make an error for if there is no info channel
+    }
+    const invite = await client.guilds
+      .resolve(this.row.guild_snowflake)
+      .channels.resolve(this.row.info_channel_snowflake)
+      .createInvite({
+        temporary: false,
+        maxAge: 0,
+      });
+    await query(`UPDATE team_servers SET server_invite = $1 WHERE id = ${this.row.id}`, [invite.code]);
+    this.row.server_invite = invite.code;
+    logger(`Made new invite for **${this.row.name}**`);
+  }
+  async setInviteChannelSnowflake(invite_channel_snowflake: string) {
+    await query(
+      `UPDATE team_servers SET info_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
+    );
+    this.row.invite_channel_snowflake = invite_channel_snowflake;
+    logger(`Set invite channel for **${this.row.name}** in main CTF`);
+  }
 
   /** TeamServer Setters */
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
