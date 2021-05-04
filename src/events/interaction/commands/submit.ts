@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
 import CommandInteraction from '../compat/CommandInteraction';
 import { CTF } from '../../../database/models';
+import { timingSafeEqual } from 'crypto';
 
 export default {
   name: 'submit',
@@ -22,21 +23,30 @@ export default {
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    // additional checks
-    // + is a user in this ctf
-    // etc
+
+    // is after the publish date
+    if (ctf.row?.start_date < new Date()) throw new Error('ctf has not yet been published');
+
+    // is a user in this CTF
+    const user = await ctf.fromUserSnowflakeUser(interaction.member.id);
+
+    // has this team already solved this challenge?
 
     const flag = options.flag.toString();
     const challengeChannelSnowflake = options.challenge_channel.toString();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    const user = await ctf.fromUserSnowflakeUser(interaction.user.id);
 
-    if (challenge.row.flag !== flag) {
-      await user.createAttempt(challenge.row.id, flag, false, new Date());
-      const attempts = await user.getAllAttempts();
-      return `Your submission was incorrect! You have made ${attempts.length}`;
+    const realFlag = Buffer.from(challenge.row.flag);
+    const providedFlag = Buffer.from(flag);
+
+    // use timing-safe comparision to verify if the flag is correct
+    if (realFlag.length === providedFlag.length && timingSafeEqual(realFlag, providedFlag)) {
+      await user.createAttempt(challenge.row.id, flag, true, new Date());
+      return `**Congratulations!** 🎉 You captured the flag for **${challenge.row.name}**`;
     }
 
-    return `This command has not been implemented yet`;
+    await user.createAttempt(challenge.row.id, flag, false, new Date());
+    const attempts = await user.getAllAttempts();
+    return `Sorry, your submission was incorrect! You have made ${attempts.length} attempts.`;
   },
 };
