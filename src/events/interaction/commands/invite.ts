@@ -1,6 +1,5 @@
-import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import { CTF } from '../../../../database/models';
+import CommandInteraction from '../compat/CommandInteraction';
+import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
 
 export default {
   name: 'invite',

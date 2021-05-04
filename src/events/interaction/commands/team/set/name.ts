@@ -27,7 +27,7 @@ export default {
       ctf.throwErrorUnlessAdmin(interaction);
       team = await ctf.fromRoleTeam(options.team_role as string);
     } else {
-      team = await ctf.fromUnspecifiedTeam(interaction.user.id, interaction.channel.id);
+      team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
     }
     return await team.setName(interaction.client, options.name as string);
   },

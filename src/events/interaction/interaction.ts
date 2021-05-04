@@ -13,11 +13,15 @@ import { CTF } from '../../database/models';
 import addctf from './commands/addctf';
 import addserver from './commands/addserver';
 import { setCommands } from './compat/commands';
+import submit from './commands/submit';
+import invite from './commands/invite';
+import setcolor from './commands/setcolor';
+import setname from './commands/setname';
 
 // our canonical list of application definitions
 export const topLevelCommands: ApplicationCommandDefinition[] = [addctf, addserver];
 export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge];
-export const userCommands: ApplicationCommandDefinition[] = [ping];
+export const userCommands: ApplicationCommandDefinition[] = [ping, submit, invite, setname, setcolor];
 const commands: ApplicationCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
 // utility to help us access passed options more intuitively
