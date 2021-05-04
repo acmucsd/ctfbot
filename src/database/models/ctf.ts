@@ -443,15 +443,9 @@ export default class CTF {
     // TODO: Determine how to handle a NoRoomError
     const teamServer = await this.getTeamServerWithSpace();
 
-    // Add user to DB
-    const { rows } = await query(`INSERT INTO users(ctf_id, user_snowflake) VALUES (${this.row.id}, $1) RETURNING *`, [
-      member.user.id,
-    ]);
-    logger(`Added new user **${member.displayName}** to **${this.row.name}**`);
-    let team: Team;
-
     // Try to give them their given team name initially, but if it fails then keep going through numbers until there's
     // one that isn't being used
+    let team: Team;
     let nameAvailable = false;
     let iteration = 1;
     const teamName = `Team ${member.displayName}`;
@@ -468,6 +462,15 @@ export default class CTF {
         }
       }
     }
+
+    // Add user to DB
+    const {
+      rows,
+    } = await query(`INSERT INTO users(ctf_id, user_snowflake, team_id) VALUES (${this.row.id}, $1, $2) RETURNING *`, [
+      member.user.id,
+      team.row.id,
+    ]);
+    logger(`Added new user **${member.displayName}** to **${this.row.name}**`);
 
     // Give them their roles on main and team server (if they're somehow on it)
     let user: GuildMember;
