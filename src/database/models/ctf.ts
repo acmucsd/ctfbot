@@ -324,7 +324,7 @@ export default class CTF {
       `INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`,
       [guild.id, name, team_limit],
     );
-    const teamServer = new TeamServer(rows[0] as TeamServerRow);
+    const teamServer = new TeamServer(rows[0] as TeamServerRow, this);
 
     // TODO: Add join event for this CTF owner to get team server admin
     const adminRole = await teamServer.makeRole(guild.client, 'CTF Admin', true);
@@ -376,7 +376,7 @@ export default class CTF {
   async fromNameTeamServer(name: string) {
     const { rows } = await query(`SELECT * FROM team_servers WHERE name = $1 and ctf_id = ${this.row.id}`, [name]);
     if (rows.length === 0) throw new Error('no team server with that name in this ctf');
-    return new TeamServer(rows[0] as TeamServerRow);
+    return new TeamServer(rows[0] as TeamServerRow, this);
   }
 
   async fromGuildSnowflakeTeamServer(guild_snowflake: string) {
@@ -384,7 +384,7 @@ export default class CTF {
       guild_snowflake,
     ]);
     if (rows.length === 0) throw new Error('no team server with that snowflake in this ctf');
-    return new TeamServer(rows[0] as TeamServerRow);
+    return new TeamServer(rows[0] as TeamServerRow, this);
   }
 
   async getAllTeams() {
@@ -407,18 +407,22 @@ export default class CTF {
   static async fromTeamServerGuildSnowflakeTeamServer(guild_snowflake: string) {
     const { rows } = await query('SELECT * FROM team_servers WHERE guild_snowflake = $1', [guild_snowflake]);
     if (rows.length === 0) throw new Error('no team server with that snowflake');
-    return new TeamServer(rows[0] as TeamServerRow);
+    const teamServerRow = rows[0] as TeamServerRow;
+    const ctf = await CTF.fromIdCTF(teamServerRow.ctf_id);
+    return new TeamServer(teamServerRow, ctf);
   }
 
   static async fromIdTeamServer(team_server_id: number) {
     const { rows } = await query(`SELECT * FROM team_servers WHERE id = ${team_server_id}`);
     if (rows.length === 0) throw new Error('invalid team server id');
-    return new TeamServer(rows[0] as TeamServerRow);
+    const teamServerRow = rows[0] as TeamServerRow;
+    const ctf = await CTF.fromIdCTF(teamServerRow.ctf_id);
+    return new TeamServer(teamServerRow, ctf);
   }
 
   async getAllTeamServers() {
     const { rows } = await query(`SELECT * FROM team_servers WHERE ctf_id = ${this.row.id}`);
-    return rows.map((row) => new TeamServer(row as TeamServerRow));
+    return rows.map((row) => new TeamServer(row as TeamServerRow, this));
   }
 
   async printAllTeamServers() {

@@ -9,9 +9,11 @@ import { adminCommands, userCommands } from '../../events/interaction/interactio
 
 export default class TeamServer {
   row: TeamServerRow;
+  ctf: CTF;
 
-  constructor(row: TeamServerRow) {
+  constructor(row: TeamServerRow, ctf: CTF) {
     this.row = row;
+    this.ctf = ctf;
   }
 
   /** TeamServer Creation / Deletion */
