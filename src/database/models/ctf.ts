@@ -238,19 +238,26 @@ export default class CTF {
     if (existingRows && existingRows.length > 0)
       throw new Error('cannot create a category with a duplicate name in this CTF');
 
-    // create the channel category for this category
-    const guild = this.getGuild(client);
-    const category = await guild.channels.create(`${name}`, {
-      type: 'category',
-    });
+    const { rows } = await query(`INSERT INTO categories(ctf_id, name) VALUES (${this.row.id}, $1) RETURNING *`, [
+      name,
+    ]);
+    const category = new Category(rows[0] as CategoryRow, this);
 
-    const {
-      rows,
-    } = await query(
-      `INSERT INTO categories(ctf_id, name, channel_category_snowflake) VALUES (${this.row.id}, $1, $2) RETURNING *`,
-      [name, category.id],
-    );
-    return new Category(rows[0] as CategoryRow, this);
+    // create the category channels for this category
+    const teamServers = await this.getAllTeamServers();
+    const categoryChannels: string[] = [];
+    for (const teamServer of teamServers) {
+      const channel = await teamServer.getGuild(client).channels.create(name, { type: 'category' });
+      categoryChannels.push(`(${category.row.id}, ${teamServer.row.id}, ${channel.id})`);
+    }
+
+    // insert all new category channels into the db at once
+    if (categoryChannels.length > 0)
+      await query(
+        `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
+      );
+
+    return category;
   }
 
   /* Category Retrieval */
@@ -306,8 +313,8 @@ export default class CTF {
       `INSERT INTO team_servers(guild_snowflake, ctf_id, name, team_limit) VALUES ($1, ${this.row.id}, $2, $3) RETURNING *`,
       [guild.id, name, team_limit],
     );
-    logger(`Created new team server **${name}** for ctf **${this.row.name}**`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
+<<<<<<< HEAD
 
     await teamServer.makeRole(guild.client, 'CTF Admin', true).then(async (role) => {
       await teamServer.setAdminRoleSnowflake(role.id);
@@ -318,6 +325,36 @@ export default class CTF {
 
     // register CTF commands now that this is a CTF
     await teamServer.registerCommands(guild.client);
+=======
+    logger(`Created new team server **${name}** for ctf **${this.row.name}**`);
+
+    // generate channels for categories and challenges
+    const categoryChannels: string[] = [];
+    const challengeChannels: string[] = [];
+    const categories = await this.getAllCategories();
+    for (const category of categories) {
+      const categoryChannel = await guild.channels.create(category.row.name, { type: 'category' });
+      categoryChannels.push(`(${category.row.id}, ${teamServer.row.id}, ${categoryChannel.id})`);
+
+      const challenges = await category.getAllChallenges();
+      for (const challenge of challenges) {
+        const challengeChannel = await guild.channels.create(challenge.row.name);
+        await challengeChannel.setParent(categoryChannel.id);
+        challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id})`);
+      }
+    }
+
+    // commit new channels to the database at once
+    if (categoryChannels.length > 0)
+      await query(
+        `INSERT INTO category_channels (category_id, teamserver_id, channel_snowflake) VALUES ${categoryChannels.join()}`,
+      );
+    if (challengeChannels.length > 0)
+      await query(
+        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
+      );
+
+>>>>>>> a40b4c592fa3d55c10e742834aedf83ac15787c1
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
     await teamServer.setInfoChannelSnowflake(infoChannel.id);
     await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);

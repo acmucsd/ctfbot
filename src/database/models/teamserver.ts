@@ -1,7 +1,7 @@
-import { Client, Guild, Role } from 'discord.js';
+import { CategoryChannel, Client, Guild, Role } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
-import { TeamRow, TeamServerRow } from '../schemas';
+import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
 import { DupeTeamError } from '../../errors';
 import Challenge from './challenge';
@@ -30,6 +30,17 @@ export default class TeamServer {
       void guild.roles.resolve(team.row.team_role_snowflake_team_server).delete();
     });
     logger(`Deleted all team channels and roles.`);
+
+    // delete all category and challenge channels
+    const { rows: challenge_rows } = await query(
+      `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`,
+    );
+    const challengeChannels = challenge_rows as ChallengeChannelRow[];
+    const { rows: category_rows } = await query(`SELECT * FROM category_channels WHERE teamserver_id = ${this.row.id}`);
+    const categoryChannels = category_rows as CategoryChannelRow[];
+
+    // async queue these for deleting
+    challengeChannels.forEach((chan) => void guild.channels.resolve(chan.channel_snowflake).delete());
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation

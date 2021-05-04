@@ -1,8 +1,8 @@
 import query from '../database';
-import { AttachmentRow, AttemptRow, CategoryRow, ChallengeRow } from '../schemas';
+import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
-import { Client } from 'discord.js';
+import { GuildChannel, Client } from 'discord.js';
 import CTF from './ctf';
 import { Category } from './index';
 
@@ -19,11 +19,15 @@ export default class Challenge {
   // makeChallenge made in Category
 
   async deleteChallenge(client: Client) {
-    await query(`DELETE FROM challenges WHERE id = ${this.row.id}`);
+    // delete the channels
+    const channels = await this.getChallengeGuildChannels(client);
+    for (const channel of channels) {
+      await channel.delete();
+    }
 
-    // delete the channel
-    const channel = this.getChannelChallenge(client);
-    await channel.delete();
+    // lastly, delete the database entry itself
+    // (should cascade to delete challenge channels)
+    await query(`DELETE FROM challenges WHERE id = ${this.row.id}`);
   }
 
   /** Challenge Setters */
@@ -31,9 +35,11 @@ export default class Challenge {
   async setName(client: Client, name: string) {
     await query(`UPDATE challenges SET name = $1 WHERE id = ${this.row.id}`, [name]);
 
-    // rename the challenge channel on discord
-    const channel = this.getChannelChallenge(client);
-    await channel.setName(name);
+    // rename the challenge channels on discord
+    const channels = await this.getChallengeGuildChannels(client);
+    for (const channel of channels) {
+      await channel.setName(name);
+    }
 
     this.row.name = name;
   }
@@ -124,10 +130,15 @@ export default class Challenge {
     return new Category(rows[0] as CategoryRow, this.ctf);
   }
 
-  // misc
-  getChannelChallenge(client: Client) {
-    const channel = this.ctf.getGuild(client).channels.resolve(this.row.channel_snowflake);
-    if (!channel) throw new Error('No channel corresponding with this challenge id found.');
-    return channel;
+  // get the channels that correspond with this challenge
+  async getChallengeGuildChannels(client: Client) {
+    const { rows } = await query(`SELECT * FROM challenge_channels WHERE challenge_id = ${this.row.id}`);
+    if (!rows) throw new Error('No channels corresponding with this challenge id found.');
+
+    return await Promise.all(
+      rows
+        .map((row) => row as ChallengeChannelRow)
+        .map((channel) => client.channels.resolve(channel.channel_snowflake) as GuildChannel),
+    );
   }
 }

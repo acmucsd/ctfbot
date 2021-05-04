@@ -1,7 +1,6 @@
 export const schema = `CREATE TABLE IF NOT EXISTS challenges (
   id serial,
   category_id integer REFERENCES categories ON DELETE CASCADE,
-  channel_snowflake text,
   name text,
   author text,
   prompt text,
@@ -18,7 +17,6 @@ export const schema = `CREATE TABLE IF NOT EXISTS challenges (
 export interface ChallengeRow {
   id: number;
   category_id: number;
-  channel_snowflake: string;
   name: string;
   author: string | null;
   prompt: string | null;
