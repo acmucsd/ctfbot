@@ -27,6 +27,11 @@ export default class CTF {
     const { rows: existingNames } = await query('SELECT id FROM ctfs WHERE name = $1', [name]);
     if (existingNames && existingNames.length > 0) throw new Error('cannot create ctf with a duplicate name');
 
+    const { rows: existingTS } = await query('SELECT id FROM team_servers WHERE guild_snowflake = $1', [
+      guildSnowflake,
+    ]);
+    if (existingTS && existingTS.length > 0) throw new Error('cannot create a ctf from an existing Team Server');
+
     const { rows } = await query('INSERT INTO ctfs(name, guild_snowflake) VALUES ($1, $2) RETURNING *', [
       name,
       guildSnowflake,
