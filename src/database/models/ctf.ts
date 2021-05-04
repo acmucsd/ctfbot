@@ -291,7 +291,12 @@ export default class CTF {
   // }
 
   async fromChannelSnowflakeChallenge(channel_snowflake: string) {
-    const { rows } = await query(`SELECT * FROM challenges WHERE channel_snowflake = $1`, [channel_snowflake]);
+    const {
+      rows,
+    } = await query(
+      `SELECT challenges.* FROM challenges, challenge_channels WHERE challenge_id = challenges.id AND channel_snowflake = $1`,
+      [channel_snowflake],
+    );
     if (rows.length === 0) throw new Error('no challenge with that channel in this ctf');
     return new Challenge(rows[0] as ChallengeRow, this);
   }
