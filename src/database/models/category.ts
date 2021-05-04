@@ -119,8 +119,10 @@ export default class Category {
       ATTACH_FILES: false,
       CREATE_INSTANT_INVITE: false,
     });
-    await categoryChannel.createOverwrite(teamServer.row.participant_role_snowflake, {
-      VIEW_CHANNEL: true,
-    });
+    // if this CTF hasn't been published yet, participants shouldn't see it
+    if (teamServer.ctf.row?.start_date >= new Date())
+      await categoryChannel.createOverwrite(teamServer.row.participant_role_snowflake, {
+        VIEW_CHANNEL: true,
+      });
   }
 }
