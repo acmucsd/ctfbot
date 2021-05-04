@@ -253,6 +253,7 @@ export default class CTF {
     const categoryChannels: string[] = [];
     for (const teamServer of teamServers) {
       const channel = await teamServer.getGuild(client).channels.create(name, { type: 'category' });
+      await Category.setCategoryChannelPermissions(channel, teamServer);
       categoryChannels.push(`(${category.row.id}, ${teamServer.row.id}, ${channel.id})`);
     }
 
@@ -341,6 +342,7 @@ export default class CTF {
     const categories = await this.getAllCategories();
     for (const category of categories) {
       const categoryChannel = await guild.channels.create(category.row.name, { type: 'category' });
+      await Category.setCategoryChannelPermissions(categoryChannel, teamServer);
       categoryChannels.push(`(${category.row.id}, ${teamServer.row.id}, ${categoryChannel.id})`);
 
       const challenges = await category.getAllChallenges();

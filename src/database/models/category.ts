@@ -4,6 +4,7 @@ import Challenge from './challenge';
 import CTF from './ctf';
 import { CategoryChannel, Client } from 'discord.js';
 import { DupeChallengeError } from '../../errors';
+import { TeamServer } from './index';
 
 export default class Category {
   row: CategoryRow;
@@ -106,5 +107,20 @@ export default class Category {
     return await Promise.all(
       categoryChannels.map((chan) => client.channels.resolve(chan.channel_snowflake) as CategoryChannel),
     );
+  }
+
+  // set default permissions to not be able to send messages, etc
+  static async setCategoryChannelPermissions(categoryChannel: CategoryChannel, teamServer: TeamServer) {
+    await categoryChannel.createOverwrite(categoryChannel.guild.roles.everyone, {
+      SEND_MESSAGES: false,
+      ADD_REACTIONS: false,
+      SEND_TTS_MESSAGES: false,
+      VIEW_CHANNEL: false,
+      ATTACH_FILES: false,
+      CREATE_INSTANT_INVITE: false,
+    });
+    await categoryChannel.createOverwrite(teamServer.row.participant_role_snowflake, {
+      VIEW_CHANNEL: true,
+    });
   }
 }
