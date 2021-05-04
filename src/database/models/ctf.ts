@@ -19,7 +19,7 @@ export default class CTF {
   }
 
   /* CTF Creation / Deletion */
-  static async createCTF(client: Client, name: string, guildSnowflake: string, member: GuildMember) {
+  static async createCTF(client: Client, name: string, guildSnowflake: string, owner: GuildMember) {
     // check if a CTF already exists in this guild
     const { rows: existingCTFs } = await query('SELECT id FROM ctfs WHERE guild_snowflake = $1', [guildSnowflake]);
     if (existingCTFs && existingCTFs.length > 0) throw new Error('cannot create a second CTF in this guild');
@@ -38,9 +38,12 @@ export default class CTF {
     const ctf = new CTF(rows[0] as CTFRow);
 
     // create an admin role and add the caller to it
-    const role = await ctf.makeRole(client, 'CTF Admin', true);
-    await ctf.setAdminRoleSnowflake(role.id);
-    await member.roles.add(role);
+    await ctf.makeRole(client, 'CTF Admin', true).then(async (role) => {
+      await ctf.setAdminRoleSnowflake(role.id);
+      await owner.roles.add(role);
+    });
+
+    await ctf.setParticipantRole(await ctf.makeRole(client, 'Participant', true));
 
     // register CTF commands now that this is a CTF
     await ctf.registerCommands(client);
@@ -61,7 +64,7 @@ export default class CTF {
       });
       await ctf.setTOSWebhook(webhook.id);
     });
-    await ctf.setParticipantRole(await ctf.makeRole(client, 'Participant', true));
+
     return ctf;
   }
 
@@ -111,9 +114,9 @@ export default class CTF {
     }
     const applicationUserCommands = await setCommands(client, userCommands, this.row.guild_snowflake);
     // ensure only users can use user commands
-    // for (const com of applicationUserCommands) {
-    //   await com.allowRole(this.row.admin_role_snowflake);
-    // }
+    for (const com of applicationUserCommands) {
+      await com.allowRole(this.row.participant_role_snowflake);
+    }
   }
 
   // No category supplied will give the top teams
@@ -210,10 +213,11 @@ export default class CTF {
     this.row.end_date = endDate;
   }
 
-  // Valid role in the CTF guild
+  // TODO: Refactor into passing by role
   async setAdminRoleSnowflake(adminRoleSnowflake: string) {
     await query(`UPDATE ctfs SET admin_role_snowflake = $1 WHERE id = ${this.row.id}`, [adminRoleSnowflake]);
     this.row.admin_role_snowflake = adminRoleSnowflake;
+    logger(`Set admin role in ${this.row.name}`);
   }
 
   // Valid channel in the CTF guild
@@ -304,6 +308,16 @@ export default class CTF {
     );
     logger(`Created new team server **${name}** for ctf **${this.row.name}**`);
     const teamServer = new TeamServer(rows[0] as TeamServerRow);
+
+    await teamServer.makeRole(guild.client, 'CTF Admin', true).then(async (role) => {
+      await teamServer.setAdminRoleSnowflake(role.id);
+      // TODO: Add join event for this CTF owner to get team server admin
+    });
+
+    await teamServer.setParticipantRole(await teamServer.makeRole(guild.client, 'Participant', true));
+
+    // register CTF commands now that this is a CTF
+    await teamServer.registerCommands(guild.client);
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
     await teamServer.setInfoChannelSnowflake(infoChannel.id);
     await teamServer.setTeamCategorySnowflake((await teamServer.makeCategory(guild.client, 'Teams')).id);
@@ -463,8 +477,9 @@ export default class CTF {
     const member =
       this.row.guild_snowflake === interaction.guild.id
         ? interaction.member
-        : this.getGuild(interaction.client).member(interaction.member.user);
-    if (member?.roles.cache.has(this.row.admin_role_snowflake)) return;
+        : interaction.client.guilds.resolve(this.row.guild_snowflake).member(interaction.member.user);
+    console.log(interaction.client.guilds.resolve(this.row.guild_snowflake));
+    if (member?.roles.resolve(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
   }
 

@@ -1,9 +1,12 @@
-import { Client, Guild } from 'discord.js';
+import { Client, Guild, Role } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
 import { DupeTeamError } from '../../errors';
+import Challenge from './challenge';
+import { setCommands } from '../../events/interaction/compat/commands';
+import { adminCommands, userCommands } from '../../events/interaction/interaction';
 
 export default class TeamServer {
   row: TeamServerRow;
@@ -53,6 +56,17 @@ export default class TeamServer {
     );
     this.row.team_category_snowflake = team_category_snowflake;
     logger(`Set info channel for **${this.row.name}** as ${team_category_snowflake}`);
+  }
+
+  async setAdminRoleSnowflake(adminRoleSnowflake: string) {
+    await query(`UPDATE team_servers SET admin_role_snowflake = $1 WHERE id = ${this.row.id}`, [adminRoleSnowflake]);
+    this.row.admin_role_snowflake = adminRoleSnowflake;
+  }
+
+  async setParticipantRole(role: Role) {
+    await query(`UPDATE team_servers SET participant_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
+    this.row.participant_role_snowflake = role.id;
+    logger(`Set **${this.row.name}**'s participant role`);
   }
 
   /**
@@ -174,10 +188,16 @@ export default class TeamServer {
     return guild;
   }
 
-  async makeRole(client: Client, name: string) {
+  async makeRole(client: Client, name: string, useExisting = true) {
     const guild = this.getGuild(client);
-    if (guild.roles.cache.find((role) => role.name === name)) throw new Error('Role with that name already exists');
-    const role = await guild.roles.create({ data: { name: `${name}` } });
+    const existingRole = guild.roles.cache.find((role) => role.name === name);
+    if (useExisting && existingRole) {
+      logger(`role ${name} already exists, using it`);
+      return existingRole;
+    }
+    const role = await guild.roles.create({
+      data: { name: `${name}` },
+    });
     logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
     return role;
   }
@@ -212,6 +232,19 @@ export default class TeamServer {
       logger(`Renamed **${roleToChange.name}** role to **${new_name}**`);
     } else {
       throw new Error('role not found in ctf');
+    }
+  }
+
+  async registerCommands(client: Client) {
+    const applicationAdminCommands = await setCommands(client, adminCommands, this.row.guild_snowflake);
+    // ensure only admins can use admin commands
+    for (const com of applicationAdminCommands) {
+      await com.allowRole(this.row.admin_role_snowflake);
+    }
+    const applicationUserCommands = await setCommands(client, userCommands, this.row.guild_snowflake);
+    // ensure only users can use user commands
+    for (const com of applicationUserCommands) {
+      await com.allowRole(this.row.participant_role_snowflake);
     }
   }
 
