@@ -1,5 +1,5 @@
 import query from '../database';
-import { InviteRow } from '../schemas/invite';
+import { InviteRow } from '../schemas';
 
 export default class Invite {
   row: InviteRow;

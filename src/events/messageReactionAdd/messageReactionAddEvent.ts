@@ -1,32 +1,33 @@
 import { MessageReaction, PartialUser, User } from 'discord.js';
-// import { logger } from '../../log';
-import { CTF } from '../../database/models';
-import { subscribedMessages, subscribedMessageCallback } from '../../';
 
-const messageReactionAddEvent = async (reaction: MessageReaction, discordUser: User | PartialUser) => {
+interface ReactionListener {
+  id: string;
+  emoji: string;
+  listener: (User) => Promise<boolean>;
+}
+
+const reactionListeners = new Map<string, ReactionListener>();
+export function registerReactionListener(id: string, emoji: string, listener: (User) => Promise<boolean>) {
+  reactionListeners.set(id, { id, emoji, listener });
+}
+
+export const deleteReactionListener = (id: string) => reactionListeners.delete(id);
+
+export default async function messageReactionAddEvent(reaction: MessageReaction, discordUser: User | PartialUser) {
   if (reaction.partial) {
+    await reaction.fetch();
     await reaction.message.fetch();
   }
-  if (reaction.partial) await reaction.fetch();
-  // Only look at thumbs up.
-  // TODO: Switch to MessageReactionCollector
-  if (reaction.emoji.name !== '👍' || !reaction.message.author.bot) return;
-  let key: string;
-  if (subscribedMessages.has(reaction.message.id)) {
-    key = reaction.message.id;
-  } else if (subscribedMessages.has(reaction.message.webhookID)) {
-    key = reaction.message.webhookID;
-  } else {
-    return;
-  }
-  // eslint-disable-next-line
-  const subscribedMessage = subscribedMessages.get(key) as subscribedMessageCallback;
-  const ctf = await CTF.fromIdCTF(subscribedMessage.id);
-  subscribedMessage.callback.call(ctf, discordUser);
-  // If it doesn't have a guild then it's a DM and will be deleted
-  if (!reaction.message.guild) {
-    subscribedMessages.delete(key);
-  }
-};
 
-export default messageReactionAddEvent;
+  const reactionListener =
+    reactionListeners.get(reaction.message.id) || reactionListeners.get(reaction.message.webhookID);
+  if (!reactionListener) return;
+  if (reaction.emoji.name !== reactionListener.emoji) return;
+  if (!reaction.message.author.bot) return;
+
+  // call the listener with the person who reacted
+  const shouldDelete = await reactionListener.listener(discordUser);
+
+  // if the listener returns true, that means we should stop listening
+  if (shouldDelete) reactionListeners.delete(reactionListener.id);
+}
