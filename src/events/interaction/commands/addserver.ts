@@ -31,7 +31,7 @@ export default {
       : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
 
     const name = options.name ? (options.name as string) : interaction.guild.name;
-    const server = await ctf.createTeamServer(interaction.guild, name, options.limit as number);
+    const server = await ctf.createTeamServer(interaction.guild, name, options.limit as number, interaction.member);
     return `Added Team Server **${server.row.name}** to CTF **${ctf.row.name}** with limit **${server.row.team_limit}**`;
   },
 } as ApplicationCommandDefinition;

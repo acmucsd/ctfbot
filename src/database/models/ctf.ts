@@ -297,7 +297,7 @@ export default class CTF {
   }
 
   /* Team Server Creation */
-  async createTeamServer(guild: Guild, name: string, team_limit: number) {
+  async createTeamServer(guild: Guild, name: string, team_limit: number, member: GuildMember) {
     const {
       rows: existingRows,
     } = await query(`SELECT id FROM team_servers WHERE ctf_id = ${this.row.id} and name = $1`, [name]);
@@ -317,6 +317,7 @@ export default class CTF {
 
     // TODO: Add join event for this CTF owner to get team server admin
     const adminRole = await teamServer.makeRole(guild.client, 'CTF Admin', true);
+    await member.roles.add(adminRole);
     await teamServer.setAdminRoleSnowflake(adminRole.id);
     await teamServer.setParticipantRole(await teamServer.makeRole(guild.client, 'Participant', true));
 
@@ -509,7 +510,7 @@ export default class CTF {
     const member =
       this.row.guild_snowflake === interaction.guild.id
         ? interaction.member
-        : interaction.client.guilds.resolve(this.row.guild_snowflake).member(interaction.member.user);
+        : this.getGuild(interaction.client).member(interaction.member.user.id);
     if (member?.roles.cache.has(this.row.admin_role_snowflake)) return;
     throw new Error('You do not have permission to use this command');
   }
