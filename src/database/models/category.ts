@@ -2,7 +2,7 @@ import query from '../database';
 import { CategoryChannelRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Challenge from './challenge';
 import CTF from './ctf';
-import { Client, GuildChannel } from 'discord.js';
+import { CategoryChannel, Client } from 'discord.js';
 import { DupeChallengeError } from '../../errors';
 
 export default class Category {
@@ -22,6 +22,8 @@ export default class Category {
     // delete the category channels associated
     const channels = await this.getCategoryGuildChannels(client);
     for (const channel of channels) {
+      // delete child challenge channels
+      await Promise.all(channel.children.map((chan) => chan.delete()));
       await channel.delete();
     }
 
@@ -70,7 +72,7 @@ export default class Category {
 
     // create a text channel for this challenge and add to the category
     for (const categoryChannel of categoryChannels) {
-      const guildChannel = client.channels.resolve(categoryChannel.channel_snowflake) as GuildChannel;
+      const guildChannel = client.channels.resolve(categoryChannel.channel_snowflake) as CategoryChannel;
       const channel = await guildChannel.guild.channels.create(name);
       await channel.setParent(categoryChannel.channel_snowflake);
       // build the VALUES query as we go
@@ -102,7 +104,7 @@ export default class Category {
   async getCategoryGuildChannels(client: Client) {
     const categoryChannels = await this.getCategoryChannels();
     return await Promise.all(
-      categoryChannels.map((chan) => client.channels.resolve(chan.channel_snowflake) as GuildChannel),
+      categoryChannels.map((chan) => client.channels.resolve(chan.channel_snowflake) as CategoryChannel),
     );
   }
 }
