@@ -1,15 +1,18 @@
-import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, PartialUser, Role } from 'discord.js';
+import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, Role } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, ChallengeRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
 import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
-import { subscribedMessageCallback, subscribedMessages } from '../../';
 import { DupeTeamError, NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 import { setCommands } from '../../events/interaction/compat/commands';
 import { adminCommands, userCommands } from '../../events/interaction/interaction';
+import {
+  deleteReactionListener,
+  registerReactionListener,
+} from '../../events/messageReactionAdd/messageReactionAddEvent';
 
 export default class CTF {
   row: CTFRow;
@@ -36,12 +39,10 @@ export default class CTF {
       name,
       guildSnowflake,
     ]);
-    logger(`Created new ctf **${name}**`);
-    // TODO: Fix ordering for channels
-    // TODO: Make a "Competitor" role for easier time giving people access to
-    //       social channels?
     const ctf = new CTF(rows[0] as CTFRow);
+    logger(`Created new ctf **${name}**`);
 
+    // TODO: Fix ordering for channels
     // create an admin role and add the caller to it
     await ctf.makeRole(client, 'CTF Admin', true).then(async (role) => {
       await ctf.setAdminRoleSnowflake(role.id);
@@ -56,19 +57,19 @@ export default class CTF {
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
 
-    const tos = await ctf.makeChannel(client, 'tos');
-    await tos.setParent(info.id);
-    await tos.updateOverwrite(tos.guild.roles.everyone, {
+    const tosChannel = await ctf.makeChannel(client, 'terms of service');
+    await tosChannel.setParent(info.id);
+    await tosChannel.updateOverwrite(tosChannel.guild.roles.everyone, {
       SEND_MESSAGES: false,
       ADD_REACTIONS: false,
     });
-    await ctf.setTOSChannel(tos.id);
-    await (tos as TextChannel).createWebhook('Terms of Service').then(async (webhook) => {
-      await webhook.send(TOSMessage).then(async (message) => {
-        await message.react('👍');
-      });
-      await ctf.setTOSWebhook(webhook.id);
-    });
+    await ctf.setTOSChannel(tosChannel.id);
+
+    const tosWebhook = await tosChannel.createWebhook('Terms of Service');
+    const tosMessage = await tosWebhook.send(TOSMessage);
+    await tosMessage.react('👍');
+
+    await ctf.setTOSWebhook(tosWebhook.id);
 
     return ctf;
   }
@@ -81,12 +82,15 @@ export default class CTF {
     }
     const webhook = await client.fetchWebhook(this.row.tos_webhook_snowflake);
     await webhook.delete();
-    subscribedMessages.delete(this.row.tos_webhook_snowflake);
+
+    deleteReactionListener(this.row.tos_webhook_snowflake);
     logger('Removed TOS webhook from the server');
+
     const tos = client.channels.resolve(this.row.tos_channel_snowflake);
     await tos.delete();
     logger('Removed TOS channel');
     await client.channels.resolve(this.row.info_category_snowflake).delete();
+
     (await this.getAllTeamServers()).forEach((server) => {
       void server.deleteTeamServer(client);
     });
@@ -94,19 +98,17 @@ export default class CTF {
     logger(`Deleted ctf **${this.row.name}**`);
   }
 
-  cacheTOS(TOScache: Map<string, subscribedMessageCallback>) {
-    TOScache.set(this.row.tos_webhook_snowflake, {
-      id: this.row.id,
-      callback: async (user: DiscordUser | PartialUser) => {
-        try {
-          await this.fromUserSnowflakeUser(user.id);
-        } catch (e) {
-          if (e instanceof NoUserError) {
-            logger(`**${user.username}** has accepted TOS`);
-            await this.createUser(user.client.guilds.resolve(this.row.guild_snowflake).members.resolve(user.id));
-          }
+  registerTOSListener() {
+    registerReactionListener(this.row.tos_webhook_snowflake, '👍', async (user: DiscordUser) => {
+      try {
+        await this.fromUserSnowflakeUser(user.id);
+      } catch (e) {
+        if (e instanceof NoUserError) {
+          logger(`**${user.username}** has accepted TOS`);
+          await this.createUser(user.client.guilds.resolve(this.row.guild_snowflake).members.resolve(user.id));
         }
-      },
+      }
+      return false;
     });
   }
 
@@ -168,9 +170,12 @@ export default class CTF {
   async setTOSWebhook(tos_webhook_snowflake: string) {
     const { rows } = await query('SELECT id FROM ctfs WHERE tos_webhook_snowflake = $1', [tos_webhook_snowflake]);
     if (rows && rows.length > 0) throw new Error('ctf already uses that webhook');
+
     await query(`UPDATE ctfs SET tos_webhook_snowflake = $1 WHERE id = ${this.row.id}`, [tos_webhook_snowflake]);
     this.row.tos_webhook_snowflake = tos_webhook_snowflake;
-    this.cacheTOS(subscribedMessages);
+
+    this.registerTOSListener();
+
     logger(`Set **${this.row.name}**'s TOS webhook`);
   }
 
@@ -703,6 +708,6 @@ export default class CTF {
     }
     channel = await guild.channels.create(`${name}`, { type: 'text' });
     logger(`Created **${name}** channel`);
-    return channel;
+    return channel as TextChannel;
   }
 }
