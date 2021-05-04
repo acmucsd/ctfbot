@@ -9,9 +9,9 @@ export default {
   type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
-      name: 'challenge_name',
+      name: 'challenge_channel',
       description: 'The challenge to get info on',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionType.CHANNEL,
       required: false,
     },
   ],
