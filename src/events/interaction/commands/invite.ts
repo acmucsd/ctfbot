@@ -1,5 +1,6 @@
 import CommandInteraction from '../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
+import { CTF } from '../../../database/models';
 
 export default {
   name: 'invite',
@@ -13,8 +14,16 @@ export default {
       required: true,
     },
   ],
-  // async
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return 'a';
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    const team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
+
+    const member = interaction.guild.member(options.user.toString());
+    const user = await ctf.fromUserSnowflakeUser(member.id);
+
+    // invite the user
+    await user.createInvite(interaction.client, team);
+
+    return `User **${member.user.username}** was invited to your team. They will need to accept.`;
   },
 } as ApplicationCommandDefinition;
