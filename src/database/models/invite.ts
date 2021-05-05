@@ -48,6 +48,11 @@ export default class Invite {
     });
   }
 
+  static async allPendingInvites() {
+    const { rows: inviteRows } = await query(`SELECT * from invites WHERE accepted = FALSE`);
+    return inviteRows.map((row) => new Invite(row as InviteRow));
+  }
+
   /** Invite Creation / Removal */
   // makeInvite made in Team
 

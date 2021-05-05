@@ -312,6 +312,13 @@ export default class CTF {
     return rows.map((row) => new Category(row as CategoryRow, this));
   }
 
+  async getAllChallenges() {
+    const { rows } = await query(
+      `SELECT challenges.* FROM challenges, categories WHERE ctf_id = ${this.row.id} AND category_id = categories.id`,
+    );
+    return rows.map((row) => new Challenge(row as ChallengeRow, this));
+  }
+
   /* Challenge Retrieval */
   /** Challenge Retrieval */
   // async fromNameChallenge(name: string) {
@@ -463,6 +470,11 @@ export default class CTF {
     const teamServerRow = rows[0] as TeamServerRow;
     const ctf = await CTF.fromIdCTF(teamServerRow.ctf_id);
     return new TeamServer(teamServerRow, ctf);
+  }
+
+  static async allCTFs() {
+    const { rows } = await query(`SELECT * from ctfs`);
+    return rows.map((row) => new CTF(row as CTFRow));
   }
 
   async getAllTeamServers() {

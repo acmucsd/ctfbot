@@ -1,5 +1,5 @@
 import query from '../database';
-import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
+import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow, CTFRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
 import { GuildChannel, Client, TextChannel, MessageEmbed } from 'discord.js';
