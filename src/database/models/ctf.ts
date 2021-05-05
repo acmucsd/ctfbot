@@ -312,6 +312,13 @@ export default class CTF {
     return rows.map((row) => new Category(row as CategoryRow, this));
   }
 
+  async getAllChallenges() {
+    const { rows } = await query(
+      `SELECT challenges.* FROM challenges, categories WHERE ctf_id = ${this.row.id} AND category_id = categories.id`,
+    );
+    return rows.map((row) => new Challenge(row as ChallengeRow, this));
+  }
+
   /* Challenge Retrieval */
   /** Challenge Retrieval */
   // async fromNameChallenge(name: string) {
@@ -463,6 +470,11 @@ export default class CTF {
     const teamServerRow = rows[0] as TeamServerRow;
     const ctf = await CTF.fromIdCTF(teamServerRow.ctf_id);
     return new TeamServer(teamServerRow, ctf);
+  }
+
+  static async allCTFs() {
+    const { rows } = await query(`SELECT * from ctfs`);
+    return rows.map((row) => new CTF(row as CTFRow));
   }
 
   async getAllTeamServers() {
@@ -626,12 +638,22 @@ export default class CTF {
 
   async getTeamServerWithSpace() {
     logger('Seeing what servers have space...');
-    // eslint-disable-next-line
-    const teamServer = (await this.getAllTeamServers()).find(async (server) => (await server.hasSpace(true)) === true);
-    if (!teamServer) {
+
+    // fetch the spaces remaining on each team server
+    const { rows } = await query(
+      `SELECT team_servers.id AS team_server_id, team_servers.team_limit - COUNT(teams.id) AS remaining FROM team_servers LEFT JOIN teams ON teams.team_server_id = team_servers.id GROUP BY team_servers.id, team_servers.team_limit`,
+    );
+
+    // find the least full server
+    const leastFull = (rows as SpaceRemaining[]).reduce((accum, curr) =>
+      accum.remaining < curr.remaining ? curr : accum,
+    );
+
+    if (!leastFull || leastFull.remaining <= 0) {
       throw new NoRoomError();
     }
-    return teamServer;
+
+    return await CTF.fromIdTeamServer(leastFull.team_server_id);
   }
 
   async fromRoleTeam(team_role_snowflake: string) {
@@ -718,3 +740,8 @@ export default class CTF {
     return channel as TextChannel;
   }
 }
+
+type SpaceRemaining = {
+  team_server_id: number;
+  remaining: number;
+};

@@ -29,7 +29,7 @@ export default {
     const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setMinPoints(newPoints);
+    await challenge.setMinPoints(interaction.client, newPoints);
 
     return `Challenge minimum points has been set to **${newPoints}**.`;
   },

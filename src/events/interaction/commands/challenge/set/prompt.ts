@@ -29,8 +29,8 @@ export default {
     const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setPrompt(newPrompt);
+    await challenge.setPrompt(interaction.client, newPrompt);
 
-    return `Challenge name has been set to **${newPrompt}**.`;
+    return `Challenge prompt has been set to **${newPrompt}**.`;
   },
 };

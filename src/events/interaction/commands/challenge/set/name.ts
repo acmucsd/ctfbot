@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
+import { client } from '../../../../../index';
 
 export default {
   name: 'name',

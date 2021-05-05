@@ -195,11 +195,13 @@ export default class Team {
     await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
 
     // IF the user is already on the right TeamServer, grant new roles
-    // TODO maybe? Check if this team server is also the main server?
-    if (oldTeamServer.row.id === this.row.team_server_id)
+    const newTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+    if (oldTeamServer.row.id === newTeamServer.row.id)
       await guildMember.roles.add(this.row.team_role_snowflake_team_server);
-
     // otherwise, just defer to when they join the new teamserver
+    // btw we should kick them if this isn't the main guild
+    else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake)
+      await guildMember.kick('You need to join your new team server');
 
     logger(
       `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${

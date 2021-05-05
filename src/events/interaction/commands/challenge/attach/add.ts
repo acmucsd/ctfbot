@@ -37,7 +37,7 @@ export default {
     const fileName = options.file_name.toString();
     const fileURL = options.file_url.toString();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.createAttachment(fileName, fileURL);
+    await challenge.createAttachment(interaction.client, fileName, fileURL);
 
     return `Attachment **${fileName}** has been added to challenge **${challenge.row.name}**`;
   },

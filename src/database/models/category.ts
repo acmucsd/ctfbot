@@ -90,6 +90,9 @@ export default class Category {
         `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake, webhook_snowflake) VALUES ${challengeChannels.join()}`,
       );
 
+    // update the challenge channels themselves
+    await challenge.updateChallengeChannels(client);
+
     return challenge;
   }
 

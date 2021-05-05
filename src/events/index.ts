@@ -5,3 +5,4 @@ export { default as interactionEvent } from './interaction';
 export { default as readyEvent } from './ready';
 export { default as MessageEvent } from './message';
 export { default as messageReactionAddEvent } from './messageReactionAdd';
+export { default as rateLimitEvent } from './rateLimit';
