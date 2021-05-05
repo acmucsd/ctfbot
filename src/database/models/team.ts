@@ -1,5 +1,5 @@
-import { Client, MessageEmbed } from 'discord.js';
-import { CTF, Invite, User } from '.';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { Challenge, CTF, Invite, TeamServer, User } from '.';
 import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
 import { logger } from '../../log';
@@ -243,6 +243,15 @@ export default class Team {
     return 7;
   }
 
+  // will return true if anybody on the team has solved the provided challenge, false otherwise
+  async hasSolvedChallenge(challenge: Challenge): Promise<boolean> {
+    const { rows } = await query(
+      `SELECT count(attempts.id) FROM attempts, users, teams WHERE attempts.user_id = users.id AND users.team_id = teams.id AND teams.id = ${this.row.id} AND challenge_id = ${challenge.row.id} AND attempts.successful = true`,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return rows[0] && rows[0].count && parseInt(rows[0].count) > 0;
+  }
+
   async getMinimalTeam(category?: string): Promise<minimalTeam> {
     const team = {
       name: this.row.name,
@@ -251,6 +260,11 @@ export default class Team {
       id: this.row.id,
     };
     return team;
+  }
+
+  async getTeamChannel(client: Client) {
+    const guild = await TeamServer.getGuildFromTeamServerID(client, this.row.team_server_id);
+    return guild.channels.resolve(this.row.text_channel_snowflake) as TextChannel;
   }
 
   static async fromID(id: number): Promise<Team> {

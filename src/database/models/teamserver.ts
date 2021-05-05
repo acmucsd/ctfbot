@@ -311,4 +311,10 @@ export default class TeamServer {
     if (rows.length === 0) throw new Error('no team associated with that id in this server');
     return new Team(rows[0] as TeamRow);
   }
+
+  static async getGuildFromTeamServerID(client: Client, teamServerID: number) {
+    const { rows } = await query(`SELECT guild_snowflake FROM team_servers WHERE id = ${teamServerID}`);
+    const guildID = (rows[0] as TeamServerRow).guild_snowflake;
+    return client.guilds.resolve(guildID);
+  }
 }

@@ -4,9 +4,10 @@ import Attachment from './attachment';
 import Attempt from './attempt';
 import { GuildChannel, Client, TextChannel, MessageEmbed } from 'discord.js';
 import CTF from './ctf';
-import { Category } from './index';
+import { Category, TeamServer } from './index';
 import attach from '../../events/interaction/commands/challenge/attach';
 import User from './user';
+import { timingSafeEqual } from 'crypto';
 
 export default class Challenge {
   row: ChallengeRow;
@@ -127,6 +128,45 @@ export default class Challenge {
     await this.updateChallengeChannels(client);
 
     return new Attachment(rows[0] as AttachmentRow);
+  }
+
+  // the almighty flag submission algorithm
+  // returns the attempt
+  async submitFlag(client: Client, user: User, flag: string) {
+    // is after the publish date
+    if (this.ctf.row?.start_date < new Date()) throw new Error('ctf has not yet been published');
+
+    // has this team already solved this challenge?
+    const team = await user.getTeam();
+    const hasSolved = await team.hasSolvedChallenge(this);
+    if (hasSolved) throw new Error('Your team has already solved this challenge!');
+
+    const realFlag = Buffer.from(this.row.flag);
+    const providedFlag = Buffer.from(flag);
+
+    // use timing-safe comparison to verify if the flag is correct
+    if (realFlag.length === providedFlag.length && timingSafeEqual(realFlag, providedFlag)) {
+      // send a notice to the team channel
+      const channel = await team.getTeamChannel(client);
+      const congratsMessage = new MessageEmbed();
+      congratsMessage.setTitle('');
+      congratsMessage.description = `Player <@${
+        user.row.user_snowflake
+      }> submitted the **correct** flag for the challenge **${
+        this.row.name
+      }**, and your team has been awarded ${500} points.`;
+      congratsMessage.description += `\n\nYou are the **${0}** person to solve this challenge.`;
+      congratsMessage.addField('Team Points', `${500}`);
+      congratsMessage.addField('Place Overall', `${21}`);
+      congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
+      congratsMessage.setTimestamp();
+      congratsMessage.setColor('50c0bf');
+
+      await channel.send(congratsMessage);
+      return await user.createAttempt(this.row.id, flag, true, new Date());
+    }
+
+    return await user.createAttempt(this.row.id, flag, false, new Date());
   }
 
   /** Attachment Retrieval */
