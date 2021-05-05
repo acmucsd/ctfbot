@@ -220,7 +220,11 @@ export default class Team {
     else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake)
       await guildMember.kick('You need to join your new team server');
 
-    logger(`User **${user.row.user_snowflake}** has joined **Team ${this.row.name} (${this.row.id})**`);
+    logger(
+      `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
+        this.row.id
+      })**`,
+    );
   }
 
   /** User Retrieval */

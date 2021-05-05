@@ -29,7 +29,11 @@ const guildMemberAddEvent = async (member: GuildMember) => {
       // Give them the participant role back
       // Give them their team role back
       const team = await ctf.fromUserTeam(member.user.id);
-      await member.roles.add([team.row.team_role_snowflake_main, ctf.row.participant_role_snowflake]);
+      await member.roles.add([
+        team.row.team_role_snowflake_main,
+        ctf.row.participant_role_snowflake,
+        (await CTF.fromIdTeamServer(team.row.team_server_id)).row.invite_role_snowflake,
+      ]);
     } catch (err) {
       if (err instanceof NoUserError) {
         // First time user joining the main ctf server
