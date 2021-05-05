@@ -1,4 +1,4 @@
-import { Client, Guild, Role } from 'discord.js';
+import { Client, Guild, GuildChannel, Role } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
@@ -45,13 +45,18 @@ export default class TeamServer {
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
-    await guild.channels.resolve(this.row.info_channel_snowflake).delete();
-    await guild.channels.resolve(this.row.team_category_snowflake).delete();
+    this.deleteChannel(client, [
+      this.row.info_channel_snowflake,
+      this.row.team_category_snowflake,
+      this.row.invite_channel_snowflake,
+    ]);
+    await guild.roles.resolve(this.row.invite_role_snowflake).delete();
     logger('Deleted CTF-Related channels and categories');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
     logger(`Deleted **${this.row.name}** TeamServer`);
   }
+
   async setServerRole(role: Role) {
     await query(`UPDATE team_servers SET invite_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
     this.row.invite_role_snowflake = role.id;
@@ -73,6 +78,7 @@ export default class TeamServer {
     this.row.server_invite = invite.code;
     logger(`Made new invite for **${this.row.name}**`);
   }
+
   async setInviteChannelSnowflake(invite_channel_snowflake: string) {
     await query(
       `UPDATE team_servers SET invite_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
@@ -139,15 +145,21 @@ export default class TeamServer {
     }
   }
 
-  async deleteChannel(client: Client, channel_snowflake: string) {
+  deleteChannel(client: Client, channel_snowflakes: string[]) {
     const guild = this.getGuild(client);
-    const channel = guild.channels.resolve(channel_snowflake);
-    if (channel) {
-      await channel.delete();
-      logger(`Channel with id ${channel_snowflake} found: deleted that channel`);
-      return;
+    if (channel_snowflakes instanceof Array) {
+      channel_snowflakes.forEach((snowflake) => {
+        guild.channels
+          .resolve(snowflake)
+          .delete()
+          .then((c) => {
+            logger(`${(c as GuildChannel).name} found: deleted that channel`);
+          })
+          .catch(() => {
+            logger(`Channel with id ${snowflake} not found`);
+          });
+      });
     }
-    logger(`Channel with id ${channel_snowflake} not found`);
   }
 
   /**

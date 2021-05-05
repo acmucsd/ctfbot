@@ -7,9 +7,9 @@ interface ReactionListener {
 }
 
 const reactionListeners = new Map<string, ReactionListener>();
-export function registerReactionListener(id: string, emoji: string, listener: (User) => Promise<boolean>) {
+export const registerReactionListener = (id: string, emoji: string, listener: (User) => Promise<boolean>) => {
   reactionListeners.set(id, { id, emoji, listener });
-}
+};
 
 export const deleteReactionListener = (id: string) => reactionListeners.delete(id);
 

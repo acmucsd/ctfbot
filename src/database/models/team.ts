@@ -32,7 +32,7 @@ export default class Team {
   async deleteTeam(client: Client) {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    await teamServer.deleteChannel(client, this.row.text_channel_snowflake);
+    teamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
     /** TODO: Remove every team member's team roles */
     await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
       /* Do nothing, because it means the team server already deleted*/
@@ -79,7 +79,7 @@ export default class Team {
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role
       const oldTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-      await oldTeamServer.deleteChannel(client, this.row.text_channel_snowflake);
+      oldTeamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
       await oldTeamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
     }
 
