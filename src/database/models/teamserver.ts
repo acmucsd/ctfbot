@@ -28,7 +28,7 @@ export default class TeamServer {
     teams.forEach((team) => {
       void guild.channels.resolve(team.row.text_channel_snowflake).delete();
       // TODO: If main is a team server and we remove the team server part, do we want the roles removed still?
-      void guild.roles.resolve(team.row.team_role_snowflake_team_server).delete();
+      void guild.roles.resolve(team.row.team_role_snowflake_team_server)?.delete();
     });
     logger(`Deleted all team channels and roles.`);
 
@@ -41,7 +41,7 @@ export default class TeamServer {
     const categoryChannels = category_rows as CategoryChannelRow[];
 
     // async queue these for deleting
-    await Promise.all(challengeChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake).delete()));
+    await Promise.all(challengeChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()));
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
@@ -50,7 +50,7 @@ export default class TeamServer {
       this.row.team_category_snowflake,
       this.row.invite_channel_snowflake,
     ]);
-    await guild.roles.resolve(this.row.invite_role_snowflake).delete();
+    await guild.roles.resolve(this.row.invite_role_snowflake)?.delete();
     logger('Deleted CTF-Related channels and categories');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
@@ -151,7 +151,7 @@ export default class TeamServer {
       channel_snowflakes.forEach((snowflake) => {
         guild.channels
           .resolve(snowflake)
-          .delete()
+          ?.delete()
           .then((c) => {
             logger(`${(c as GuildChannel).name} found: deleted that channel`);
           })

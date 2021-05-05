@@ -13,7 +13,6 @@ const guildMemberAddEvent = async (member: GuildMember) => {
   try {
     ctf = await CTF.fromGuildSnowflakeCTF(member.guild.id);
   } catch {
-    // Not a CTF guild
     return;
   }
   let teamServer: TeamServer;
@@ -27,9 +26,10 @@ const guildMemberAddEvent = async (member: GuildMember) => {
     try {
       // Try to resolve the user
       await ctf.fromUserSnowflakeUser(member.user.id);
-      // Give them their main role back
+      // Give them the participant role back
+      // Give them their team role back
       const team = await ctf.fromUserTeam(member.user.id);
-      await member.roles.add(team.row.team_role_snowflake_main);
+      await member.roles.add([team.row.team_role_snowflake_main, ctf.row.participant_role_snowflake]);
     } catch (err) {
       if (err instanceof NoUserError) {
         // First time user joining the main ctf server
@@ -39,7 +39,11 @@ const guildMemberAddEvent = async (member: GuildMember) => {
         throw err;
       }
     }
-  } else if (teamServer) {
+    return;
+  }
+
+  if (teamServer) {
+    // if user is an admin in the main guild, give them admin in the team server
     if (
       member.client.guilds
         .resolve(ctf.row.guild_snowflake)
@@ -49,17 +53,17 @@ const guildMemberAddEvent = async (member: GuildMember) => {
       await member.roles.add(teamServer.row.admin_role_snowflake);
       return;
     }
+
+    // otherwise, users should get participant
     try {
       await ctf.fromUserSnowflakeUser(member.user.id);
+
       const team = await ctf.fromUserTeam(member.user.id);
       if ((await CTF.fromIdTeamServer(team.row.team_server_id)).row.guild_snowflake !== member.guild.id) {
         throw new Error();
       }
       // Give them their team server role back
       await member.roles.add([team.row.team_role_snowflake_team_server, teamServer.row.participant_role_snowflake]);
-      // .catch((err) => {
-      //   throw err;
-      // });
     } catch {
       await member.kick('Not a valid user for this team server').then((m) => {
         void m

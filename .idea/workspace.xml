@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="29601830-a8a9-4e40-8f76-f94841390639" name="Default Changelist" comment="User flow additions">
+    <list default="true" id="29601830-a8a9-4e40-8f76-f94841390639" name="Default Changelist" comment="user.isAlone fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/database/models/category.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/category.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/models/ctf.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/ctf.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/models/team.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/team.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/database/models/teamserver.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/database/models/teamserver.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/log/logger.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/log/logger.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/guildMemberAdd/guildMemberAdd.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/guildMemberAdd/guildMemberAdd.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/guildMemberRemove/guildMemberRemove.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/guildMemberRemove/guildMemberRemove.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/events/interaction/interaction.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/events/interaction/interaction.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,20 +21,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GithubPullRequestsUISettings">
-    <option name="selectedUrlAndAccountId">
-      <UrlAndAccount>
-        <option name="accountId" value="076cad4a-bdbb-4a96-89cf-fdf8c44356f5" />
-        <option name="url" value="https://github.com/acmucsd/ctfbot.git" />
-      </UrlAndAccount>
-    </option>
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedIndex" value="1" />
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1mfGZm1ETfLlegYa4hyuaufLhPj" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -39,9 +41,8 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="TODO_SCOPE" value="All Places" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/events/interaction/commands" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -49,10 +50,19 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.standard" value="" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
-    <property name="settings.editor.selected.configurable" value="Docker" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
+    <property name="prettierjs.PrettierConfiguration.Package" value="C:\Users\Owner\WebstormProjects\ctfbot\node_modules\prettier" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="ts.external.directory.path" value="C:\Users\Owner\WebstormProjects\ctfbot\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Owner\WebstormProjects\ctfbot\src\events\interaction\commands" />
+      <recent name="C:\Users\Owner\WebstormProjects\ctfbot\src\database\schemas" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Owner\WebstormProjects\ctfbot\src\events\interaction\commands" />
+    </key>
   </component>
   <component name="RunManager" selected="npm.start">
     <configuration name="build" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
@@ -60,6 +70,16 @@
       <command value="run" />
       <scripts>
         <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="lint-fix" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="lint-fix" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -75,13 +95,10 @@
       <envs />
       <method v="2" />
     </configuration>
-    <list>
-      <item itemvalue="npm.start" />
-      <item itemvalue="npm.build" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="npm.start" />
+        <item itemvalue="npm.lint-fix" />
         <item itemvalue="npm.build" />
       </list>
     </recent_temporary>
@@ -96,8 +113,19 @@
       <updated>1609877290372</updated>
       <workItem from="1609877291632" duration="2418000" />
       <workItem from="1610465249360" duration="8233000" />
-      <workItem from="1619302046078" duration="2613000" />
-      <workItem from="1619309787752" duration="4859000" />
+      <workItem from="1619290117109" duration="10040000" />
+      <workItem from="1619547945108" duration="12000" />
+      <workItem from="1619555897022" duration="894000" />
+      <workItem from="1619556818190" duration="3845000" />
+      <workItem from="1619630147146" duration="2382000" />
+      <workItem from="1619811083749" duration="2237000" />
+      <workItem from="1619817393632" duration="1230000" />
+      <workItem from="1619899832132" duration="3464000" />
+      <workItem from="1620042949746" duration="504000" />
+      <workItem from="1620043472425" duration="11953000" />
+      <workItem from="1620056614161" duration="15986000" />
+      <workItem from="1620128157601" duration="31091000" />
+      <workItem from="1620213466058" duration="3669000" />
     </task>
     <task id="LOCAL-00001" summary="details for removing a user">
       <created>1609880141557</created>
@@ -134,14 +162,315 @@
       <option name="project" value="LOCAL" />
       <updated>1610474361318</updated>
     </task>
-    <task id="LOCAL-00006" summary="User flow additions">
-      <created>1619308909887</created>
+    <task id="LOCAL-00006" summary="case error">
+      <created>1619301641376</created>
       <option name="number" value="00006" />
       <option name="presentableId" value="LOCAL-00006" />
       <option name="project" value="LOCAL" />
-      <updated>1619308909887</updated>
+      <updated>1619301641376</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="commands are automatically registered in all accessible guilds">
+      <created>1619301670221</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1619301670221</updated>
+    </task>
+    <task id="LOCAL-00008" summary="dockerfile">
+      <created>1619301677489</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1619301677489</updated>
+    </task>
+    <task id="LOCAL-00009" summary="prettier config change for line endings and line widths">
+      <created>1619557308283</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1619557308283</updated>
+    </task>
+    <task id="LOCAL-00010" summary="prettier reformat">
+      <created>1619557816853</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1619557816853</updated>
+    </task>
+    <task id="LOCAL-00011" summary="logger will behave if non-string input is logged">
+      <created>1619558248020</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1619558248020</updated>
+    </task>
+    <task id="LOCAL-00012" summary="accidentally committed?">
+      <created>1619558580039</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1619558580039</updated>
+    </task>
+    <task id="LOCAL-00013" summary="admin role is now created and assigned on ctf creation">
+      <created>1619560036867</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1619560036867</updated>
+    </task>
+    <task id="LOCAL-00014" summary="user flow documentation">
+      <created>1619902450400</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1619902450400</updated>
+    </task>
+    <task id="LOCAL-00015" summary="reformat with longer line length">
+      <created>1620043512660</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1620043512660</updated>
+    </task>
+    <task id="LOCAL-00016" summary="updated readme to coincide with new top-level commands">
+      <created>1620053590368</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053590368</updated>
+    </task>
+    <task id="LOCAL-00017" summary="ApplicationCommand.allowRole">
+      <created>1620053619907</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053619907</updated>
+    </task>
+    <task id="LOCAL-00018" summary="default access changes on commands">
+      <created>1620053653386</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053653386</updated>
+    </task>
+    <task id="LOCAL-00019" summary="updated to CHANNEL_MESSAGE_WITH_SOURCE since CHANNEL_MESSAGE was deprecated">
+      <created>1620053683577</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053683577</updated>
+    </task>
+    <task id="LOCAL-00020" summary="commands.ts bug fixes">
+      <created>1620053700964</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053700964</updated>
+    </task>
+    <task id="LOCAL-00021" summary="default_permission type inclusion">
+      <created>1620053717709</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053717709</updated>
+    </task>
+    <task id="LOCAL-00022" summary="command registration for CTF guilds only">
+      <created>1620053949057</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1620053949057</updated>
+    </task>
+    <task id="LOCAL-00023" summary="/addctf /addserver global commands">
+      <created>1620056468861</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1620056468861</updated>
+    </task>
+    <task id="LOCAL-00024" summary="ctf.makeRole useExisting">
+      <created>1620057322028</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1620057322028</updated>
+    </task>
+    <task id="LOCAL-00025" summary="challenge and category channels in each team server">
+      <created>1620072980355</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1620072980355</updated>
+    </task>
+    <task id="LOCAL-00026" summary="team servers + category, challenge channels">
+      <created>1620075313660</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1620075313660</updated>
+    </task>
+    <task id="LOCAL-00027" summary="minor bugs with teamserver challenges / categories">
+      <created>1620083106497</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1620083106497</updated>
+    </task>
+    <task id="LOCAL-00028" summary="addserver permissions relax">
+      <created>1620083117891</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1620083117891</updated>
+    </task>
+    <task id="LOCAL-00029" summary="corrected breaking commits">
+      <created>1620131591027</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1620131591028</updated>
+    </task>
+    <task id="LOCAL-00030" summary="ctf del awaits">
+      <created>1620132293488</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1620132293488</updated>
+    </task>
+    <task id="LOCAL-00031" summary="interaction ack before response">
+      <created>1620132320279</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1620132320279</updated>
+    </task>
+    <task id="LOCAL-00032" summary="category delete clears children channels">
+      <created>1620132772097</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1620132772097</updated>
+    </task>
+    <task id="LOCAL-00033" summary="addserver will grant CTF Admin Role">
+      <created>1620133319868</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1620133319868</updated>
+    </task>
+    <task id="LOCAL-00034" summary="addserver will grant CTF Admin Role">
+      <created>1620133951981</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1620133951981</updated>
+    </task>
+    <task id="LOCAL-00035" summary="ctf del await">
+      <created>1620133971948</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1620133971948</updated>
+    </task>
+    <task id="LOCAL-00036" summary="fetchallmembers fix">
+      <created>1620133986275</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1620133986275</updated>
+    </task>
+    <task id="LOCAL-00037" summary="fix for fromChannelSnowflakeChallenge">
+      <created>1620134445100</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1620134445100</updated>
+    </task>
+    <task id="LOCAL-00038" summary="challenge get using channels">
+      <created>1620134734727</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1620134734727</updated>
+    </task>
+    <task id="LOCAL-00039" summary="team server check in createCTF">
+      <created>1620135067011</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1620135067011</updated>
+    </task>
+    <task id="LOCAL-00040" summary="category Participant permissions">
+      <created>1620136663438</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1620136663438</updated>
+    </task>
+    <task id="LOCAL-00041" summary="teamServers now include a reference to the parent CTF">
+      <created>1620137372286</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1620137372286</updated>
+    </task>
+    <task id="LOCAL-00042" summary="setCategoryChannelPermissions will only set participant permissions if its after the CTF startDate">
+      <created>1620137411060</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1620137411060</updated>
+    </task>
+    <task id="LOCAL-00043" summary="user commands">
+      <created>1620139092152</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1620139092152</updated>
+    </task>
+    <task id="LOCAL-00044" summary="initial checks for submit">
+      <created>1620140130873</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1620140130873</updated>
+    </task>
+    <task id="LOCAL-00045" summary="/invite sends a message">
+      <created>1620153126775</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1620153126775</updated>
+    </task>
+    <task id="LOCAL-00046" summary="bug with teams not being added to users on team creation">
+      <created>1620153160727</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1620153160727</updated>
+    </task>
+    <task id="LOCAL-00047" summary="revamped reactionListener infra">
+      <created>1620160116582</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1620160116582</updated>
+    </task>
+    <task id="LOCAL-00048" summary="persistent team invite listeners">
+      <created>1620165472538</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1620165472538</updated>
+    </task>
+    <task id="LOCAL-00049" summary="user.isAlone fix">
+      <created>1620165893993</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1620165893993</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -160,13 +489,32 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="details for removing a user" />
-    <MESSAGE value="grammer? i hardly even know her!" />
-    <MESSAGE value="typescript and eslint environment with hello world" />
-    <MESSAGE value="structure and backbone" />
-    <MESSAGE value="webstorm config files" />
-    <MESSAGE value="User flow additions" />
-    <option name="LAST_COMMIT_MESSAGE" value="User flow additions" />
+    <MESSAGE value="challenge and category channels in each team server" />
+    <MESSAGE value="team servers + category, challenge channels" />
+    <MESSAGE value="minor bugs with teamserver challenges / categories" />
+    <MESSAGE value="addserver permissions relax" />
+    <MESSAGE value="corrected breaking commits" />
+    <MESSAGE value="ctf del awaits" />
+    <MESSAGE value="interaction ack before response" />
+    <MESSAGE value="category delete clears children channels" />
+    <MESSAGE value="create" />
+    <MESSAGE value="addserver will grant CTF Admin Role" />
+    <MESSAGE value="ctf del await" />
+    <MESSAGE value="fetchallmembers fix" />
+    <MESSAGE value="fix for fromChannelSnowflakeChallenge" />
+    <MESSAGE value="challenge get using channels" />
+    <MESSAGE value="team server check in createCTF" />
+    <MESSAGE value="category Participant permissions" />
+    <MESSAGE value="teamServers now include a reference to the parent CTF" />
+    <MESSAGE value="setCategoryChannelPermissions will only set participant permissions if its after the CTF startDate" />
+    <MESSAGE value="user commands" />
+    <MESSAGE value="initial checks for submit" />
+    <MESSAGE value="/invite sends a message" />
+    <MESSAGE value="bug with teams not being added to users on team creation" />
+    <MESSAGE value="revamped reactionListener infra" />
+    <MESSAGE value="persistent team invite listeners" />
+    <MESSAGE value="user.isAlone fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="user.isAlone fix" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

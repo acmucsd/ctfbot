@@ -166,8 +166,9 @@ export default class Team {
   }
 
   // remove user from team
-  // if team is empty, it is deleted
   async removeUser(client: Client, user: User) {
+    // if team is empty, it is deleted
+    // WARNING: WILL CAUSE AN ILLEGAL STATE
     if (await user.isAlone()) return this.deleteTeam(client);
 
     // otherwise, we'll need to be more precise about their removal
@@ -176,6 +177,7 @@ export default class Team {
 
   // add user to team
   async addUser(client: Client, user: User) {
+    // can only add users that are alone!
     const isUserAlone = await user.isAlone();
     if (!isUserAlone) throw new Error('User has already joined a team');
 
@@ -199,7 +201,6 @@ export default class Team {
       await guildMember.roles.add(this.row.team_role_snowflake_team_server);
 
     // otherwise, just defer to when they join the new teamserver
-    // TODO
 
     logger(`User **${user.row.user_snowflake}** has joined team **${this.row.name} (${this.row.id})**`);
   }

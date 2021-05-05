@@ -52,7 +52,7 @@ export default class CTF {
     await ctf.setParticipantRole(await ctf.makeRole(client, 'Participant', true));
 
     // register CTF commands now that this is a CTF
-    await ctf.registerCommands(client);
+    void ctf.registerCommands(client).then();
 
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
@@ -80,20 +80,39 @@ export default class CTF {
     for (const team of teams) {
       await team.deleteTeam(client);
     }
-    const webhook = await client.fetchWebhook(this.row.tos_webhook_snowflake);
-    await webhook.delete();
 
+    try {
+      const webhook = await client.fetchWebhook(this.row.tos_webhook_snowflake);
+      await webhook.delete();
+      logger('Removed TOS webhook from the server');
+    } catch (e) {
+      logger("Couldn't remove TOS webhook from the server! (maybe it was deleted?)");
+    }
     deleteReactionListener(this.row.tos_webhook_snowflake);
-    logger('Removed TOS webhook from the server');
 
-    const tos = client.channels.resolve(this.row.tos_channel_snowflake);
-    await tos.delete();
+    await client.channels
+      .resolve(this.row.tos_channel_snowflake)
+      ?.delete()
+      .catch(() => {} /* do nothing, this just means it was already gone */);
     logger('Removed TOS channel');
-    await client.channels.resolve(this.row.info_category_snowflake).delete();
 
-    (await this.getAllTeamServers()).forEach((server) => {
-      void server.deleteTeamServer(client);
-    });
+    await client.channels
+      .resolve(this.row.info_category_snowflake)
+      ?.delete()
+      .catch(() => {} /* do nothing, this just means it was already gone */);
+    logger('Removed Info category');
+
+    // delete ctf roles
+    const ctfGuild = this.getGuild(client);
+    await ctfGuild.roles
+      .resolve(this.row.participant_role_snowflake)
+      ?.delete()
+      .catch(() => {} /* do nothing, this just means it was already gone */);
+
+    // synchronously delete all team servers
+    const teamServers = await this.getAllTeamServers();
+    await Promise.all(teamServers.map((teamServer) => teamServer.deleteTeamServer(client)));
+
     await query(`DELETE FROM ctfs WHERE id = ${this.row.id}`);
     logger(`Deleted ctf **${this.row.name}**`);
   }
@@ -339,7 +358,7 @@ export default class CTF {
     await teamServer.setParticipantRole(pRole);
 
     // register CTF commands now that this is a CTF
-    await teamServer.registerCommands(guild.client);
+    void teamServer.registerCommands(guild.client).then();
     logger(`Created new team server **${name}** for ctf **${this.row.name}**`);
 
     // generate channels for categories and challenges
