@@ -23,6 +23,7 @@ export default class TeamServer {
     // TODO: Does deleting a team server delete all of the associated teams just like with a ctf?
     const teams = await this.getAllTeams();
     const guild = client.guilds.resolve(this.row.guild_snowflake);
+    const mainGuild = this.ctf.getGuild(client);
 
     // Delete all team roles and channels
     teams.forEach((team) => {
@@ -42,16 +43,17 @@ export default class TeamServer {
 
     // async queue these for deleting
     await Promise.all(challengeChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()));
+    await Promise.all(categoryChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()));
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
-    this.deleteChannel(client, [
-      this.row.info_channel_snowflake,
-      this.row.team_category_snowflake,
-      this.row.invite_channel_snowflake,
-    ]);
-    await guild.roles.resolve(this.row.invite_role_snowflake)?.delete();
-    logger('Deleted CTF-Related channels and categories');
+    await guild.roles.resolve(this.row.participant_role_snowflake)?.delete();
+    this.deleteChannel(client, [this.row.info_channel_snowflake, this.row.team_category_snowflake]);
+    logger('Deleted CTF-Related roles, channels, and categories');
+
+    await mainGuild.channels.resolve(this.row.invite_channel_snowflake)?.delete();
+    await mainGuild.roles.resolve(this.row.invite_role_snowflake)?.delete();
+    logger('Deleted TeamServer-related channels from main guild');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
     logger(`Deleted **${this.row.name}** TeamServer`);
