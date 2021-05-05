@@ -1,4 +1,4 @@
-import { Client } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { CTF, Invite, User } from '.';
 import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
@@ -93,6 +93,23 @@ export default class Team {
     // Make new text channel and team server role
     const textChannel = await newTeamServer.makeChannel(client, this.row.name.toLowerCase().replace(' ', '-'));
     await textChannel.setParent(newTeamServer.row.team_category_snowflake);
+
+    // send welcome message
+    const welcomeMessage = new MessageEmbed();
+    welcomeMessage.setTitle(`Welcome to your personal space, ${this.row.name}`);
+    welcomeMessage.setAuthor(`${newTeamServer.row.name} - Team ${this.row.name}`);
+    welcomeMessage.description = `You have joined **${newTeamServer.ctf.row.name}**, and you are currently in your team channel.`;
+    welcomeMessage.description +=
+      '\n\nTo set your **team name** or **team color**, you can use the `/setname` and `/setcolor` commands respectively.';
+    welcomeMessage.description +=
+      "\n\nTo **invite** another person onto your team, you'll need to use `/invite @username`. You should do this in the Main Guild. Then, they will need to accept your invite. Similarly, to **join** another team, they will have to invite you first.";
+    welcomeMessage.description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
+    welcomeMessage.description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
+    welcomeMessage.setTimestamp();
+    welcomeMessage.setColor('50c0bf');
+
+    await textChannel.send(welcomeMessage);
+
     // Make sure only the team can see their channel
     /** TODO: Do we want admins being able to see every channel? */
     await textChannel.overwritePermissions([

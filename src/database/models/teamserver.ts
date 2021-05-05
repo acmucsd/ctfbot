@@ -1,4 +1,4 @@
-import { Client, Guild, GuildChannel, Role } from 'discord.js';
+import { Client, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
@@ -130,7 +130,7 @@ export default class TeamServer {
     }
     channel = await guild.channels.create(`${name}`, { type: 'text' });
     logger(`Created **${name}** channel`);
-    return channel;
+    return channel as TextChannel;
   }
 
   async renameChannel(client: Client, channel_snowflake: string, newName: string) {

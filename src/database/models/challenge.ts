@@ -5,6 +5,8 @@ import Attempt from './attempt';
 import { GuildChannel, Client, TextChannel, MessageEmbed } from 'discord.js';
 import CTF from './ctf';
 import { Category } from './index';
+import attach from '../../events/interaction/commands/challenge/attach';
+import User from './user';
 
 export default class Challenge {
   row: ChallengeRow;
@@ -144,6 +146,22 @@ export default class Challenge {
     return rows.map((row) => new Attempt(row as AttemptRow));
   }
 
+  async getSolves(): Promise<number> {
+    const { rows } = await query(
+      `SELECT COUNT(id) FROM attempts WHERE challenge_id = ${this.row.id} AND successful = true`,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
+    return rows && rows[0].count && parseInt(rows[0].count);
+  }
+
+  getCurrentPoints(solves: number) {
+    const a = this.row.initial_points || 0;
+    const b = this.row.min_points || 0;
+    const s = this.row.point_decay || 1;
+
+    return Math.ceil(((b - a) / (s * s)) * (solves * solves) + a);
+  }
+
   // get challenge category
   async getCategory() {
     const { rows } = await query(`SELECT * FROM categories WHERE id = ${this.row.category_id}`);
@@ -169,13 +187,39 @@ export default class Challenge {
   async updateChallengeChannels(client: Client) {
     const category = await this.getCategory();
 
-    const updatedMessage = new MessageEmbed();
-    updatedMessage.setTitle(this.row.name);
-    updatedMessage.setDescription(this.row.prompt);
-    updatedMessage.setAuthor(`${category.row.name} - ${this.row.difficulty}`);
-    updatedMessage.setFooter(`By ${this.row.author}`);
-    updatedMessage.setTimestamp();
-    updatedMessage.setColor('50c0bf');
+    const challengeMessage = new MessageEmbed();
+    challengeMessage.setTitle(this.row.name);
+    challengeMessage.setDescription(this.row.prompt);
+    challengeMessage.setAuthor(`${category.row.name} - ${this.row.difficulty}`);
+    challengeMessage.setFooter(`By ${this.row.author}`);
+    challengeMessage.setTimestamp();
+    challengeMessage.setColor('50c0bf');
+
+    const attachments = await this.getAllAttachments();
+    attachments.forEach((attachment) => challengeMessage.addField(attachment.row.name, attachment.row.url));
+
+    const solvesMessage = new MessageEmbed();
+    const solves = await this.getSolves();
+    // if there are no solves, the message is slightly different
+    if (solves === 0) {
+      solvesMessage.setTitle('🚨 This challenge current has no solves! 🚨');
+      solvesMessage.setDescription('Do you have what it takes to be the first?');
+    } else {
+      const user = await User.fromID(this.row.first_blood_id);
+      const team = await user.getTeam();
+      // try and pull the display name from the main guild, otherwise use their username
+      const username =
+        this.ctf.getGuild(client).members.resolve(user.row.user_snowflake).displayName ||
+        client.users.resolve(user.row.user_snowflake).username;
+      solvesMessage.setTitle('🔓 This challenge has been solved 🔓');
+      solvesMessage.setDescription(
+        `The first to solve this challenge was **${username}** from **Team ${team.row.name}**`,
+      );
+    }
+    solvesMessage.addField('Current # of Solves', `${solves}`, true);
+    solvesMessage.addField('Current Point Value', `${this.getCurrentPoints(solves)}`, true);
+    solvesMessage.setTimestamp();
+    solvesMessage.setColor('e91e63');
 
     const channels = await this.getChallengeChannels();
     for (const channel of channels) {
@@ -183,15 +227,17 @@ export default class Challenge {
       const messages = await guildChannel.messages.fetch();
 
       // find only the messages we've sent
-      const challengeMessages = messages.filter((message) => message.author.id === client.user.id);
+      const botMessages = messages.filter((message) => message.author.id === client.user.id);
       // if the challenge messages don't already exist, we need to send them
-      if (!challengeMessages || challengeMessages.size === 0) {
-        await guildChannel.send(updatedMessage);
+      if (!botMessages || botMessages.size === 0) {
+        await guildChannel.send(challengeMessage);
+        await guildChannel.send(solvesMessage);
         return;
       }
 
       // otherwise, we need to edit them
-      await challengeMessages.first().edit(updatedMessage);
+      await botMessages.array()[0].edit(solvesMessage);
+      await botMessages.array()[1].edit(challengeMessage);
     }
   }
 }
