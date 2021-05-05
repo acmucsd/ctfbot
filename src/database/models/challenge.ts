@@ -146,16 +146,17 @@ export default class Challenge {
 
     // use timing-safe comparison to verify if the flag is correct
     if (realFlag.length === providedFlag.length && timingSafeEqual(realFlag, providedFlag)) {
+      const attempt = await user.createAttempt(this.row.id, flag, true, new Date());
+
       // send a notice to the team channel
+      const solves = await this.getSolves();
+      const points = this.getCurrentPoints(solves);
+
       const channel = await team.getTeamChannel(client);
       const congratsMessage = new MessageEmbed();
-      congratsMessage.setTitle('');
-      congratsMessage.description = `Player <@${
-        user.row.user_snowflake
-      }> submitted the **correct** flag for the challenge **${
-        this.row.name
-      }**, and your team has been awarded ${500} points.`;
-      congratsMessage.description += `\n\nYou are the **${0}** person to solve this challenge.`;
+      congratsMessage.setTitle('🎉 Congratulations! 🎉');
+      congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
+      congratsMessage.description += `\n\nYou are the **${solves + 1}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${500}`);
       congratsMessage.addField('Place Overall', `${21}`);
       congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
@@ -163,7 +164,7 @@ export default class Challenge {
       congratsMessage.setColor('50c0bf');
 
       await channel.send(congratsMessage);
-      return await user.createAttempt(this.row.id, flag, true, new Date());
+      return attempt;
     }
 
     return await user.createAttempt(this.row.id, flag, false, new Date());

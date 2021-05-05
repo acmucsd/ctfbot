@@ -5,7 +5,7 @@ import query from '../database';
 import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import CommandInteraction from '../../events/interaction/compat/CommandInteraction';
-import { DupeTeamError, NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
+import { NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 import { setCommands } from '../../events/interaction/compat/commands';
 import { adminCommands, userCommands } from '../../events/interaction/interaction';
