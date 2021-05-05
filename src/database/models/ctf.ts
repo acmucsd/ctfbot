@@ -1,4 +1,4 @@
-import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, Role } from 'discord.js';
+import { Client, Guild, GuildMember, TextChannel, User as DiscordUser, Role, MessageEmbed } from 'discord.js';
 import { Category, Team, TeamServer, User } from '.';
 import { CategoryRow, ChallengeRow, CTFRow, TeamServerRow, UserRow } from '../schemas';
 import query from '../database';
@@ -419,7 +419,16 @@ export default class CTF {
         VIEW_CHANNEL: true,
       });
       await teamServer.setInviteChannelSnowflake(channel.id);
-      await channel.send(`Placeholder text!\n https://discord.gg/${teamServer.row.server_invite}`);
+
+      // build the message
+      const message = new MessageEmbed();
+      message.setAuthor(this.row.name);
+      message.setTitle('Your team has been placed in a Team Server');
+      message.setDescription(
+        `Your dedicated CTF environment is **${teamServer.row.name}**. \nPlease join above to participate and access the challenges.`,
+      );
+      message.setColor('50c0bf');
+      await channel.send(`https://discord.gg/${teamServer.row.server_invite}`, message);
     });
     return teamServer;
   }
