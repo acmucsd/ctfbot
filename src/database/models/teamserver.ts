@@ -75,7 +75,7 @@ export default class TeamServer {
   }
   async setInviteChannelSnowflake(invite_channel_snowflake: string) {
     await query(
-      `UPDATE team_servers SET info_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
+      `UPDATE team_servers SET invite_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.invite_channel_snowflake = invite_channel_snowflake;
     logger(`Set invite channel for **${this.row.name}** in main CTF`);
@@ -178,12 +178,12 @@ export default class TeamServer {
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
 
-    if (this.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      const role = await ctf.makeRole(client, name);
-      await team.setTeamRoleSnowflakeMain(role.id);
-    } else {
-      await team.setTeamRoleSnowflakeMain(team.row.team_role_snowflake_team_server);
-    }
+    // The team server role has already been created, this is for the main server role
+    await team.setTeamRoleSnowflakeMain(
+      this.row.guild_snowflake === ctf.row.guild_snowflake
+        ? team.row.team_role_snowflake_team_server
+        : (await ctf.makeRole(client, name)).id,
+    );
     return team;
   }
 

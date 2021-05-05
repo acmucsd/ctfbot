@@ -46,22 +46,28 @@ const guildMemberAddEvent = async (member: GuildMember) => {
         .members.resolve(member.id)
         ?.roles.cache.find((role) => role.id === ctf.row.admin_role_snowflake)
     ) {
-      // They're an admin
+      await member.roles.add(teamServer.row.admin_role_snowflake);
       return;
     }
     try {
       await ctf.fromUserSnowflakeUser(member.user.id);
       const team = await ctf.fromUserTeam(member.user.id);
-      if (team.row.team_server_id.toString() !== member.guild.id) {
+      if ((await CTF.fromIdTeamServer(team.row.team_server_id)).row.guild_snowflake !== member.guild.id) {
         throw new Error();
       }
       // Give them their team server role back
-      await member.roles.add(team.row.team_role_snowflake_main).catch((err) => {
-        throw err;
-      });
+      await member.roles.add([team.row.team_role_snowflake_team_server, teamServer.row.participant_role_snowflake]);
+      // .catch((err) => {
+      //   throw err;
+      // });
     } catch {
-      await member.send('PLACEHOLDER');
-      void member.kick('Not a valid user for this team server');
+      await member.kick('Not a valid user for this team server').then((m) => {
+        void m
+          .send(
+            "Don\t know how you got here but you aren't supposed to be here. If you believe you are then please let a CTF Admin know",
+          )
+          .catch(() => {});
+      });
     }
   }
 };

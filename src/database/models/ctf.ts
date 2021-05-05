@@ -335,7 +335,8 @@ export default class CTF {
     const adminRole = await teamServer.makeRole(guild.client, 'CTF Admin', true);
     await member.roles.add(adminRole);
     await teamServer.setAdminRoleSnowflake(adminRole.id);
-    await teamServer.setParticipantRole(await teamServer.makeRole(guild.client, 'Participant', true));
+    const pRole = await teamServer.makeRole(guild.client, 'Participant', true);
+    await teamServer.setParticipantRole(pRole);
 
     // register CTF commands now that this is a CTF
     await teamServer.registerCommands(guild.client);
@@ -388,7 +389,7 @@ export default class CTF {
         VIEW_CHANNEL: true,
       });
       await teamServer.setInviteChannelSnowflake(channel.id);
-      await (channel as TextChannel).send(`Placeholder text!\n https://discord.gg/${teamServer.row.server_invite}`);
+      await channel.send(`Placeholder text!\n https://discord.gg/${teamServer.row.server_invite}`);
     });
     return teamServer;
   }
