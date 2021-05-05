@@ -405,6 +405,20 @@ export default class CTF {
     if (this.row.guild_snowflake === teamServer.row.guild_snowflake) {
       await infoChannel.setParent(this.row.info_category_snowflake);
     }
+
+    // info page on the team server
+    const infoMessage = new MessageEmbed();
+    infoMessage.setAuthor(this.row.name);
+    infoMessage.setTitle(`Welcome to ${teamServer.row.name} 👋`);
+    infoMessage.description = `This is a *team server* for **${this.row.name}**.`;
+    infoMessage.description += '\nIt hosts **team channels** and **challenge channels** for the competition.';
+    infoMessage.description += `\n\nBy joining, you should have been given the <@&${teamServer.row.participant_role_snowflake}> role and your team role, and you should have access to one channel under the **TEAMS** category, that is your workspace for this CTF. You can find more information there.`;
+    infoMessage.description += `\n\nIf you cannot find it, please let a <@&${teamServer.row.admin_role_snowflake}> know.`;
+    infoMessage.description +=
+      '\n\nIf you are not participating in the competition or if this is not the team server you have been assigned, you will be shortly kicked.';
+    infoMessage.setColor('50c0bf');
+    await infoChannel.send(infoMessage);
+
     await teamServer.setServerInvite(guild.client);
     // TODO: Check if on main server and ignore process if so
     await teamServer.setServerRole(await this.makeRole(guild.client, `${teamServer.row.name}`));
