@@ -591,7 +591,7 @@ export default class CTF {
       );
       return;
     }
-    logger(`**${role_snowflake}** role not found`);
+    logger(`Role with snowflake **${role_snowflake}** not found`);
   }
 
   async setRoleColor(client: Client, role_snowflake: string, color: string) {

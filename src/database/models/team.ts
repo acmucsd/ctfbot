@@ -201,7 +201,11 @@ export default class Team {
 
     // otherwise, just defer to when they join the new teamserver
 
-    logger(`User **${user.row.user_snowflake}** has joined team **${this.row.name} (${this.row.id})**`);
+    logger(
+      `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
+        this.row.id
+      })**`,
+    );
   }
 
   /** User Retrieval */
