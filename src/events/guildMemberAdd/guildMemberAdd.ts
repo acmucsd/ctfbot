@@ -69,13 +69,16 @@ const guildMemberAddEvent = async (member: GuildMember) => {
       // Give them their team server role back
       await member.roles.add([team.row.team_role_snowflake_team_server, teamServer.row.participant_role_snowflake]);
     } catch {
-      await member.kick('Not a valid user for this team server').then((m) => {
-        void m
-          .send(
-            "Don\t know how you got here but you aren't supposed to be here. If you believe you are then please let a CTF Admin know",
-          )
-          .catch(() => {});
-      });
+      // kick after 10 seconds
+      setTimeout(() => {
+        void member.kick('Not a valid user for this team server').then((m) => {
+          void m
+            .send(
+              "Don\t know how you got here but you aren't supposed to be here. If you believe you are then please let a CTF Admin know",
+            )
+            .catch(() => {});
+        });
+      }, 1000 * 10);
     }
   }
 };
