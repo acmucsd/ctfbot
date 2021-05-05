@@ -381,11 +381,7 @@ export default class CTF {
       for (const challenge of challenges) {
         const challengeChannel = await guild.channels.create(challenge.row.name);
         await challengeChannel.setParent(categoryChannel.id);
-        // create a webhook for that channel
-        const webhook = await challengeChannel.createWebhook(guild.client.user.username, {
-          avatar: guild.client.user.avatar,
-        });
-        challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id}, ${webhook.id})`);
+        challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id})`);
       }
     }
 
@@ -396,7 +392,7 @@ export default class CTF {
       );
     if (challengeChannels.length > 0)
       await query(
-        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake, webhook_snowflake) VALUES ${challengeChannels.join()}`,
+        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
       );
 
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
