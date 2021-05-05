@@ -29,7 +29,7 @@ export default {
     const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setAuthor(newAuthor);
+    await challenge.setAuthor(interaction.client, newAuthor);
 
     return `Challenge author has been set to **${newAuthor}**.`;
   },

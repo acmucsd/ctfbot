@@ -47,7 +47,7 @@ export default {
     const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setDifficulty(difficulty);
+    await challenge.setDifficulty(interaction.client, difficulty);
 
     return `Challenge difficulty has been set to **${difficulty}**.`;
   },

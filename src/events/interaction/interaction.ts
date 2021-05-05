@@ -9,7 +9,6 @@ import {
   CommandOptionMap,
   InteractionType,
 } from './compat/types';
-import { CTF } from '../../database/models';
 import addctf from './commands/addctf';
 import addserver from './commands/addserver';
 import { setCommands } from './compat/commands';

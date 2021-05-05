@@ -2,7 +2,7 @@ import query from '../database';
 import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
-import { GuildChannel, Client } from 'discord.js';
+import { GuildChannel, Client, TextChannel, MessageEmbed } from 'discord.js';
 import CTF from './ctf';
 import { Category } from './index';
 
@@ -42,36 +42,51 @@ export default class Challenge {
     }
 
     this.row.name = name;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setAuthor(author: string) {
+  async setAuthor(client: Client, author: string) {
     await query(`UPDATE challenges SET author = $1 WHERE id = ${this.row.id}`, [author]);
+
     this.row.author = author;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setPrompt(prompt: string) {
+  async setPrompt(client: Client, prompt: string) {
     await query(`UPDATE challenges SET prompt = $1 WHERE id = ${this.row.id}`, [prompt]);
     this.row.prompt = prompt;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setDifficulty(difficulty: string) {
+  async setDifficulty(client: Client, difficulty: string) {
     await query(`UPDATE challenges SET difficulty = $1 WHERE id = ${this.row.id}`, [difficulty]);
     this.row.difficulty = difficulty;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setInitialPoints(initial_points: number) {
+  async setInitialPoints(client: Client, initial_points: number) {
     await query(`UPDATE challenges SET initial_points = $1 WHERE id = ${this.row.id}`, [initial_points]);
     this.row.initial_points = initial_points;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setPointDecay(point_decay: number) {
+  async setPointDecay(client: Client, point_decay: number) {
     await query(`UPDATE challenges SET point_decay = $1 WHERE id = ${this.row.id}`, [point_decay]);
     this.row.point_decay = point_decay;
+
+    await this.updateChallengeChannels(client);
   }
 
-  async setMinPoints(min_points: number) {
+  async setMinPoints(client: Client, min_points: number) {
     await query(`UPDATE challenges SET min_points = $1 WHERE id = ${this.row.id}`, [min_points]);
     this.row.min_points = min_points;
+
+    await this.updateChallengeChannels(client);
   }
 
   async setFlag(flag: string) {
@@ -80,9 +95,11 @@ export default class Challenge {
   }
 
   // Valid User in the CTF(?)
-  async setFirstBlood(first_blood_id: number) {
+  async setFirstBlood(client: Client, first_blood_id: number) {
     await query(`UPDATE challenges SET first_blood_id = $1 WHERE id = ${this.row.id}`, [first_blood_id]);
     this.row.first_blood_id = first_blood_id;
+
+    await this.updateChallengeChannels(client);
   }
 
   async setPublishTime(publish_time: Date) {
@@ -91,7 +108,7 @@ export default class Challenge {
   }
 
   /** Attachment Creation */
-  async createAttachment(name: string, url: string) {
+  async createAttachment(client: Client, name: string, url: string) {
     // check if a attachment already exists with that name for the challenge
     const {
       rows: existingRows,
@@ -104,6 +121,9 @@ export default class Challenge {
       name,
       url,
     ]);
+
+    await this.updateChallengeChannels(client);
+
     return new Attachment(rows[0] as AttachmentRow);
   }
 
@@ -132,13 +152,46 @@ export default class Challenge {
 
   // get the channels that correspond with this challenge
   async getChallengeGuildChannels(client: Client) {
+    const channels = await this.getChallengeChannels();
+
+    return await Promise.all(
+      channels.map((channel) => client.channels.resolve(channel.channel_snowflake) as TextChannel),
+    );
+  }
+
+  async getChallengeChannels() {
     const { rows } = await query(`SELECT * FROM challenge_channels WHERE challenge_id = ${this.row.id}`);
     if (!rows) throw new Error('No channels corresponding with this challenge id found.');
 
-    return await Promise.all(
-      rows
-        .map((row) => row as ChallengeChannelRow)
-        .map((channel) => client.channels.resolve(channel.channel_snowflake) as GuildChannel),
-    );
+    return rows.map((row) => row as ChallengeChannelRow);
+  }
+
+  async updateChallengeChannels(client: Client) {
+    const category = await this.getCategory();
+
+    const updatedMessage = new MessageEmbed();
+    updatedMessage.setTitle(this.row.name);
+    updatedMessage.setDescription(this.row.prompt);
+    updatedMessage.setAuthor(`${category.row.name} - ${this.row.difficulty}`);
+    updatedMessage.setFooter(`By ${this.row.author}`);
+    updatedMessage.setTimestamp();
+    updatedMessage.setColor('50c0bf');
+
+    const channels = await this.getChallengeChannels();
+    for (const channel of channels) {
+      const guildChannel = client.channels.resolve(channel.channel_snowflake) as TextChannel;
+      const messages = await guildChannel.messages.fetch();
+
+      // find only the messages we've sent
+      const challengeMessages = messages.filter((message) => message.author.id === client.user.id);
+      // if the challenge messages don't already exist, we need to send them
+      if (!challengeMessages || challengeMessages.size === 0) {
+        await guildChannel.send(updatedMessage);
+        return;
+      }
+
+      // otherwise, we need to edit them
+      await challengeMessages.first().edit(updatedMessage);
+    }
   }
 }

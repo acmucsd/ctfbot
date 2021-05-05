@@ -30,7 +30,7 @@ export default {
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
 
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setPointDecay(newDecay);
+    await challenge.setPointDecay(interaction.client, newDecay);
 
     return `Challenge point decay has been set to **${newDecay}**.`;
   },
