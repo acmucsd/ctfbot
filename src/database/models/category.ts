@@ -76,14 +76,18 @@ export default class Category {
       const guildChannel = client.channels.resolve(categoryChannel.channel_snowflake) as CategoryChannel;
       const channel = await guildChannel.guild.channels.create(name);
       await channel.setParent(categoryChannel.channel_snowflake);
+      // create a webhook for that channel
+      const webhook = await channel.createWebhook(client.user.username, {
+        avatar: client.user.avatar,
+      });
       // build the VALUES query as we go
-      challengeChannels.push(`(${challenge.row.id}, ${categoryChannel.teamserver_id}, ${channel.id})`);
+      challengeChannels.push(`(${challenge.row.id}, ${categoryChannel.teamserver_id}, ${channel.id}, ${webhook.id})`);
     }
 
     // insert all new challenge channels into the db at once
     if (challengeChannels.length > 0)
       await query(
-        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
+        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake, webhook_snowflake) VALUES ${challengeChannels.join()}`,
       );
 
     return challenge;

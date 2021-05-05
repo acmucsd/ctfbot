@@ -1,6 +1,6 @@
 import CommandInteraction from '../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
-import { CTF, Team } from '../../../database/models';
+import { CTF } from '../../../database/models';
 
 export default {
   name: 'setname',
@@ -16,7 +16,12 @@ export default {
   ],
   async execute(interaction: CommandInteraction, options: CommandOptionMap) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+
     const team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
-    return await team.setName(interaction.client, options.name as string);
+    const oldName = team.row.name;
+
+    await team.setName(interaction.client, options.name.toString());
+
+    return `Changed **Team ${oldName}**'s name to **Team ${options.name.toString()}**`;
   },
 } as ApplicationCommandDefinition;

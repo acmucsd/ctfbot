@@ -374,7 +374,11 @@ export default class CTF {
       for (const challenge of challenges) {
         const challengeChannel = await guild.channels.create(challenge.row.name);
         await challengeChannel.setParent(categoryChannel.id);
-        challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id})`);
+        // create a webhook for that channel
+        const webhook = await challengeChannel.createWebhook(guild.client.user.username, {
+          avatar: guild.client.user.avatar,
+        });
+        challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id}, ${webhook.id})`);
       }
     }
 
@@ -385,7 +389,7 @@ export default class CTF {
       );
     if (challengeChannels.length > 0)
       await query(
-        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake) VALUES ${challengeChannels.join()}`,
+        `INSERT INTO challenge_channels (challenge_id, teamserver_id, channel_snowflake, webhook_snowflake) VALUES ${challengeChannels.join()}`,
       );
 
     const infoChannel = await teamServer.makeChannel(guild.client, 'info');
@@ -484,25 +488,8 @@ export default class CTF {
     // TODO: Determine how to handle a NoRoomError
     const teamServer = await this.getTeamServerWithSpace();
 
-    // Try to give them their given team name initially, but if it fails then keep going through numbers until there's
-    // one that isn't being used
-    let team: Team;
-    let nameAvailable = false;
-    let iteration = 1;
-    const teamName = `Team ${member.displayName}`;
-    while (!nameAvailable) {
-      try {
-        team = await teamServer.makeTeam(member.client, this, `${teamName}${iteration > 1 ? ` ${iteration}` : ''}`);
-        nameAvailable = true;
-      } catch (e) {
-        if (e instanceof DupeTeamError) {
-          iteration++;
-        } else {
-          // Something bad happened so bubble up
-          throw e;
-        }
-      }
-    }
+    // create a team for this user that contains only them
+    const team = await teamServer.makeTeam(member.client, this, member.displayName);
 
     // Add user to DB
     const {

@@ -115,7 +115,6 @@ export default class Team {
   async setName(client: Client, newName: string) {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    const oldName = this.row.name;
 
     const teams = (await ctf.getAllTeams()).filter((team) => team.row.name === newName);
     if (teams.length !== 0) throw new Error('a team with that name already exists');
@@ -123,12 +122,12 @@ export default class Team {
     await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [newName]);
     this.row.name = newName;
 
-    await ctf.setRoleName(client, this.row.team_role_snowflake_main, newName);
+    await ctf.setRoleName(client, this.row.team_role_snowflake_main, `Team ${newName}`);
     if (this.row.team_role_snowflake_main !== this.row.team_role_snowflake_team_server) {
       await teamServer.setRoleName(client, this.row.team_role_snowflake_team_server, newName);
     }
     await teamServer.renameChannel(client, this.row.text_channel_snowflake, newName);
-    return `Changed **${oldName}**'s name to **${newName}**`;
+    return newName;
   }
 
   async setDescription(description: string) {
