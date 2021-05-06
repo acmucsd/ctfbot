@@ -32,6 +32,10 @@ export default class User {
     );
     if (existingRows && existingRows.length > 0) throw new Error('invite for that user already exists');
 
+    // can only invite users that are alone!
+    const isUserAlone = await this.isAlone();
+    if (!isUserAlone) throw new Error('User has already joined a team');
+
     // create invite
     const {
       rows,
