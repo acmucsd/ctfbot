@@ -200,7 +200,7 @@ export default class Challenge {
     const b = this.row.min_points || 0;
     const s = this.row.point_decay || 1;
 
-    return Math.ceil(((b - a) / (s * s)) * (solves * solves) + a);
+    return Math.max(Math.ceil(((b - a) / (s * s)) * (solves * solves) + a), b);
   }
 
   // get challenge category
