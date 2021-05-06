@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "${PGPASSWORD}"
+      POSTGRES_USER: ctfbot
+    volumes:
+      - ctfbot-db:/var/lib/postgresql/data
+    networks:
+      - ctfbot-net
+  ctfbot:
+    depends_on:
+      - postgres
+    build:
+      context: .
+    environment:
+      DISCORD_TOKEN: "${DISCORD_TOKEN}"
+      PGPASSWORD: "${PGPASSWORD}"
+      PGHOST: "postgres"
+    networks:
+      - ctfbot-net
+networks:
+  ctfbot-net:
+volumes:
+  ctfbot-db:
