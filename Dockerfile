@@ -16,7 +16,10 @@ COPY src ./src
 COPY tsconfig.json .
 RUN npm run build
 
-FROM base AS production
+FROM base AS production_env
+RUN npm install -g pm2
+
+FROM production_env AS production
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=release-build /app/dist ./dist
-CMD ["npm", "run", "start:prod"]
+CMD [ "pm2-runtime", "npm", "--", "start:prod" ]
