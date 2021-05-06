@@ -152,18 +152,24 @@ export default class Challenge {
       const solves = await this.getSolves();
       const points = this.getCurrentPoints(solves);
 
-      const channel = await team.getTeamChannel(client);
-      const congratsMessage = new MessageEmbed();
-      congratsMessage.setTitle('🎉 Congratulations! 🎉');
-      congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
-      congratsMessage.description += `\n\nYou are the **${solves + 1}** person to solve this challenge.`;
-      congratsMessage.addField('Team Points', `${500}`);
-      congratsMessage.addField('Place Overall', `${21}`);
-      congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
-      congratsMessage.setTimestamp();
-      congratsMessage.setColor('50c0bf');
-
-      await channel.send(congratsMessage);
+      await team.getTeamChannel(client).then(async (channel) => {
+        await channel.send(
+          new MessageEmbed()
+            .setTitle('🎉 Congratulations! 🎉')
+            .setDescription(
+              `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${
+                this.row.name
+              }**, and your team has been awarded ${points} points.\n\nYou are the #**${
+                solves + 1
+              }** person to solve this challenge.`,
+            )
+            .addField('Team Points', `${500}`)
+            .addField('Place Overall', `${21}`)
+            .addField('Challenges Unlocked', '#mann-hunt2')
+            .setTimestamp()
+            .setColor('50c0bf'),
+        );
+      });
       return attempt;
     }
 
