@@ -36,6 +36,7 @@ export default {
     if (!attachment) throw new Error('could not find an attachment with that name');
 
     await attachment.deleteAttachment();
+    await challenge.updateChallengeChannels(interaction.client);
 
     return `Attachment **${fileName}** has been removed from challenge **${challenge.row.name}**`;
   },
