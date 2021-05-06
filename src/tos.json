@@ -2,33 +2,6 @@
   "content": "Below is everything you need to know to compete in San Diego CTF. You will need to react to this message to indicate you have read and understood the rules before the competition will become available to you. Please ensure your device supports embeds.",
   "embeds": [
     {
-      "title": "How to Play :soccer:",
-      "description": "A brief overview of how to compete in San Diego CTF. We also have a full video tutorial here: https://",
-      "color": 4700601,
-      "fields": [
-        {
-          "name": "Scoring Points",
-          "value": "Points are awarded"
-        },
-        {
-          "name": "Joining Teams",
-          "value": "TBD"
-        },
-        {
-          "name": "Submitting Flags",
-          "value": "TBD"
-        },
-        {
-          "name": "Tracking Progress",
-          "value": "TBD"
-        },
-        {
-          "name": "Determining Winners",
-          "value": "TBD"
-        }
-      ]
-    },
-    {
       "title": "Competition Rules :notebook:",
       "description": "You must meet the following terms and conditions and agree to them in order to participate in San Diego CTF.",
       "color": 12145991,
