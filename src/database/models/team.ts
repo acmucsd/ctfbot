@@ -87,7 +87,7 @@ export default class Team {
     this.row.team_server_id = team_server_id;
 
     // Make their team role
-    const role = await newTeamServer.makeRole(client, this.row.name);
+    const role = await newTeamServer.makeRole(client, `Team ${this.row.name}`);
     await this.setTeamRoleSnowflakeTeamServer(role.id);
 
     // Make new text channel and team server role
