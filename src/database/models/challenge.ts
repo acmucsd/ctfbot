@@ -159,7 +159,7 @@ export default class Challenge {
       const congratsMessage = new MessageEmbed();
       congratsMessage.setTitle('🎉 Congratulations! 🎉');
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
-      congratsMessage.description += `\n\nYou are the **${solves}** person to solve this challenge.`;
+      congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${500}`);
       congratsMessage.addField('Place Overall', `${21}`);
       congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
