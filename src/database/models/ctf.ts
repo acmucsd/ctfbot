@@ -401,6 +401,11 @@ export default class CTF {
     if (this.row.guild_snowflake === teamServer.row.guild_snowflake) {
       await infoChannel.setParent(this.row.info_category_snowflake);
     }
+    // lock down info channel
+    await infoChannel.updateOverwrite(infoChannel.guild.roles.everyone, {
+      SEND_MESSAGES: false,
+      ADD_REACTIONS: false,
+    });
 
     // info page on the team server
     const infoMessage = new MessageEmbed();
