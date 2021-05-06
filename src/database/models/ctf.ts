@@ -551,6 +551,10 @@ export default class CTF {
       await user.roles.add(team.row.team_role_snowflake_main);
       await user.roles.add(this.row.participant_role_snowflake);
       await user.roles.add(teamServer.row.invite_role_snowflake);
+      // send a DM with the team server link
+      await user
+        .send(`Enter your assigned team server to begin. https://discord.gg/${teamServer.row.server_invite}`)
+        .catch(() => {} /* I don't care if it works! */);
     }
 
     return new User(rows[0] as UserRow);

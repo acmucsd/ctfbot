@@ -20,7 +20,7 @@ export default class Invite {
     const message = new MessageEmbed();
     message.color = 15158332;
     message.title = `You have been invited to join **Team ${fromTeam.row.name}**`;
-    message.description = 'You can accept this invite if you ***react to this message*** with :+1:.';
+    message.description = `You (<@${toUser.row.user_snowflake}>) can accept this invite if you ***react to this message*** with :+1:.`;
     message.description += '\n\nYour team chat will be deleted and you will be added to their team chats.';
     message.description += '\n\n**You may also need to join their team server if they are in a different region.**';
     message.description += '\nIf so, look for your new team server chat in the Main Guild.';
@@ -31,6 +31,15 @@ export default class Invite {
 
     const sentMessage = await currentTeamChannel.send(message);
     await this.setMessageSnowflake(sentMessage.id);
+
+    // lets ALSO DM them IF they aren't on their team server
+    const discordUser = client.users.resolve(toUser.row.user_snowflake);
+    if (discordUser && !currentTeamChannel.guild.member(discordUser)) {
+      const invite = await currentTeamChannel.createInvite();
+      await discordUser
+        .send(`You have been invited to join a team. Join your team channel to accept the invite. ${invite.url}`)
+        .catch(() => {} /* I don't care if it works! */);
+    }
 
     // add a react listener to actually add the person to the team
     await sentMessage.react('👍');
