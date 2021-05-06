@@ -69,12 +69,7 @@ export default class User {
       [challenge_id, attempted_flag, successful, timestamp],
     );
 
-    const attempt = new Attempt(rows[0] as AttemptRow);
-
-    // TODO
-    // notify for first blood
-
-    return attempt;
+    return new Attempt(rows[0] as AttemptRow);
   }
 
   /** Attempt Retrieval */

@@ -134,7 +134,7 @@ export default class Challenge {
   // returns the attempt
   async submitFlag(client: Client, user: User, flag: string) {
     // is after the publish date
-    if (this.ctf.row?.start_date < new Date()) throw new Error('ctf has not yet been published');
+    if (this.ctf.row?.start_date > new Date()) throw new Error('ctf has not yet been published');
 
     // has this team already solved this challenge?
     const team = await user.getTeam();
@@ -152,11 +152,14 @@ export default class Challenge {
       const solves = await this.getSolves();
       const points = this.getCurrentPoints(solves);
 
+      // update first blood
+      if (solves === 1) await this.setFirstBlood(client, user.row.id);
+
       const channel = await team.getTeamChannel(client);
       const congratsMessage = new MessageEmbed();
       congratsMessage.setTitle('🎉 Congratulations! 🎉');
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
-      congratsMessage.description += `\n\nYou are the **${solves + 1}** person to solve this challenge.`;
+      congratsMessage.description += `\n\nYou are the **${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${500}`);
       congratsMessage.addField('Place Overall', `${21}`);
       congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
