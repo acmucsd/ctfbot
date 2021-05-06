@@ -20,7 +20,7 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const date = parse(options.start_date?.toString() ?? '', 'yyyy MM dd HH:mm', new Date());
+    const date = options.start_date ? parse(options.start_date.toString(), 'yyyy MM dd HH:mm', new Date()) : new Date();
     if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
     await ctf.setStartDate(date);
     return `CTF start date has been changed to **${date.toString()}**`;
