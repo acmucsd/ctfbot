@@ -26,6 +26,8 @@ export default class User {
 
   /** Invite Creation */
   async createInvite(client: Client, team: Team) {
+    if (this.row.team_id === team.row.id) throw new Error('You cannot invite a user that is already on your team!');
+
     const { rows: existingRows } = await query(
       `SELECT id FROM invites WHERE team_id = $1 and user_id = ${this.row.id}`,
       [team.row.id],
