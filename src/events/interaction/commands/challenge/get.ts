@@ -25,13 +25,33 @@ export default {
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     const category = await challenge.getCategory();
 
+    const attachments = await challenge.getAllAttachments();
+
     // complicated embedded response
     await interaction.reply({
       embeds: [
         {
           title: challenge.row.name,
           description: challenge.row.prompt,
-          // fields: attachments
+          fields: [
+            ...attachments.map((attach) => ({ name: attach.row.name, value: attach.row.url })),
+            {
+              name: 'flag',
+              value: `||${challenge.row.flag}||`,
+            },
+            {
+              name: 'minimum_points',
+              value: challenge.row.min_points,
+            },
+            {
+              name: 'initial_points',
+              value: challenge.row.initial_points,
+            },
+            {
+              name: 'solves until minimum',
+              value: challenge.row.point_decay,
+            },
+          ],
           author: {
             name: `${category.row.name} - ${challenge.row.difficulty}`,
           },
