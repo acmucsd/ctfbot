@@ -475,7 +475,9 @@ export default class CTF {
     const teams = await this.getAllTeams();
     return teams.length == 0
       ? `CTF **${this.row.name}** has no teams yet`
-      : `CTF **${this.row.name}**'s teams are: **${teams.map((team) => team.row.name).join('**, **')}**`;
+      : `CTF **${this.row.name}**'s teams are: **${(
+          await Promise.all(teams.map(async (team) => `${team.row.name} (${await team.calculatePoints()})`))
+        ).join('**, **')}**`;
   }
 
   // Get either TeamServer or main ctf guild id and return the ctf
