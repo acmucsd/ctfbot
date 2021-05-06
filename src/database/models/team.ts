@@ -32,7 +32,7 @@ export default class Team {
   async deleteTeam(client: Client) {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    teamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
+    await teamServer.getGuild(client).channels.resolve(this.row.text_channel_snowflake)?.delete();
     /** TODO: Remove every team member's team roles */
     await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
       /* Do nothing, because it means the team server already deleted*/
@@ -217,8 +217,12 @@ export default class Team {
       await guildMember.roles.add(this.row.team_role_snowflake_team_server);
     // otherwise, just defer to when they join the new teamserver
     // btw we should kick them if this isn't the main guild
-    else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake)
+    else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake) {
       await guildMember.kick('You need to join your new team server');
+      // we'll also need to make sure we get the right TS role in the main guild
+      await mainGuildMember.roles.remove(oldTeamServer.row.invite_role_snowflake);
+      await mainGuildMember.roles.add(newTeamServer.row.invite_role_snowflake);
+    }
 
     logger(
       `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
