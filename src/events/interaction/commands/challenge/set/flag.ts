@@ -25,8 +25,8 @@ export default {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const newFlag = options.newFlag.toString();
-    const challengeChannelSnowflake = options.challenge_channel.toString() ?? interaction.channel.id;
+    const newFlag = options.flag.toString();
+    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.setFlag(newFlag);
