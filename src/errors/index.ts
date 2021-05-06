@@ -1,4 +1,4 @@
-export { NoTeamUserError } from './noTeamUserError';
+export { NoTeamUserError } from './NoTeamUserError';
 export { NoUserError } from './NoUserError';
 export { DupeTeamError } from './DupeTeamError';
 export { NoRoomError } from './NoRoomError';
