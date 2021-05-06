@@ -36,20 +36,24 @@ export default {
           fields: [
             ...attachments.map((attach) => ({ name: attach.row.name, value: attach.row.url })),
             {
-              name: 'flag',
-              value: `||${challenge.row.flag}||`,
-            },
-            {
               name: 'minimum_points',
-              value: challenge.row.min_points,
+              value: challenge.row.min_points || '0',
+              inline: true,
             },
             {
               name: 'initial_points',
-              value: challenge.row.initial_points,
+              value: challenge.row.initial_points || '0',
+              inline: true,
             },
             {
               name: 'solves until minimum',
-              value: challenge.row.point_decay,
+              value: challenge.row.point_decay || '0',
+              inline: true,
+            },
+            {
+              name: 'flag',
+              value: `||${challenge.row.flag}||`,
+              inline: true,
             },
           ],
           author: {
