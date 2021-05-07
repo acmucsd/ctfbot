@@ -58,7 +58,7 @@ export default {
             },
             {
               name: 'challenge dependencies',
-              value: dependencies.join(', '),
+              value: `ids ${dependencies.join(', ')}`,
               inline: false,
             },
           ],
