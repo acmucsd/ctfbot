@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { category, challenge, ctf, ping, team } from './commands';
+import { category, challenge, ctf, ping, scoreboard, team } from './commands';
 import CommandInteraction from './compat/CommandInteraction';
 import { logger, embedify } from '../../log';
 import {
@@ -16,10 +16,11 @@ import submit from './commands/submit';
 import invite from './commands/invite';
 import setcolor from './commands/setcolor';
 import setname from './commands/setname';
+import { CTF } from '../../database/models';
 
 // our canonical list of application definitions
 export const topLevelCommands: ApplicationCommandDefinition[] = [addctf, addserver];
-export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge];
+export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge, scoreboard];
 export const userCommands: ApplicationCommandDefinition[] = [ping, submit, invite, setname, setcolor];
 const commands: ApplicationCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
@@ -99,5 +100,5 @@ export const registerCommands = async (client: Client) => {
   //     logger(`no ctf in guild ${guildID}`);
   //   }
   // }
-  // logger('commands registered');
+  logger('commands registered');
 };

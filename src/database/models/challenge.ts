@@ -161,12 +161,16 @@ export default class Challenge {
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
-      congratsMessage.addField('Place Overall', `${21}`);
-      congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
+      // congratsMessage.addField('Place Overall', `${21}`);
+      // congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
       congratsMessage.setTimestamp();
       congratsMessage.setColor('50c0bf');
 
       await channel.send(congratsMessage);
+
+      // update points and such
+      await this.updateChallengeChannels(client);
+
       return attempt;
     }
 
@@ -199,9 +203,13 @@ export default class Challenge {
   }
 
   getCurrentPoints(solves: number) {
-    const a = this.row.initial_points || 0;
-    const b = this.row.min_points || 0;
-    const s = this.row.point_decay || 1;
+    return Challenge.calculateDynamicPoints(this.row.initial_points, this.row.min_points, this.row.point_decay, solves);
+  }
+
+  static calculateDynamicPoints(initialPoints: number, minPoints: number, pointDecay: number, solves: number) {
+    const a = initialPoints || 0;
+    const b = minPoints || 0;
+    const s = pointDecay || 1;
 
     return Math.max(Math.ceil(((b - a) / (s * s)) * (solves * solves) + a), b);
   }
