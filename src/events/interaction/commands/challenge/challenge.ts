@@ -3,10 +3,11 @@ import attach from './attach';
 import del from './del';
 import get from './get';
 import set from './set';
+import dependency from './dependency';
 
 export default {
   name: 'challenge',
   description: 'Challenge management and submission',
-  options: [add, attach, del, get, set],
+  options: [add, attach, del, get, set, dependency],
   default_permission: false,
 };

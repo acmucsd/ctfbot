@@ -1,10 +1,10 @@
 import query from '../database';
-import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow, CTFRow } from '../schemas';
+import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
-import { GuildChannel, Client, TextChannel, MessageEmbed } from 'discord.js';
+import { Client, TextChannel, MessageEmbed } from 'discord.js';
 import CTF from './ctf';
-import { Category, TeamServer } from './index';
+import { Category } from './index';
 import attach from '../../events/interaction/commands/challenge/attach';
 import User from './user';
 import { timingSafeEqual } from 'crypto';

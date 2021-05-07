@@ -1,6 +1,6 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Challenge, CTF, Invite, TeamServer, User } from '.';
-import { AttemptRow, InviteRow, TeamRow, UserRow } from '../schemas';
+import { InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
 import { logger } from '../../log';
 import { NoRoomError } from '../../errors';

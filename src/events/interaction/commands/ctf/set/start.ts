@@ -3,7 +3,7 @@ import { parse } from 'date-fns';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
-import { CategoryChannel, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 
 export default {
   name: 'start',
