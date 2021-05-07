@@ -155,6 +155,12 @@ export default class Challenge {
       // update first blood
       if (solves === 1) await this.setFirstBlood(client, user.row.id);
 
+      // add a check in /submit that, after a successful submit, give that team role permission to
+      // view the unlocked challenges. Also, add that channels were unlocked to the congrats message.
+      const newChallengeIDs = await this.getChallengeDependencies();
+      const newChallengeNames = newChallengeIDs.map(
+        async (challengeID) => await CTF.fromIDChallenge(challengeID.toString()),
+      );
       const channel = await team.getTeamChannel(client);
       const congratsMessage = new MessageEmbed();
       congratsMessage.setTitle('🎉 Congratulations! 🎉');
@@ -162,9 +168,26 @@ export default class Challenge {
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
       // congratsMessage.addField('Place Overall', `${21}`);
-      // congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
+      congratsMessage.addField(
+        'Challenges Unlocked',
+        `${newChallengeNames.map(async (name) => `#${await name}`).join(', ')}`,
+      );
       congratsMessage.setTimestamp();
       congratsMessage.setColor('50c0bf');
+
+      const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
+      const challengeChannels = await teamServer.getAllChallengeChannels();
+      const relevantChallengeChannels = challengeChannels.filter((chal) =>
+        newChallengeIDs.find((c) => c === chal.challenge_id),
+      );
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      relevantChallengeChannels.forEach(async (c) => {
+        await channel.guild.channels
+          .resolve(c.channel_snowflake)
+          .updateOverwrite(channel.guild.roles.resolve(team.row.team_role_snowflake_team_server), {
+            VIEW_CHANNEL: true,
+          });
+      });
 
       await channel.send(congratsMessage);
 

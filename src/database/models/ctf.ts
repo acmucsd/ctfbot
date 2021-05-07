@@ -300,6 +300,16 @@ export default class CTF {
     logger(`Set **${this.row.name}**'s TOS webhook`);
   }
 
+  static async fromIDChallenge(challenge_id: string) {
+    const { rows } = await query(`SELECT name FROM challenges WHERE id = ${challenge_id}`);
+
+    if (!rows[0]) {
+      throw new Error('No challenge associated with that ID in this CTF');
+    }
+
+    return rows[0] as string;
+  }
+
   /* CTF Retrieval */
   static async fromNameCTF(name: string) {
     const { rows } = await query('SELECT * FROM ctfs WHERE name = $1', [name]);
