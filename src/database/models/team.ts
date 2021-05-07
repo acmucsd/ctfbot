@@ -1,6 +1,6 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Challenge, CTF, Invite, TeamServer, User } from '.';
-import { InviteRow, TeamRow, UserRow } from '../schemas';
+import { AttemptRow, InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
 import { logger } from '../../log';
 import { NoRoomError } from '../../errors';
@@ -241,8 +241,16 @@ export default class Team {
   }
 
   async calculateAccuracy(category?: string) {
-    await new Promise(() => 7);
-    return 7;
+    // TODO: modify by query to account for categories if specified
+    const { rows } = await query(
+      `SELECT attempts.successful FROM attempts, users WHERE attempts.user_id = users.id AND users.team_id = ${this.row.id}`,
+    );
+    const attempts = rows[0] as AttemptRow[];
+    if (!attempts) {
+      return 0.0;
+    }
+    const accuracy = attempts.filter((attempt) => attempt.successful).length / attempts.length;
+    return accuracy;
   }
 
   async calculatePoints(category?: string) {
