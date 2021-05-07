@@ -74,7 +74,7 @@ export default class Team {
 
   async setTeamServerID(client: Client, team_server_id: number) {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
-    if (!(await newTeamServer.hasSpace())) throw new NoRoomError();
+    if (!(await newTeamServer.hasSpace(true))) throw new NoRoomError();
 
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role

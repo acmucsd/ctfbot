@@ -199,6 +199,7 @@ export default class TeamServer {
     // );
     // if (teams.length !== 0) throw new DupeTeamError();
     const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
+    console.log(rows);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
 
