@@ -3,6 +3,7 @@ import { parse } from 'date-fns';
 import CommandInteraction from '../../../compat/CommandInteraction';
 import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
+import { CategoryChannel, TextChannel } from 'discord.js';
 
 export default {
   name: 'start',
@@ -23,6 +24,26 @@ export default {
     const date = options.start_date ? parse(options.start_date.toString(), 'yyyy MM dd HH:mm', new Date()) : new Date();
     if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
     await ctf.setStartDate(date);
+    if (!options.start_date) {
+      // loop through every Challenge_Channel and add permission Participant: can view
+      const teamServers = await ctf.getAllTeamServers();
+      // It doesn't like the async for each for some reason
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      teamServers.forEach(async (teamServer) => {
+        const channels = await teamServer.getAllChallengeChannels();
+        // It doesn't like the async for each for some reason
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        channels.forEach(async (channel) => {
+          // Add in check to see if it has any deoendencies
+          await (interaction.client.channels.resolve(channel.channel_snowflake) as TextChannel).updateOverwrite(
+            teamServer.getGuild(interaction.client).roles.resolve(teamServer.row.participant_role_snowflake),
+            {
+              VIEW_CHANNEL: true,
+            },
+          );
+        });
+      });
+    }
     return `CTF start date has been changed to **${date.toString()}**`;
   },
 } as ApplicationCommandDefinition;

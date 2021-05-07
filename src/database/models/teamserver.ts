@@ -37,7 +37,7 @@ export default class TeamServer {
 
     // async queue these for deleting
     await Promise.all(
-      (await this.getAllChallengeCategories()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
+      (await this.getAllChallengeChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
     );
     await Promise.all(
       (await this.getAllCategoryChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
@@ -115,7 +115,7 @@ export default class TeamServer {
     logger(`Set **${this.row.name}**'s participant role`);
   }
 
-  async getAllChallengeCategories() {
+  async getAllChallengeChannels() {
     const { rows: challenge_rows } = await query(
       `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`,
     );
