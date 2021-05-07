@@ -27,16 +27,12 @@ export default {
     if (!options.start_date) {
       // loop through every Challenge_Channel and add permission Participant: can view
       const teamServers = await ctf.getAllTeamServers();
-      const challengesWithPrereqs = await Challenge.getChallengeIDsWithDependencies();
-      // It doesn't like the async for each for some reason
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      teamServers.forEach(async (teamServer) => {
+      const challengesWithPrereqs = new Set(await Challenge.getChallengeIDsWithDependencies());
+      for (const teamServer of teamServers) {
         const challengeChannels = await teamServer.getAllChallengeChannels();
-        // It doesn't like the async for each for some reason
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        challengeChannels.forEach(async (channel) => {
+        for (const channel of challengeChannels) {
           // Checks to see if the challenge is a challenge with a prerequisite
-          if (!challengesWithPrereqs.find((challenge) => challenge === channel.challenge_id)) {
+          if (challengesWithPrereqs.has(channel.challenge_id)) {
             await (interaction.client.channels.resolve(channel.channel_snowflake) as TextChannel).updateOverwrite(
               teamServer.getGuild(interaction.client).roles.resolve(teamServer.row.participant_role_snowflake),
               {
@@ -44,8 +40,8 @@ export default {
               },
             );
           }
-        });
-      });
+        }
+      }
     }
     return `CTF start date has been changed to **${date.toString()}**`;
   },
