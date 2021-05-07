@@ -91,46 +91,45 @@ export default class Team {
     await this.setTeamRoleSnowflakeTeamServer(role.id);
 
     // Make and configure the channel on the new team server
-    await newTeamServer.makeChannel(client, this.row.name.toLowerCase().replace(' ', '-')).then(async (textChannel) => {
-      // Description creation is kept split up for readability
-      let description = `You have joined **${newTeamServer.ctf.row.name}**, and you are currently in your team channel.`;
-      description +=
-        '\n\nTo set your **team name** or **team color**, you can use the `/setname` and `/setcolor` commands respectively.';
-      description +=
-        "\n\nTo **invite** another person onto your team, you'll need to use `/invite @username`. You should do this in the Main Guild. Then, they will need to accept your invite. Similarly, to **join** another team, they will have to invite you first.";
-      description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
-      description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
+    const textChannel = await newTeamServer.makeChannel(client, this.row.name.toLowerCase().replace(' ', '-'));
+    // Description creation is kept split up for readability
+    let description = `You have joined **${newTeamServer.ctf.row.name}**, and you are currently in your team channel.`;
+    description +=
+      '\n\nTo set your **team name** or **team color**, you can use the `/setname` and `/setcolor` commands respectively.';
+    description +=
+      "\n\nTo **invite** another person onto your team, you'll need to use `/invite @username`. You should do this in the Main Guild. Then, they will need to accept your invite. Similarly, to **join** another team, they will have to invite you first.";
+    description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
+    description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
 
-      // // Move team channel to team category
-      // await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
-      //   logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
-      // });
+    // // Move team channel to team category
+    // await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
+    //   logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
+    // });
 
-      // Make sure only the team can view their own team channel
-      await textChannel.overwritePermissions([
-        {
-          id: textChannel.guild.roles.everyone,
-          deny: ['VIEW_CHANNEL'],
-        },
-        {
-          id: textChannel.guild.roles.resolve(this.row.team_role_snowflake_team_server),
-          allow: ['VIEW_CHANNEL'],
-        },
-      ]);
+    // Make sure only the team can view their own team channel
+    await textChannel.overwritePermissions([
+      {
+        id: textChannel.guild.roles.everyone,
+        deny: ['VIEW_CHANNEL'],
+      },
+      {
+        id: textChannel.guild.roles.resolve(this.row.team_role_snowflake_team_server),
+        allow: ['VIEW_CHANNEL'],
+      },
+    ]);
 
-      // Send welcome message
-      await textChannel.send(
-        new MessageEmbed()
-          .setTitle(`Welcome to your personal space, ${this.row.name}`)
-          .setAuthor(`${newTeamServer.row.name} - Team ${this.row.name}`)
-          .setDescription(description)
-          .setTimestamp()
-          .setColor('50c0bf'),
-      );
+    // Send welcome message
+    await textChannel.send(
+      new MessageEmbed()
+        .setTitle(`Welcome to your personal space, ${this.row.name}`)
+        .setAuthor(`${newTeamServer.row.name} - Team ${this.row.name}`)
+        .setDescription(description)
+        .setTimestamp()
+        .setColor('50c0bf'),
+    );
 
-      // Update the database with this channel
-      await this.setTextChannelSnowflake(textChannel.id);
-    });
+    // Update the database with this channel
+    await this.setTextChannelSnowflake(textChannel.id);
   }
 
   // Unique per CTF
