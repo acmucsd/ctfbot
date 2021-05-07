@@ -246,13 +246,13 @@ export default class Team {
       `SELECT attempts.successful, COUNT(attempts.successful)::integer FROM attempts, users WHERE attempts.user_id = users.id AND users.team_id = ${this.row.id} GROUP BY attempts.successful`,
     );
 
-    type Row = {
+    type AccuracyRow = {
       successful: boolean;
       count: number;
     };
 
-    const successfulAttempts = (rows as Row[]).find((row) => row.successful)?.count ?? 0;
-    const unsuccessfulAttempts = (rows as Row[]).find((row) => !row.successful)?.count ?? 0;
+    const successfulAttempts = (rows as AccuracyRow[]).find((row) => row.successful)?.count ?? 0;
+    const unsuccessfulAttempts = (rows as AccuracyRow[]).find((row) => !row.successful)?.count ?? 0;
     const total = successfulAttempts + unsuccessfulAttempts || 1;
 
     return successfulAttempts / total;
@@ -265,7 +265,19 @@ export default class Team {
     const { rows } = await query(
       `SELECT initial_points, min_points, point_decay, solves::integer FROM (SELECT challenges.id as challenge_id, team_id, COUNT(team_id) OVER (PARTITION BY challenge_id) AS solves FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved, challenges WHERE challenge_id = challenges.id AND team_id = ${this.row.id}`,
     );
-    return 7;
+
+    type PointsRow = {
+      initial_points: number;
+      min_points: number;
+      point_decay: number;
+      solves: number;
+    };
+
+    return (rows as PointsRow[]).reduce(
+      (accum, curr) =>
+        accum + Challenge.calculateDynamicPoints(curr.initial_points, curr.min_points, curr.point_decay, curr.solves),
+      0,
+    );
   }
 
   // will return true if anybody on the team has solved the provided challenge, false otherwise

@@ -199,9 +199,13 @@ export default class Challenge {
   }
 
   getCurrentPoints(solves: number) {
-    const a = this.row.initial_points || 0;
-    const b = this.row.min_points || 0;
-    const s = this.row.point_decay || 1;
+    return Challenge.calculateDynamicPoints(this.row.initial_points, this.row.min_points, this.row.point_decay, solves);
+  }
+
+  static calculateDynamicPoints(initialPoints: number, minPoints: number, pointDecay: number, solves: number) {
+    const a = initialPoints || 0;
+    const b = minPoints || 0;
+    const s = pointDecay || 1;
 
     return Math.max(Math.ceil(((b - a) / (s * s)) * (solves * solves) + a), b);
   }
