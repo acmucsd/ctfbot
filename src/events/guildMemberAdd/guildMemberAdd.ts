@@ -30,7 +30,7 @@ const guildMemberAddEvent = async (member: GuildMember) => {
       // Give them their team role back
       const team = await ctf.fromUserTeam(member.user.id);
       await member.roles.add([
-        team.row.team_role_snowflake_main,
+        //team.row.team_role_snowflake_main,
         ctf.row.participant_role_snowflake,
         (await CTF.fromIdTeamServer(team.row.team_server_id)).row.invite_role_snowflake,
       ]);

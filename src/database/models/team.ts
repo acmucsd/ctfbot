@@ -143,7 +143,8 @@ export default class Team {
     await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [newName]);
     this.row.name = newName;
 
-    await ctf.setRoleName(client, this.row.team_role_snowflake_main, `Team ${newName}`);
+    if (this.row.team_role_snowflake_main)
+      await ctf.setRoleName(client, this.row.team_role_snowflake_main, `Team ${newName}`);
     if (this.row.team_role_snowflake_main !== this.row.team_role_snowflake_team_server) {
       await teamServer.setRoleName(client, this.row.team_role_snowflake_team_server, newName);
     }
@@ -167,7 +168,7 @@ export default class Team {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
     await teamServer.setRoleColor(client, this.row.team_role_snowflake_team_server, color);
-    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
+    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake && this.row.team_role_snowflake_main) {
       await ctf.setRoleColor(client, this.row.team_role_snowflake_main, color);
     }
     return `Changed **${this.row.name}**'s color ${oldColor != null ? `from **${oldColor}** ` : ''}to **${color}**`;
@@ -213,7 +214,7 @@ export default class Team {
 
     // main guild
     const mainGuildMember = oldTeamServer.ctf.getGuild(client).member(user.row.user_snowflake);
-    await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
+    if (this.row.team_role_snowflake_main) await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
 
     // IF the user is already on the right TeamServer, grant new roles
     const newTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);

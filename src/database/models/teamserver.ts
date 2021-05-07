@@ -204,11 +204,11 @@ export default class TeamServer {
     await team.setTeamServerID(client, this.row.id);
 
     // The team server role has already been created, this is for the main server role
-    await team.setTeamRoleSnowflakeMain(
-      this.row.guild_snowflake === ctf.row.guild_snowflake
-        ? team.row.team_role_snowflake_team_server
-        : (await ctf.makeRole(client, `Team ${name}`)).id,
-    );
+    // await team.setTeamRoleSnowflakeMain(
+    //   this.row.guild_snowflake === ctf.row.guild_snowflake
+    //     ? team.row.team_role_snowflake_team_server
+    //     : (await ctf.makeRole(client, `Team ${name}`)).id,
+    // );
     return team;
   }
 

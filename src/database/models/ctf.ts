@@ -660,7 +660,7 @@ export default class CTF {
     user = member.client.guilds.resolve(this.row.guild_snowflake).members.resolve(member.id);
     // TODO: Edge case that user is false
     if (user) {
-      await user.roles.add(team.row.team_role_snowflake_main);
+      if (team.row.team_role_snowflake_main) await user.roles.add(team.row.team_role_snowflake_main);
       await user.roles.add(this.row.participant_role_snowflake);
       await user.roles.add(teamServer.row.invite_role_snowflake);
       // send a DM with the team server link
