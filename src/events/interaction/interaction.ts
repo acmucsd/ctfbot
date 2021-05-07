@@ -90,15 +90,15 @@ export const registerCommands = async (client: Client) => {
   logger(`registered global commands`);
   // register commands for all current guilds
   // TODO: we probably don't actually need this, lol
-  for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
-    try {
-      const ctf = await CTF.fromGuildSnowflakeCTF(guildID);
-      await ctf.registerCommands(client);
-      logger(`registered commands for guild ${guildID}`);
-    } catch (e) {
-      logger(e);
-      logger(`no ctf in guild ${guildID}`);
-    }
-  }
+  // for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
+  //   try {
+  //     const ctf = await CTF.fromGuildSnowflakeCTF(guildID);
+  //     await ctf.registerCommands(client);
+  //     logger(`registered commands for guild ${guildID}`);
+  //   } catch (e) {
+  //     logger(e);
+  //     logger(`no ctf in guild ${guildID}`);
+  //   }
+  // }
   logger('commands registered');
 };

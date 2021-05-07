@@ -167,6 +167,10 @@ export default class Challenge {
       congratsMessage.setColor('50c0bf');
 
       await channel.send(congratsMessage);
+
+      // update points and such
+      await this.updateChallengeChannels(client);
+
       return attempt;
     }
 

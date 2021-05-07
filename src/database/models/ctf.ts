@@ -159,9 +159,93 @@ export default class CTF {
     }
   }
 
-  // No category supplied will give the top teams
-  async getScoreboard() {
-    const { rows } = await query(`SELECT * FROM teams WHERE ctf_id = ${this.row.id}`);
+  // updates the scoreboard in the CTF scoreboard chat
+  // TODO: assumes you are running one CTF, please fix
+  async updateScoreboard(client: Client) {
+    if (!this.row.scoreboard_channel_snowflake) {
+      logger('Scoreboard channel is not defined, skipping update');
+      return;
+    }
+
+    // first we need to calculate how many points each challenge is currently worth
+    const { rows: challengePointRows } = await query(
+      `SELECT challenge_id, initial_points, min_points, point_decay, solves::integer FROM (SELECT challenges.id as challenge_id, team_id, COUNT(team_id) OVER (PARTITION BY challenge_id) AS solves FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved, challenges WHERE challenge_id = challenges.id`,
+    );
+
+    type ChallengePointsRow = {
+      challenge_id: number;
+      initial_points: number;
+      min_points: number;
+      point_decay: number;
+      solves: number;
+    };
+
+    const challengePointMap = (challengePointRows as ChallengePointsRow[]).reduce((accum, curr) => {
+      accum[curr.challenge_id] = Challenge.calculateDynamicPoints(
+        curr.initial_points,
+        curr.min_points,
+        curr.point_decay,
+        curr.solves,
+      );
+      return accum;
+    }, {});
+
+    // second, we need to fetch which teams have completed which challenges
+
+    const { rows: challengeTeamRows } = await query(
+      `SELECT challenges.id as challenge_id, users.team_id, teams.name as team_name FROM challenges, attempts, users, teams WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true AND users.team_id = teams.id`,
+    );
+
+    type ChallengeTeamRow = {
+      challenge_id: number;
+      team_id: number;
+      team_name: string;
+    };
+
+    // third, we compute the total points (and accuracy) of each team
+
+    const teams = (challengeTeamRows as ChallengeTeamRow[]).reduce(
+      (accum: { [key: number]: { points: number; name: string } }, curr) => {
+        accum[curr.team_id] = accum[curr.team_id] || { points: 0, name: curr.team_name };
+        accum[curr.team_id].points += challengePointMap[curr.challenge_id];
+        return accum;
+      },
+      {},
+    );
+
+    // fourth, we sort, first by points, secondly by accuracy, thirdly by time
+    const sortedTeams = Object.entries(teams)
+      .map((team) => ({ id: team[0], ...team[1] }))
+      .sort((a, b) => b.points - a.points);
+
+    // now we update our channel!
+
+    const description = [
+      '```java',
+      ...sortedTeams.map((team, i) => `${i} - ${team.name}${' '.repeat(50 - team.name.length)}${team.points}`),
+      '```',
+    ];
+
+    const scoreboardMessage = new MessageEmbed();
+    scoreboardMessage
+      .setTitle('Scoreboard')
+      .setColor('')
+      .setDescription(description.join('\n').substring(0, 2048))
+      .setTimestamp();
+
+    const guildChannel = client.channels.resolve(this.row.scoreboard_channel_snowflake) as TextChannel;
+    const messages = await guildChannel.messages.fetch();
+
+    // find only the messages we've sent
+    const botMessages = messages.filter((message) => message.author.id === client.user.id);
+    // if the challenge messages don't already exist, we need to send them
+    if (!botMessages || botMessages.size === 0) {
+      await guildChannel.send(scoreboardMessage);
+      return;
+    }
+
+    // otherwise, we need to edit them
+    await botMessages.array()[0].edit(scoreboardMessage);
   }
 
   // async getCategoryScoreboard(category: Category) {}
