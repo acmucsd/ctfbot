@@ -34,16 +34,14 @@ export default class TeamServer {
     logger(`Deleted all team channels and roles.`);
 
     // delete all category and challenge channels
-    const { rows: challenge_rows } = await query(
-      `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`,
-    );
-    const challengeChannels = challenge_rows as ChallengeChannelRow[];
-    const { rows: category_rows } = await query(`SELECT * FROM category_channels WHERE teamserver_id = ${this.row.id}`);
-    const categoryChannels = category_rows as CategoryChannelRow[];
 
     // async queue these for deleting
-    await Promise.all(challengeChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()));
-    await Promise.all(categoryChannels.map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()));
+    await Promise.all(
+      (await this.getAllChallengeCategories()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
+    );
+    await Promise.all(
+      (await this.getAllCategoryChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
+    );
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
@@ -115,6 +113,18 @@ export default class TeamServer {
     await query(`UPDATE team_servers SET participant_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
     this.row.participant_role_snowflake = role.id;
     logger(`Set **${this.row.name}**'s participant role`);
+  }
+
+  async getAllChallengeCategories() {
+    const { rows: challenge_rows } = await query(
+      `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`,
+    );
+    return challenge_rows as ChallengeChannelRow[];
+  }
+
+  async getAllCategoryChannels() {
+    const { rows: category_rows } = await query(`SELECT * FROM category_channels WHERE teamserver_id = ${this.row.id}`);
+    return category_rows as CategoryChannelRow[];
   }
 
   /**
