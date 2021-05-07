@@ -26,6 +26,7 @@ export default {
     const category = await challenge.getCategory();
 
     const attachments = await challenge.getAllAttachments();
+    const dependencies = await challenge.getChallengeDependencies();
 
     // complicated embedded response
     await interaction.reply({
@@ -54,6 +55,11 @@ export default {
               name: 'flag',
               value: `||${challenge.row.flag}||`,
               inline: true,
+            },
+            {
+              name: 'challenge dependencies',
+              value: dependencies.join(', '),
+              inline: false,
             },
           ],
           author: {
