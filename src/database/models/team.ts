@@ -101,10 +101,10 @@ export default class Team {
       description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
       description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
 
-      // Move team channel to team category
-      await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
-        logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
-      });
+      // // Move team channel to team category
+      // await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
+      //   logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
+      // });
 
       // Make sure only the team can view their own team channel
       await textChannel.overwritePermissions([
