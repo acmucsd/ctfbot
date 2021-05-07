@@ -323,7 +323,7 @@ export default class Challenge {
     const solves = await this.getSolves();
     // if there are no solves, the message is slightly different
     if (solves === 0) {
-      solvesMessage.setTitle('🚨 This challenge current has no solves! 🚨');
+      solvesMessage.setTitle('🚨 This challenge currently has no solves! 🚨');
       solvesMessage.setDescription('Do you have what it takes to be the first?');
     } else {
       const user = await User.fromID(this.row.first_blood_id);
