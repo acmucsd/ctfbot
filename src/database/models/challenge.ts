@@ -157,7 +157,9 @@ export default class Challenge {
 
       // add a check in /submit that, after a successful submit, give that team role permission to
       // view the unlocked challenges. Also, add that channels were unlocked to the congrats message.
+      // TODO: doesn't handle the case where there are multiple dependencies for one challenge
       const newChallengeIDs = await this.getChallengeDependencies();
+      const newChallengeIDSet = new Set(newChallengeIDs);
       const newChallengeNames = newChallengeIDs.map(
         async (challengeID) => await CTF.fromIDChallenge(challengeID.toString()),
       );
@@ -168,28 +170,27 @@ export default class Challenge {
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
       // congratsMessage.addField('Place Overall', `${21}`);
-      congratsMessage.addField(
-        'Challenges Unlocked',
-        `${newChallengeNames.map(async (name) => `#${await name}`).join(', ')}`,
-      );
+      if (newChallengeNames)
+        congratsMessage.addField(
+          'Challenges Unlocked',
+          `${newChallengeNames.map(async (name) => `#${await name}`).join(', ')}`,
+        );
       congratsMessage.setTimestamp();
       congratsMessage.setColor('50c0bf');
 
+      await channel.send(congratsMessage);
+
       const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
       const challengeChannels = await teamServer.getAllChallengeChannels();
-      const relevantChallengeChannels = challengeChannels.filter((chal) =>
-        newChallengeIDs.find((c) => c === chal.challenge_id),
-      );
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      relevantChallengeChannels.forEach(async (c) => {
+      const relevantChallengeChannels = challengeChannels.filter((chal) => newChallengeIDSet.has(chal.challenge_id));
+
+      for (const c of relevantChallengeChannels) {
         await channel.guild.channels
           .resolve(c.channel_snowflake)
           .updateOverwrite(channel.guild.roles.resolve(team.row.team_role_snowflake_team_server), {
             VIEW_CHANNEL: true,
           });
-      });
-
-      await channel.send(congratsMessage);
+      }
 
       // update points and such
       await this.updateChallengeChannels(client);
