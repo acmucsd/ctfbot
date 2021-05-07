@@ -25,5 +25,7 @@ export default {
     const main = await ctf.fromChannelSnowflakeChallenge(options.main_challenge as string);
     const prereq = await ctf.fromChannelSnowflakeChallenge(options.prerequisite_challenge as string);
     await main.addChallengeDependency(prereq);
+
+    return `Challenge **${prereq.row.name}** added as a prerequesite to challenge **${main.row.name}**.`;
   },
 };

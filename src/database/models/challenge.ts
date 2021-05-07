@@ -155,32 +155,15 @@ export default class Challenge {
       // update first blood
       if (solves === 1) await this.setFirstBlood(client, user.row.id);
 
+      const channel = await team.getTeamChannel(client);
+      const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
+
       // add a check in /submit that, after a successful submit, give that team role permission to
       // view the unlocked challenges. Also, add that channels were unlocked to the congrats message.
       // TODO: doesn't handle the case where there are multiple dependencies for one challenge
       const newChallengeIDs = await this.getChallengeDependencies();
       const newChallengeIDSet = new Set(newChallengeIDs);
-      const newChallengeNames = newChallengeIDs.map(
-        async (challengeID) => await CTF.fromIDChallenge(challengeID.toString()),
-      );
-      const channel = await team.getTeamChannel(client);
-      const congratsMessage = new MessageEmbed();
-      congratsMessage.setTitle('🎉 Congratulations! 🎉');
-      congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
-      congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
-      congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
-      // congratsMessage.addField('Place Overall', `${21}`);
-      if (newChallengeNames)
-        congratsMessage.addField(
-          'Challenges Unlocked',
-          `${newChallengeNames.map(async (name) => `#${await name}`).join(', ')}`,
-        );
-      congratsMessage.setTimestamp();
-      congratsMessage.setColor('50c0bf');
 
-      await channel.send(congratsMessage);
-
-      const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
       const challengeChannels = await teamServer.getAllChallengeChannels();
       const relevantChallengeChannels = challengeChannels.filter((chal) => newChallengeIDSet.has(chal.challenge_id));
 
@@ -191,6 +174,22 @@ export default class Challenge {
             VIEW_CHANNEL: true,
           });
       }
+
+      const congratsMessage = new MessageEmbed();
+      congratsMessage.setTitle('🎉 Congratulations! 🎉');
+      congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
+      congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
+      congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
+      // congratsMessage.addField('Place Overall', `${21}`);
+      if (relevantChallengeChannels)
+        congratsMessage.addField(
+          'Challenges Unlocked',
+          `${relevantChallengeChannels.map((c) => `<#${c.channel_snowflake}>`).join(', ')}`,
+        );
+      congratsMessage.setTimestamp();
+      congratsMessage.setColor('50c0bf');
+
+      await channel.send(congratsMessage);
 
       // update points and such
       await this.updateChallengeChannels(client);
@@ -273,7 +272,11 @@ export default class Challenge {
   // Gets all challenges who have dependencies
   static async getChallengeIDsWithDependencies() {
     const { rows } = await query('SELECT DISTINCT main_challenge_id FROM challenge_dependencies');
-    return rows as number[];
+
+    type challengeIDRows = { main_challenge_id: number };
+
+    const results = rows as challengeIDRows[];
+    return results.map((result) => result.main_challenge_id);
   }
 
   // Gets all challenges who had this as a prerequisite
@@ -281,7 +284,11 @@ export default class Challenge {
     const { rows } = await query(
       `SELECT main_challenge_id FROM challenge_dependencies WHERE challenge_dependency_id = ${this.row.id}`,
     );
-    return rows as number[];
+
+    type challengeIDRows = { main_challenge_id: number };
+
+    const results = rows as challengeIDRows[];
+    return results.map((result) => result.main_challenge_id);
   }
 
   // get challenge category
