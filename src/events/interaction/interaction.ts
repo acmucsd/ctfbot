@@ -92,8 +92,8 @@ export const registerCommands = async (client: Client) => {
   // TODO: we probably don't actually need this, lol
   for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
     try {
-      const ctf = await CTF.fromGuildSnowflakeCTF(guildID);
-      await ctf.registerCommands(client);
+      const ts = await CTF.fromTeamServerGuildSnowflakeTeamServer(guildID);
+      await ts.registerCommands(client);
       logger(`registered commands for guild ${guildID}`);
     } catch (e) {
       logger(e);
