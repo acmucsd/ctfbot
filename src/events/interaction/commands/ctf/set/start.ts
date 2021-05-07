@@ -31,8 +31,8 @@ export default {
       for (const teamServer of teamServers) {
         const challengeChannels = await teamServer.getAllChallengeChannels();
         for (const channel of challengeChannels) {
-          // Checks to see if the challenge is a challenge with a prerequisite
-          if (challengesWithPrereqs.has(channel.challenge_id)) {
+          // only publish challenges that don't have prereqs
+          if (!challengesWithPrereqs.has(channel.challenge_id)) {
             await (interaction.client.channels.resolve(channel.channel_snowflake) as TextChannel).updateOverwrite(
               teamServer.getGuild(interaction.client).roles.resolve(teamServer.row.participant_role_snowflake),
               {
