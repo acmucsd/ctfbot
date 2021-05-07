@@ -254,7 +254,12 @@ export default class Team {
   }
 
   async calculatePoints(category?: string) {
-    await new Promise(() => 7);
+    // first, which challenges have been solved by this team?
+    // second, how many points is each challenge worth?
+    // third, what is the sum?
+    const { rows } = await query(
+      `SELECT challenge_id, COUNT(team_id) OVER (PARTITION BY challenge_id) FROM (SELECT challenges.id as challenge_id, users.team_id FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved WHERE team_id = ${this.row.id}`,
+    );
     return 7;
   }
 
