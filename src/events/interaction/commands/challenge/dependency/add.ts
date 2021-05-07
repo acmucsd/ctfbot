@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import CommandInteraction from '../../../compat/CommandInteraction';
+import { CTF } from '../../../../../database/models';
 
 export default {
   name: 'add',
@@ -13,11 +14,16 @@ export default {
       required: true,
     },
     {
-      name: 'challenge_channel',
+      name: 'prerequisite_challenge',
       description: 'The challenge to add as a dependency/prerequisite',
       type: ApplicationCommandOptionType.CHANNEL,
       required: true,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {},
+  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    const main = await ctf.fromChannelSnowflakeChallenge(options.main_challenge as string);
+    const prereq = await ctf.fromChannelSnowflakeChallenge(options.prerequisite_challenge as string);
+    await main.addChallengeDependency(prereq);
+  },
 };

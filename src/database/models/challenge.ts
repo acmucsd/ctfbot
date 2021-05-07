@@ -214,6 +214,52 @@ export default class Challenge {
     return Math.max(Math.ceil(((b - a) / (s * s)) * (solves * solves) + a), b);
   }
 
+  async addChallengeDependency(challenge: Challenge) {
+    const { rows } = await query(
+      `SELECT * FROM challenge_dependencies WHERE main_challenge_id = ${this.row.id} AND challenge_dependency_id = ${challenge.row.id}`,
+    );
+
+    if (rows[0]) {
+      throw new Error('That challenge is already a prerequisite for the secified challenge');
+    }
+
+    await query(
+      `INSERT INTO challenge_dependencies(main_challenge_id, challenge_dependency_id) VALUES (${this.row.id}, ${challenge.row.id}) RETURNING *`,
+    );
+
+    return `Added **${challenge.removeChallengeDependency.name}** as a prerequisite for **${this.row.id}**`;
+  }
+
+  async removeChallengeDependency(challenge: Challenge) {
+    const { rows } = await query(
+      `SELECT * FROM challenge_dependencies WHERE main_challenge_id = ${this.row.id} AND challenge_dependency_id = ${challenge.row.id}`,
+    );
+
+    if (!rows) {
+      throw new Error("That challenge isn't a prerequisite for the secified challenge");
+    }
+
+    await query(
+      `DELETE FROM challenge_dependencies WHERE main_challenge_id = ${this.row.id} AND challenge_dependency_id = ${challenge.row.id}`,
+    );
+
+    return `Removed **${challenge.removeChallengeDependency.name}** as a prerequisite from **${this.row.id}**`;
+  }
+
+  // Gets all challenges who have dependencies
+  static async getChallengeIDsWithDependencies() {
+    const { rows } = await query('SELECT DISTINCT main_challenge_id FROM challenge_dependencies');
+    return rows as number[];
+  }
+
+  // Gets all challenges who had this as a prerequisite
+  async getChallengeDependencies() {
+    const { rows } = await query(
+      `SELECT main_challenge_id FROM challenge_dependencies WHERE challenge_dependency_id = ${this.row.id}`,
+    );
+    return rows as number[];
+  }
+
   // get challenge category
   async getCategory() {
     const { rows } = await query(`SELECT * FROM categories WHERE id = ${this.row.category_id}`);

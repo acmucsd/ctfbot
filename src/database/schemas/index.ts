@@ -10,6 +10,7 @@ import { schema as challengesSchema } from './challenge';
 import { schema as challengeChannelsSchema } from './challenge_channel';
 import { schema as attemptsSchema } from './attempt';
 import { schema as attachmentsSchema } from './attachment';
+import { schema as challengeDependencySchema } from './challenge_dependency';
 
 // add schemas to this as we go
 const schemas = [
@@ -24,6 +25,7 @@ const schemas = [
   challengeChannelsSchema,
   attemptsSchema,
   attachmentsSchema,
+  challengeDependencySchema,
 ];
 
 // janky code that waits for each table to initialize before declaring the next one
@@ -45,3 +47,4 @@ export { InviteRow } from './invite';
 export { TeamRow } from './team';
 export { TeamServerRow } from './teamserver';
 export { UserRow } from './user';
+export { ChallengeDependencyRow } from './challenge_dependency';
