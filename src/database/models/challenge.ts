@@ -161,8 +161,8 @@ export default class Challenge {
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
-      congratsMessage.addField('Place Overall', `${21}`);
-      congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
+      // congratsMessage.addField('Place Overall', `${21}`);
+      // congratsMessage.addField('Challenges Unlocked', '#mann-hunt2');
       congratsMessage.setTimestamp();
       congratsMessage.setColor('50c0bf');
 

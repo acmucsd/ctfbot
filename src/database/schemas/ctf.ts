@@ -8,6 +8,7 @@ export const schema = `CREATE TABLE IF NOT EXISTS ctfs (
     admin_role_snowflake text,
     participant_role_snowflake text,
     announcements_channel_snowflake text,
+    scoreboard_channel_snowflake text,
     tos_channel_snowflake text,
     tos_webhook_snowflake text,
     info_category_snowflake text,
@@ -24,6 +25,7 @@ export interface CTFRow {
   admin_role_snowflake: string | null;
   participant_role_snowflake: string | null;
   announcements_channel_snowflake: string | null;
+  scoreboard_channel_snowflake: string | null;
   tos_channel_snowflake: string | null;
   tos_webhook_snowflake: string | null;
   info_category_snowflake: string | null;

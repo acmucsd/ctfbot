@@ -56,6 +56,10 @@ export default class CTF {
 
     const info = await ctf.makeChannelCategory(client, 'Info');
     await ctf.setInfoCategory(info.id);
+    await info.updateOverwrite(info.guild.roles.everyone, {
+      SEND_MESSAGES: false,
+      ADD_REACTIONS: false,
+    });
 
     const tosChannel = await ctf.makeChannel(client, 'terms of service');
     await tosChannel.setParent(info.id);
@@ -64,6 +68,10 @@ export default class CTF {
       ADD_REACTIONS: false,
     });
     await ctf.setTOSChannel(tosChannel.id);
+
+    const scoreboardChannel = await ctf.makeChannel(client, 'scoreboard');
+    await scoreboardChannel.setParent(info.id);
+    await ctf.setScoreboardChannel(scoreboardChannel.id);
 
     const tosWebhook = await tosChannel.createWebhook('Terms of Service');
     const tosMessage = await tosWebhook.send(TOSMessage);
@@ -92,6 +100,12 @@ export default class CTF {
 
     await client.channels
       .resolve(this.row.tos_channel_snowflake)
+      ?.delete()
+      .catch(() => {} /* do nothing, this just means it was already gone */);
+    logger('Removed TOS channel');
+
+    await client.channels
+      .resolve(this.row.scoreboard_channel_snowflake)
       ?.delete()
       .catch(() => {} /* do nothing, this just means it was already gone */);
     logger('Removed TOS channel');
@@ -146,12 +160,8 @@ export default class CTF {
   }
 
   // No category supplied will give the top teams
-  async getScoreboard(category?: string) {
+  async getScoreboard() {
     const { rows } = await query(`SELECT * FROM teams WHERE ctf_id = ${this.row.id}`);
-    const teams = rows.map(async (teamRow) => await new Team(teamRow).getMinimalTeam(category));
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const minimalTeams = (await Promise.all(teams)).sort(Team.teamCompare.bind(this)).slice(0, 20);
-    logger(minimalTeams.map((team) => `${team.name} has ${team.points} with ${team.accuracy}`).toString());
   }
 
   // async getCategoryScoreboard(category: Category) {}
@@ -184,6 +194,14 @@ export default class CTF {
     await query(`UPDATE ctfs SET tos_channel_snowflake = $1 WHERE id = ${this.row.id}`, [tos_channel_snowflake]);
     this.row.tos_channel_snowflake = tos_channel_snowflake;
     logger(`Set **${this.row.name}**'s TOS channel`);
+  }
+
+  async setScoreboardChannel(scoreboard_channel_snowflake: string) {
+    await query(`UPDATE ctfs SET scoreboard_channel_snowflake = $1 WHERE id = ${this.row.id}`, [
+      scoreboard_channel_snowflake,
+    ]);
+    this.row.scoreboard_channel_snowflake = scoreboard_channel_snowflake;
+    logger(`Set **${this.row.name}**'s Scoreboard channel`);
   }
 
   async setTOSWebhook(tos_webhook_snowflake: string) {
