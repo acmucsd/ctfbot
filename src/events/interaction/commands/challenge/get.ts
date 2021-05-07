@@ -57,7 +57,7 @@ export default {
               inline: true,
             },
             {
-              name: 'challenge dependencies',
+              name: 'unlocks',
               value: `ids ${dependencies.join(', ')}`,
               inline: false,
             },
