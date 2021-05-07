@@ -197,7 +197,7 @@ export default class TeamServer {
         team.row.name === name ||
         team.row.name.toLowerCase().replace(' ', '-') === name.toLowerCase().replace(' ', '-'),
     );
-    if (teams.length !== 0) throw new DupeTeamError();
+    //if (teams.length !== 0) throw new DupeTeamError();
     const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
