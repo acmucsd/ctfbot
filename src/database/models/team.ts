@@ -243,14 +243,19 @@ export default class Team {
   async calculateAccuracy(category?: string) {
     // TODO: modify by query to account for categories if specified
     const { rows } = await query(
-      `SELECT attempts.successful FROM attempts, users WHERE attempts.user_id = users.id AND users.team_id = ${this.row.id}`,
+      `SELECT attempts.successful, COUNT(attempts.successful)::integer FROM attempts, users WHERE attempts.user_id = users.id AND users.team_id = ${this.row.id} GROUP BY attempts.successful`,
     );
-    const attempts = rows[0] as AttemptRow[];
-    if (!attempts) {
-      return 0.0;
-    }
-    const accuracy = attempts.filter((attempt) => attempt.successful).length / attempts.length;
-    return accuracy;
+
+    type Row = {
+      successful: boolean;
+      count: number;
+    };
+
+    const successfulAttempts = (rows as Row[]).find((row) => row.successful)?.count ?? 0;
+    const unsuccessfulAttempts = (rows as Row[]).find((row) => !row.successful)?.count ?? 0;
+    const total = successfulAttempts + unsuccessfulAttempts || 1;
+
+    return successfulAttempts / total;
   }
 
   async calculatePoints(category?: string) {
@@ -258,7 +263,7 @@ export default class Team {
     // second, how many points is each challenge worth?
     // third, what is the sum?
     const { rows } = await query(
-      `SELECT challenge_id, COUNT(team_id) OVER (PARTITION BY challenge_id) FROM (SELECT challenges.id as challenge_id, users.team_id FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved WHERE team_id = ${this.row.id}`,
+      `SELECT initial_points, min_points, point_decay, solves::integer FROM (SELECT challenges.id as challenge_id, team_id, COUNT(team_id) OVER (PARTITION BY challenge_id) AS solves FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved, challenges WHERE challenge_id = challenges.id AND team_id = ${this.row.id}`,
     );
     return 7;
   }
