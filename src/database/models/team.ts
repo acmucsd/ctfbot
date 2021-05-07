@@ -216,17 +216,43 @@ export default class Team {
 
     // IF the user is already on the right TeamServer, grant new roles
     const newTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+    const newTeamServerGuild = newTeamServer.getGuild(client);
     if (oldTeamServer.row.id === newTeamServer.row.id)
       await guildMember.roles.add(this.row.team_role_snowflake_team_server);
     // otherwise, just defer to when they join the new teamserver
     // btw we should kick them if this isn't the main guild
     else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake) {
-      await guildMember.kick('You need to join your new team server');
+      guildMember
+        .send(
+          new MessageEmbed()
+            .setTitle("You've been relocated!")
+            .setTimestamp()
+            .setDescription(
+              `Hey there! Because Team ${this.row.name} isn't on your previous team server, you've been relocated to their team server. Please join it here!`,
+            )
+            .setColor('50c0bf'),
+        )
+        .then(async () => {
+          await guildMember.send(`https://discord.gg/${newTeamServer.row.server_invite}`);
+          logger(`DM'd ${guildMember.user.username} that they must move to ${newTeamServerGuild.name}`);
+        })
+        .catch(() => {
+          logger(`Unable to DM ${guildMember.user.username}`);
+        });
+      await guildMember.kick('User was moved to a different team server');
       // we'll also need to make sure we get the right TS role in the main guild
       await mainGuildMember.roles.remove(oldTeamServer.row.invite_role_snowflake);
       await mainGuildMember.roles.add(newTeamServer.row.invite_role_snowflake);
     }
 
+    // Send a message to the new team server announcing their acceptance
+    await (newTeamServerGuild.channels.resolve(this.row.text_channel_snowflake) as TextChannel).send(
+      new MessageEmbed()
+        .setTitle(`Welcome ${guildMember.user.username} to Team ${this.row.name}!`)
+        .setTimestamp()
+        .setDescription(`Go forth and solve challenges!`)
+        .setColor('50c0bf'),
+    );
     logger(
       `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
         this.row.id
