@@ -218,43 +218,48 @@ export default class CTF {
       .map((team) => ({ id: team[0], ...team[1] }))
       .sort((a, b) => b.points - a.points);
 
-    // now we update our channel!
-
-    const description = sortedTeams
-      .map(
-        (team, i) =>
-          `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name}${' '.repeat(35 - team.name.length)}${' '.repeat(
-            4 - `${team.points}`.length,
-          )}${team.points}`,
-      )
-      .join('\n')
-      .substring(0, 2000);
-
+    // compute the total points possible in the ctf
     const pointsPossible = Object.values(challengePointMap).reduce(
       (accum: number, curr: number) => accum + curr,
       0,
     ) as number;
 
-    const scoreboardMessage = new MessageEmbed();
-    scoreboardMessage
-      .setTitle(`Scoreboard - ${pointsPossible} Points Possible`)
-      .setColor('50c0bf')
-      .setDescription(`\`\`\`java\n${description}\n\`\`\``)
-      .setTimestamp();
+    // now we update our channel!
 
-    const guildChannel = client.channels.resolve(this.row.scoreboard_channel_snowflake) as TextChannel;
-    const messages = await guildChannel.messages.fetch();
+    const scoreboardLines = sortedTeams.map(
+      (team, i) =>
+        `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name}${' '.repeat(35 - team.name.length)}${' '.repeat(
+          4 - `${team.points}`.length,
+        )}${team.points}`,
+    );
 
     // find only the messages we've sent
-    const botMessages = messages.filter((message) => message.author.id === client.user.id);
-    // if the challenge messages don't already exist, we need to send them
-    if (!botMessages || botMessages.size === 0) {
-      await guildChannel.send(scoreboardMessage);
-      return;
+    const guildChannel = client.channels.resolve(this.row.scoreboard_channel_snowflake) as TextChannel;
+    const messages = await guildChannel.messages.fetch();
+    const botMessages = messages.filter((message) => message.author.id === client.user.id).array();
+
+    while (scoreboardLines) {
+      // we can only print 43 lines at a time
+      const description = scoreboardLines.splice(0, 43).join('\n');
+      const scoreboardMessage = new MessageEmbed();
+      scoreboardMessage
+        .setTitle(`Scoreboard - ${pointsPossible} Points Possible`)
+        .setColor('50c0bf')
+        .setDescription(`\`\`\`java\n${description}\n\`\`\``)
+        .setTimestamp();
+
+      // if the challenge messages don't already exist, we need to send them
+      if (!botMessages || botMessages.length === 0) {
+        await guildChannel.send(scoreboardMessage);
+        continue;
+      }
+
+      // otherwise, we need to edit them
+      await botMessages.pop().edit(scoreboardMessage);
     }
 
-    // otherwise, we need to edit them
-    await botMessages.array()[0].edit(scoreboardMessage);
+    // whatever messages are left in the array need to be deleted
+    while (botMessages) await botMessages.pop().delete();
   }
 
   // async getCategoryScoreboard(category: Category) {}
