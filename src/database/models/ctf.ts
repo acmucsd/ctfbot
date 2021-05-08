@@ -222,7 +222,7 @@ export default class CTF {
 
     const description = sortedTeams
       .map((team, i) => `${i} - ${team.name}${' '.repeat(50 - team.name.length)}${team.points}`)
-      .join('/n')
+      .join('\n')
       .substring(0, 2000);
 
     const scoreboardMessage = new MessageEmbed();
