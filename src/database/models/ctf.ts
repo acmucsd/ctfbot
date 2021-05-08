@@ -159,14 +159,8 @@ export default class CTF {
     }
   }
 
-  // updates the scoreboard in the CTF scoreboard chat
-  // TODO: assumes you are running one CTF, please fix
-  async updateScoreboard(client: Client) {
-    if (!this.row.scoreboard_channel_snowflake) {
-      logger('Scoreboard channel is not defined, skipping update');
-      return;
-    }
-
+  // compute useful information for calculating scoreboard and ranking
+  async computeStatistics() {
     // first we need to calculate how many points each challenge is currently worth
     const { rows: challengePointRows } = await query(
       `SELECT challenge_id, initial_points, min_points, point_decay, solves::integer FROM (SELECT challenges.id as challenge_id, team_id, COUNT(team_id) OVER (PARTITION BY challenge_id) AS solves FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true) AS solved, challenges WHERE challenge_id = challenges.id`,
@@ -202,16 +196,15 @@ export default class CTF {
       team_name: string;
     };
 
+    const challengesByTeams = challengeTeamRows as ChallengeTeamRow[];
+
     // third, we compute the total points (and accuracy) of each team
 
-    const teams = (challengeTeamRows as ChallengeTeamRow[]).reduce(
-      (accum: { [key: number]: { points: number; name: string } }, curr) => {
-        accum[curr.team_id] = accum[curr.team_id] || { points: 0, name: curr.team_name };
-        accum[curr.team_id].points += challengePointMap[curr.challenge_id];
-        return accum;
-      },
-      {},
-    );
+    const teams = challengesByTeams.reduce((accum: { [key: number]: { points: number; name: string } }, curr) => {
+      accum[curr.team_id] = accum[curr.team_id] || { points: 0, name: curr.team_name };
+      accum[curr.team_id].points += challengePointMap[curr.challenge_id];
+      return accum;
+    }, {});
 
     // fourth, we sort, first by points, secondly by accuracy, thirdly by time
     const sortedTeams = Object.entries(teams)
@@ -223,6 +216,21 @@ export default class CTF {
       (accum: number, curr: number) => accum + curr,
       0,
     ) as number;
+
+    return { challengePointMap, challengesByTeams, sortedTeams, pointsPossible };
+  }
+
+  // updates the scoreboard in the CTF scoreboard chat
+  // TODO: assumes you are running one CTF, please fix
+  async updateScoreboard(client: Client) {
+    if (!this.row.scoreboard_channel_snowflake) {
+      logger('Scoreboard channel is not defined, skipping update');
+      return;
+    }
+
+    // grab data from magic function
+    // apes stronger together
+    const { sortedTeams, pointsPossible } = await this.computeStatistics();
 
     // now we update our channel!
 

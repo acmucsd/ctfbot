@@ -1,6 +1,6 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Challenge, CTF, Invite, TeamServer, User } from '.';
-import { InviteRow, TeamRow, UserRow } from '../schemas';
+import { ChallengeRow, InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
 import { logger } from '../../log';
 import { NoRoomError } from '../../errors';
@@ -284,6 +284,17 @@ export default class Team {
     const total = successfulAttempts + unsuccessfulAttempts || 1;
 
     return successfulAttempts / total;
+  }
+
+  // returns the challenges solved
+  async getSolvedChallenges() {
+    const { rows } = await query(
+      `SELECT challenges.* FROM challenges, attempts, users WHERE challenges.id = attempts.challenge_id AND attempts.user_id = users.id AND attempts.successful = true AND users.team_id = ${this.row.id}`,
+    );
+
+    const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+
+    return (rows as ChallengeRow[]).map((row) => new Challenge(row, teamServer.ctf));
   }
 
   async calculatePoints(category?: string) {
