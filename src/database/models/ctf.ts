@@ -223,7 +223,7 @@ export default class CTF {
     const description = sortedTeams
       .map(
         (team, i) =>
-          `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name}${' '.repeat(40 - team.name.length)}${' '.repeat(
+          `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name}${' '.repeat(35 - team.name.length)}${' '.repeat(
             4 - `${team.points}`.length,
           )}${team.points}`,
       )
