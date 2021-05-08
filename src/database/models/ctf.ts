@@ -238,7 +238,7 @@ export default class CTF {
     const messages = await guildChannel.messages.fetch();
     const botMessages = messages.filter((message) => message.author.id === client.user.id).array();
 
-    while (scoreboardLines) {
+    while (scoreboardLines && scoreboardLines.length !== 0) {
       // we can only print 43 lines at a time
       const description = scoreboardLines.splice(0, 43).join('\n');
       const scoreboardMessage = new MessageEmbed();
@@ -259,7 +259,7 @@ export default class CTF {
     }
 
     // whatever messages are left in the array need to be deleted
-    while (botMessages) await botMessages.pop().delete();
+    while (botMessages && botMessages.length !== 0) await botMessages.pop().delete();
   }
 
   // async getCategoryScoreboard(category: Category) {}
