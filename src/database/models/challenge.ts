@@ -181,11 +181,11 @@ export default class Challenge {
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
       // congratsMessage.addField('Place Overall', `${21}`);
-      if (relevantChallengeChannels)
-        congratsMessage.addField(
-          'Challenges Unlocked',
-          `${relevantChallengeChannels.map((c) => `<#${c.channel_snowflake}>`).join(', ')}`,
-        );
+      // if (relevantChallengeChannels)
+      //   congratsMessage.addField(
+      //     'Challenges Unlocked',
+      //     `${relevantChallengeChannels.map((c) => `<#${c.channel_snowflake}>`).join(', ')}`,
+      //   );
       congratsMessage.setTimestamp();
       congratsMessage.setColor('50c0bf');
 
