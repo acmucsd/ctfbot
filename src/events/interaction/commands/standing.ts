@@ -15,11 +15,14 @@ export default {
     const { challengePointMap, sortedTeams, pointsPossible } = await ctf.computeStatistics();
 
     const solvedChallenges = await team.getSolvedChallenges();
+    const challenges = await ctf.getAllChallenges();
 
-    const challengeDetails = solvedChallenges
-      .map((chal) => ({ name: chal.row.name, points: challengePointMap[chal.row.id] as number }))
-      .sort((chalA, chalB) => chalB.points - chalA.points)
-      .map((chal) => `**${chal.name}** (${chal.points})`);
+    const challengeSummary = challenges.map(
+      (challenge) =>
+        `${solvedChallenges.find((c) => c.row.id === challenge.row.id) ? ':green_circle:' : ':red_circle:'} **${
+          challenge.row.name
+        }** (${challengePointMap[challenge.row.id] as number})`,
+    );
 
     const userRank = sortedTeams.findIndex((t) => t.id === team.row.id.toString());
     const startingRank = Math.max(userRank - 2, 0);
@@ -38,9 +41,11 @@ export default {
     message
       .setTitle(`Team ${team.row.name} Current Standing`)
       .setColor('50c0bf')
-      .setDescription(`\`\`\`java\n${scoreboardLines.join('\n') || 'No challenges submitted'}\n\`\`\``);
-    if (challengeDetails.length > 0)
-      message.addField('Current Solved Challenges', challengeDetails.join(', ').substring(0, 1020));
+      .setDescription(
+        `\`\`\`java\n${scoreboardLines.join('\n') || 'No challenges submitted'}\n\`\`\`\n${challengeSummary.join(
+          '\n',
+        )}`,
+      );
 
     const teamChannel = interaction.client.channels.resolve(team.row.text_channel_snowflake) as TextChannel;
     await teamChannel.send(message);
