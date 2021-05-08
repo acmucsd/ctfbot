@@ -221,14 +221,24 @@ export default class CTF {
     // now we update our channel!
 
     const description = sortedTeams
-      .map((team, i) => `${i} - ${team.name}${' '.repeat(50 - team.name.length)}${team.points}`)
+      .map(
+        (team, i) =>
+          `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name}${' '.repeat(40 - team.name.length)}${' '.repeat(
+            4 - `${team.points}`.length,
+          )}${team.points}`,
+      )
       .join('\n')
       .substring(0, 2000);
 
+    const pointsPossible = Object.values(challengePointMap).reduce(
+      (accum: number, curr: number) => accum + curr,
+      0,
+    ) as number;
+
     const scoreboardMessage = new MessageEmbed();
     scoreboardMessage
-      .setTitle('Scoreboard')
-      .setColor('')
+      .setTitle(`Scoreboard - ${pointsPossible} Points Possible`)
+      .setColor('50c0bf')
       .setDescription(`\`\`\`java\n${description}\n\`\`\``)
       .setTimestamp();
 
