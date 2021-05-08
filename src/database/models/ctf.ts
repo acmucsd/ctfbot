@@ -238,7 +238,7 @@ export default class CTF {
       (team, i) =>
         `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name.substring(0, 30)}${' '.repeat(
           Math.max(35 - team.name.length, 5),
-        )}${' '.repeat(4 - `${team.points}`.length)}${team.points}`,
+        )}${' '.repeat(5 - `${team.points}`.length)}${team.points}`,
     );
 
     // find only the messages we've sent
