@@ -27,8 +27,8 @@ export default {
       .slice(Math.max(userRank - 2, 0), Math.min(userRank + 2, sortedTeams.length))
       .map(
         (team, i) =>
-          `${' '.repeat(3 - `${userRank + i}`.length)}${userRank + i} - ${team.name}${' '.repeat(
-            35 - team.name.length,
+          `${' '.repeat(3 - `${userRank + i}`.length)}${userRank + i} - ${team.name.substring(0, 30)}${' '.repeat(
+            Math.max(35 - team.name.length, 5),
           )}${' '.repeat(4 - `${team.points}`.length)}${team.points}`,
       );
 
