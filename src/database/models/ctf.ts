@@ -220,17 +220,16 @@ export default class CTF {
 
     // now we update our channel!
 
-    const description = [
-      '```java',
-      ...sortedTeams.map((team, i) => `${i} - ${team.name}${' '.repeat(50 - team.name.length)}${team.points}`),
-      '```',
-    ];
+    const description = sortedTeams
+      .map((team, i) => `${i} - ${team.name}${' '.repeat(50 - team.name.length)}${team.points}`)
+      .join('/n')
+      .substring(0, 2000);
 
     const scoreboardMessage = new MessageEmbed();
     scoreboardMessage
       .setTitle('Scoreboard')
       .setColor('')
-      .setDescription(description.join('\n').substring(0, 2048))
+      .setDescription(`\`\`\`java\n${description}\n\`\`\``)
       .setTimestamp();
 
     const guildChannel = client.channels.resolve(this.row.scoreboard_channel_snowflake) as TextChannel;
