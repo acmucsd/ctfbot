@@ -17,11 +17,12 @@ import invite from './commands/invite';
 import setcolor from './commands/setcolor';
 import setname from './commands/setname';
 import { CTF } from '../../database/models';
+import standing from './commands/standing';
 
 // our canonical list of application definitions
 export const topLevelCommands: ApplicationCommandDefinition[] = [addctf, addserver];
 export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge, scoreboard];
-export const userCommands: ApplicationCommandDefinition[] = [ping, submit, invite, setname, setcolor];
+export const userCommands: ApplicationCommandDefinition[] = [ping, submit, invite, setname, setcolor, standing];
 const commands: ApplicationCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
 // utility to help us access passed options more intuitively
@@ -90,15 +91,15 @@ export const registerCommands = async (client: Client) => {
   logger(`registered global commands`);
   // register commands for all current guilds
   // TODO: we probably don't actually need this, lol
-  // for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
-  //   try {
-  //     const ts = await CTF.fromTeamServerGuildSnowflakeTeamServer(guildID);
-  //     await ts.registerCommands(client);
-  //     logger(`registered commands for guild ${guildID}`);
-  //   } catch (e) {
-  //     logger(e);
-  //     logger(`no ctf in guild ${guildID}`);
-  //   }
-  // }
+  for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
+    try {
+      const ts = await CTF.fromTeamServerGuildSnowflakeTeamServer(guildID);
+      await ts.registerCommands(client);
+      logger(`registered commands for guild ${guildID}`);
+    } catch (e) {
+      logger(e);
+      logger(`no ctf in guild ${guildID}`);
+    }
+  }
   logger('commands registered');
 };

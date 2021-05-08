@@ -36,8 +36,9 @@ export default {
     message
       .setTitle(`Team ${team.row.name} Current Standing`)
       .setColor('50c0bf')
-      .setDescription(`\`\`\`java\n${scoreboardLines.join('\n')}\n\`\`\``)
-      .addField('Current Solved Challenges', challengeDetails.join(', ').substring(0, 1020) + '...');
+      .setDescription(`\`\`\`java\n${scoreboardLines.join('\n') || 'No challenges submitted'}\n\`\`\``);
+    if (challengeDetails.length > 0)
+      message.addField('Current Solved Challenges', challengeDetails.join(', ').substring(0, 1020));
 
     const teamChannel = interaction.client.channels.resolve(team.row.text_channel_snowflake) as TextChannel;
     await teamChannel.send(message);
