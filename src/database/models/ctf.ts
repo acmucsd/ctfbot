@@ -234,12 +234,14 @@ export default class CTF {
 
     // now we update our channel!
 
-    const scoreboardLines = sortedTeams.map(
-      (team, i) =>
-        `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name.substring(0, 30)}${' '.repeat(
-          Math.max(35 - team.name.length, 5),
-        )}${' '.repeat(5 - `${team.points}`.length)}${team.points}`,
-    );
+    const scoreboardLines = sortedTeams.map((team, i) => {
+      logger(
+        `${team.name}: ${3 - `${i}`.length}, ${Math.max(35 - team.name.length, 5)}, ${5 - `${team.points}`.length}`,
+      );
+      return `${' '.repeat(3 - `${i}`.length)}${i} - ${team.name.substring(0, 30)}${' '.repeat(
+        Math.max(35 - team.name.length, 5),
+      )}${' '.repeat(5 - `${team.points}`.length)}${team.points}`;
+    });
 
     // find only the messages we've sent
     const guildChannel = client.channels.resolve(this.row.scoreboard_channel_snowflake) as TextChannel;

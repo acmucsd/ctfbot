@@ -22,14 +22,16 @@ export default {
       .map((chal) => `**${chal.name}** (${chal.points})`);
 
     const userRank = sortedTeams.findIndex((t) => t.id === team.row.id.toString());
+    const startingRank = Math.max(userRank - 2, 0);
     const scoreboardLines = sortedTeams
       // we only want the two teams above and below us
-      .slice(Math.max(userRank - 2, 0), Math.min(userRank + 2, sortedTeams.length))
+      .slice(startingRank, Math.min(userRank + 3, sortedTeams.length))
       .map(
         (team, i) =>
-          `${' '.repeat(3 - `${userRank + i}`.length)}${userRank + i} - ${team.name.substring(0, 30)}${' '.repeat(
-            Math.max(35 - team.name.length, 5),
-          )}${' '.repeat(5 - `${team.points}`.length)}${team.points}`,
+          `${' '.repeat(3 - `${startingRank + i}`.length)}${startingRank + i} - ${team.name.substring(
+            0,
+            30,
+          )}${' '.repeat(Math.max(35 - team.name.length, 5))}${' '.repeat(5 - `${team.points}`.length)}${team.points}`,
       );
 
     const message = new MessageEmbed();
