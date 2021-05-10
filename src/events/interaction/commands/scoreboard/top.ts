@@ -32,12 +32,12 @@ export default {
     );
 
     const results = {
-      //tasks: challenges.map((chal) => chal.row.name),
+      tasks: challenges.map((chal) => chal.row.name),
       standings: sortedTeams.map((team, i) => ({
-        //pos: `${i + 1}`,
-        team: team.name,
+        pos: i + 1,
+        team: team.name.replace(/[\u{0080}-\u{FFFF}]/gu, (match) => `\\u${match.codePointAt(0)}`),
         score: team.points,
-        //taskStats: taskStatsByTeam[team.id] as { [key: string]: { points: number } },
+        taskStats: taskStatsByTeam[team.id] as { [key: string]: { points: number } },
       })),
     };
 
