@@ -1,26 +1,52 @@
 # ctfbot
 Discord bot to facilitate an entire Capture the Flag competition internally. Official CTF platform of [San Diego CTF](https://sdc.tf).
 
+## disclaimer
+
+**This code is a work in progress, is in heavy beta**, ***and not necessarily even recommended for production use yet.***
+The team behind this bot created it as an experiment and used it for the first time to host [San Diego CTF 2021](https://github.com/acmucsd/sdctf-2021).
+In places, the code might be monkeypatch'd for that competition, or might otherwise not match the WIP documentation.
+
+Look for (TODO) next to documented features that have not been added yet.
+
+Also, we're a bunch of college students, and while we expect to work on it heavily each year to improve it,
+**we are not on call to solve problems most of the time.**
+
+**Bottom line**: if you want to use this while its in beta, don't expect everything to work, expect Discord rate limiting to cause weird problems, and don't expect support from us.
+
+Also, you should check out our [FAQ](FAQ.md) if you have a question about the project.
+
+## contributing to this project
+
+Anyone and everyone is welcome to contribute. Please take a moment to
+review the [guidelines for contributing](CONTRIBUTING.md).
+
+* [Bug reports](CONTRIBUTING.md#bug-reports)
+* [Feature requests](CONTRIBUTING.md#feature-requests)
+* [Pull requests](CONTRIBUTING.md#pull-requests)
+
 ## getting started
 
-Before you run the project, you'll need to have a postgres instance to connect to.
-You can configure the connection parameters with the [usual environment variables](https://node-postgres.com/features/connecting),
-or if you have docker installed, you can spin up a postgres server that the development version can connect to with **no configuration**
-with the following command:
+You'll need a [Discord bot](https://discord.com/developers/applications) on a server with the `bot` and `application.commands` scopes.
+On servers, we usually just grant `Administrator` permissions.
+You'll need to keep the bot `private` (so others can't add it to their server and kick off a CTF).
+Finally, you'll probably need `Server Members Intent` so the bot can download info about the online users.
 
-```bash
-docker run --name ctfbot-postgres -p 5432:5432 -e POSTGRES_PASSWORD=dAf1bjOwYUrVse8DsAZZBh2fkxXQwAbGrmE7EHUA -e POSTGRES_USER=ctfbot -d postgres
+Once you have a bot, you can add its token to a `.env` file in the root of the project.
+```dotenv
+DISCORD_TOKEN=yourtoken
+PGPASSWORD=somethingrandom
 ```
 
-From here, you'll need [node-gyp installed](https://github.com/nodejs/node-gyp#installation) and all the build tools to compile native bindings.
+The recommended way to run the project is with docker / [docker-compose](https://docs.docker.com/compose/). Make sure you have those installed.
+Once installed, you should be able to do `docker-compose up` and everything *should* kinda work. 
 
-Lastly, to clone the project, build the dependencies, compile the code, and execute:
+Currently, if you want to run the project in development mode (to see changes live), you'll need to run it outside of docker.
+See [CONTRIBUTING](./CONTRIBUTING.md#running-the-project-for-development) for more information.
 
-```bash
-git clone https://github.com/acmucsd/ctfbot.git
-npm install # may require postgres to be installed
-npm start # run development mode, changes trigger a reload
-```
+## admin flow
+
+(TODO)
 
 ## user flow
 
@@ -35,48 +61,48 @@ They will need to agree to these terms in order to participate.
 Once the user reacts affirmatively to the **Terms of Service**, ctfbot will automatically grant that user:
 1. a **User** registration in the CTF
 2. a **Team** registration that contains only the user and is assigned to the least full Team Server
-3. the `@Competitor` role, that grants access to challenge channels and user commands
+3. the `@Participant` role, that grants access to challenge channels and user commands
 4. a role that corresponds to the team server they have been added to, granting access to their team server channel
 5. a channel in that team server corresponding to their team
+6. for users that have DMs enabled, they will also be sent an invite link to their new team server
 
 ### 3 - joining their team server
 When the user joins their team server, they will arrive in a landing channel with a short
 explanation on where to find challenges and how to change team servers.
 They will immediately be granted their team role and have access to their team channel, where they can submit challenges.
 
-If they join the wrong team server, they will be kicked and directed to their real team server.
+If they join the wrong team server, they will be kicked and directed (via DM) to their real team server.
 
 ### 4 - adding people to their team
 The original member of a team can expand their team by using the `/team invite DISCORD_USER` command.
 You may only invite users that have already accepted TOS.
-The invited user will receive your invitation in their team chat, and they can accept by either reacting
-or using the command `/team join TEAM_NAME`.
+The invited user will receive your invitation in their team chat, and they can accept by reacting to the message.
+
+The user will also receive a notice of the invite as a DM (if they have DMs turned on).
 
 Once you have added a user to your team, they will be kicked out of their channels, chats, and roles and added to your team's resources.
 
 ### 5 - submitting challenges
-The user can attempt a challenge by viewing the **challenge channel** in the **main guild**,
-and reacting to it to get the prompt sent to their team channel.
+The user can attempt a challenge by viewing a **challenge channel** in their **team server**.
+All necessary information should be contained there.
 
 Once the challenge is complete, they should submit the flag using the `/submit` command, preferably in their team channel.
-If they attempt to use this command in another channel, or if a flag is detected in any channel,
-the message will be deleted and the user will be warned.
 
-When a challenge is submitted, the solve will be announced,
+When a challenge is submitted, the solve will be announced in the team channel,
 and the user may be granted access to an additional challenge channel, if another challenge was unlocked.
 
 ### 6 - checking status
-The user can always view the leaderboard chats in the **main guild**. 
-There is a top-in-each-category leaderboard, and there is an overall leaderboard.
-These are updated every couple of minutes.
+The user can always view the leaderboard channels in the **main guild**. 
+There is a ~~top-in-each-category leaderboard~~ (TODO), and there is an overall leaderboard.
+These are updated every two minutes.
 
-The user can request their own standing in their team channel with `/scoreboard standing`.
+The user can request their own standing in their team channel with `/standing`.
 
 ## commands
 
 The bot is controlled primarily through [Slash Commands](https://discord.com/developers/docs/interactions/slash-commands). 
 
-There are two kinds of commands, administrative commands and user commands.
+There are two kinds of commands, **administrative commands** and **user commands**.
 
 Discord also makes a distinction between globally registered commands and per-guild commands. Most commands provided are per-guild commands, the bot will not respond to commands outside of a guild with which it is registered.
 
@@ -88,40 +114,39 @@ Once these commands are run in a particular server, the remaining per-guild comm
 
 ### administrative commands
 
-To use the commands detailed in this section, your Discord user needs to have the admin role in the CTF settings. 
+To use the commands detailed in this section, your Discord user needs to either have created the CTF
+or have the `CTF Admin` role that is created when the CTF is created. 
 
 #### adding a new CTF
 ```java
 /addctf NAME [DESCRIPTION]
 ```
 
-This creates a new CTF in the guild you're currently in. It will create all of the channel categories it will add competition channels to, as well as some meta channels for announcements and logging. Avoid deleting these categories and channels, but you can otherwise name them / rearrange them freely.
+This creates a new CTF in the guild you're currently in. It will create some meta channels for announcements and logging. Avoid deleting these categories and channels, but you can otherwise name them / rearrange them freely.
 
 **Note**: there is a limit of one CTF per guild.
 
 **Note 2**: until you *publish* the CTF by setting the start date and end date, challenges cannot be submitted by players.
 
-**Note 3**: creating a ctf will also create an Admin role that the calling user will be added to.
+**Note 3**: creating a ctf will also create a `CTF Admin` role that the initial user will be added to.
 
 #### editing a CTF
 ```java
 /ctf set name NAME
 /ctf set description DESCRIPTION
 /ctf set admin ADMIN_ROLE
-/ctf set start [START_DATE]
-/ctf set end [END_DATE]
+/ctf set start [START_DATE] // (TODO)
+/ctf set end [END_DATE] // (TODO)
 ```
 
 Edit various parameters of the current CTF.
 
-Using `set start` without specifying a start date will cause the startdate to be set to "now". This effectively *publishes* a CTF. Likewise, using `set end` without specifying an end date will cause the current CTF to be closed immediately.
+~~Using `set start` without specifying a start date will cause the startdate to be set to "now".
+This effectively *publishes* a CTF.
+Likewise, using `set end` without specifying an end date will cause the current CTF to be closed immediately.~~
 
-#### managing a CTF
-```java
-/ctf announce MESSAGE
-```
-
-Posts the message you provide in the official CTF #announcements channel. More formatting and details to come soon.
+**Note:** the above has yet to be implemented.
+Currently, you can run `/ctf set start` to publish challenge channels to those with the `@Participant` role but that's all it does. 
 
 #### removing a CTF
 ```java
@@ -143,7 +168,7 @@ The second command will list all of the team servers belonging to the indicated 
 
 The third command will remove the indicated team server from the indicated CTF. The CTF can also be inferred by the guild you are on. 
 
-#### creating a team
+#### ~~creating a team~~ (TODO)
 ```java
 /team add NAME [SERVER_NAME]
 ```
@@ -154,7 +179,7 @@ Creating a team this way does not add anybody to the team, it is an *empty team*
 
 **Note 2**: creating a team will always cause the creation of an associated *team role* and *team channel*.
 
-#### editing a team
+#### ~~editing a team~~ (TODO)
 ```java
 /team set name NAME [TEAM_ROLE]
 /team set description DESCRIPTION [TEAM_ROLE]
@@ -167,14 +192,14 @@ Edit the name, description, role color, and captain of the associated team. If n
 
 **Note**: when setting the team server of a team, the target team server must not be full. Also, the current team's channels will be deleted, message history will be lost, and current members will be given an invite to the new server where their new team channels await.
 
-#### managing teams
+#### ~~managing teams~~ (TODO)
 ```java
 /team get
 ```
 
 Returns a list of all teams currently in the CTF.
 
-#### managing team users
+#### ~~managing team users~~ (TODO)
 ```java
 /team user get [TEAM_ROLE]
 /team user add USER [TEAM_ROLE]
@@ -189,7 +214,7 @@ Allows you to list the users in a team, add a user to a team, and delete a user 
 
 **Note 3**: Removing a user from a team that is the team captain will *not* cause the captain to be reassigned, that must be done separately.
 
-#### removing teams
+#### ~~removing teams~~ (TODO)
 ```java
 /team del [TEAM_ROLE]
 ```
@@ -305,7 +330,7 @@ All users in the server are able to use these commands regardless of admin statu
 #### joining a team
 ```java
 /invite DISCORD_USERNAME
-/join TEAM_NAME // NOT ADDED ATM
+/join TEAM_NAME // (TODO)
 ```
 
 Invite allows for the owner of a team to invite a user within the CTF to their current 
@@ -333,7 +358,7 @@ Similar to the admin only commands, these take in no argument for team and will 
 the user's current team. Non-admins will only be allowed to use this command in their specific
 team channel, but the functionality will carry over.
 
-#### scoreboard
+#### ~~scoreboard~~ (TODO)
 ```java
 /scoreboard top [CATEGORY]
 /scoreboard team [TEAM_NAME]
