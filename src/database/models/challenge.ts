@@ -2,10 +2,9 @@ import query from '../database';
 import { AttachmentRow, AttemptRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
 import Attachment from './attachment';
 import Attempt from './attempt';
-import { Client, TextChannel, MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import CTF from './ctf';
 import { Category } from './index';
-import attach from '../../events/interaction/commands/challenge/attach';
 import User from './user';
 import { timingSafeEqual } from 'crypto';
 
@@ -180,6 +179,7 @@ export default class Challenge {
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
       congratsMessage.description += `\n\nYou are the #**${solves}** person to solve this challenge.`;
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
+      // TODO this caused problems in production, can we figure out a way to get it to work?
       // congratsMessage.addField('Place Overall', `${21}`);
       // if (relevantChallengeChannels)
       //   congratsMessage.addField(

@@ -1,5 +1,5 @@
 import query from '../database';
-import { CategoryChannelRow, CategoryRow, ChallengeChannelRow, ChallengeRow } from '../schemas';
+import { CategoryChannelRow, CategoryRow, ChallengeRow } from '../schemas';
 import Challenge from './challenge';
 import CTF from './ctf';
 import { CategoryChannel, Client } from 'discord.js';

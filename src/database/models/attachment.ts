@@ -1,5 +1,5 @@
 import query from '../database';
-import { AttachmentRow } from '../schemas/attachment';
+import { AttachmentRow } from '../schemas';
 
 export default class Attachment {
   row: AttachmentRow;

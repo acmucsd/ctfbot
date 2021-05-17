@@ -1,5 +1,5 @@
 import query from '../database';
-import { AttemptRow } from '../schemas/attempt';
+import { AttemptRow } from '../schemas';
 
 export default class Attempt {
   row: AttemptRow;

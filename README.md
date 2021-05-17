@@ -12,7 +12,7 @@ Look for (TODO) next to documented features that have not been added yet.
 Also, we're a bunch of college students, and while we expect to work on it heavily each year to improve it,
 **we are not on call to solve problems most of the time.**
 
-**Bottom line**: if you want to use this while its in beta, don't expect everything to work, expect Discord rate limiting to cause weird problems, and don't expect support from us.
+**Bottom line**: if you want to use this while its in beta, don't expect everything to work, expect Discord rate limiting to cause weird problems, and don't expect support from ACM Cyber.
 
 Also, you should check out our [FAQ](FAQ.md) if you have a question about the project.
 
