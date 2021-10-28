@@ -11,6 +11,7 @@ export const client = new Client({
   partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
   intents: [Intents.FLAGS.GUILD_MEMBERS],
 });
+
 eventLoader(client);
 
 client

@@ -34,21 +34,22 @@ const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandl
   const subcommandGroupName = interaction.options.getSubcommandGroup();
   const subcommandName = interaction.options.getSubcommand(true);
 
-  // handle the case where its command -> subcommand group -> subcommand
-  if (subcommandGroupName) {
-    const groupDefinition = definition.options
-      .filter((opt): opt is ExecutableSubGroupData => opt.type === 'SUB_COMMAND_GROUP')
-      .find((opt) => opt.name === subcommandGroupName);
-    if (!groupDefinition) throw createCommandNotFoundError(interaction);
-    const commandDefinition = groupDefinition.options.find((opt) => opt.name === subcommandName);
+  // handle the case where its command -> subcommand
+  if (!subcommandGroupName) {
+    // handle the case where its command -> subcommand
+    const commandDefinition = definition.options
+      .filter((opt): opt is ExecutableSubCommandData => opt.type === 'SUB_COMMAND')
+      .find((opt) => opt.name === subcommandName);
     if (!commandDefinition) throw createCommandNotFoundError(interaction);
     return commandDefinition.execute;
   }
 
-  // handle the case where its command -> subcommand
-  const commandDefinition = definition.options
-    .filter((opt): opt is ExecutableSubCommandData => opt.type === 'SUB_COMMAND')
-    .find((opt) => opt.name === subcommandName);
+  // handle the case where its command -> subcommand group -> subcommand
+  const groupDefinition = definition.options
+    .filter((opt): opt is ExecutableSubGroupData => opt.type === 'SUB_COMMAND_GROUP')
+    .find((opt) => opt.name === subcommandGroupName);
+  if (!groupDefinition) throw createCommandNotFoundError(interaction);
+  const commandDefinition = groupDefinition.options.find((opt) => opt.name === subcommandName);
   if (!commandDefinition) throw createCommandNotFoundError(interaction);
   return commandDefinition.execute;
 };
@@ -98,7 +99,7 @@ export const interactionEvent = async (interaction: Interaction) => {
 export const registerCommands = async (client: Client<true>) => {
   logger.info('registering commands...');
   // first, register global commands
-  const results = await client.application.commands.set(topLevelCommands);
+  await client.application.commands.set(topLevelCommands);
 
   logger.info(`registered global commands`);
 };

@@ -50,8 +50,7 @@
     },
     {
       "title": ":warning: You must agree to the terms and conditions :warning:",
-      "description": "React with :thumbsup: to indicate you have completed reading the above and consent to the terms and conditions outlined.",
-      "color": null
+      "description": "React with :thumbsup: to indicate you have completed reading the above and consent to the terms and conditions outlined."
     }
   ]
 }

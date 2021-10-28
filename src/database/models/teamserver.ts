@@ -1,4 +1,4 @@
-import { Client, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
+import { CategoryChannel, Client, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
@@ -180,7 +180,7 @@ export default class TeamServer {
    * @param client
    * @param name
    */
-  async makeCategory(client: Client, name: string) {
+  async makeCategory(client: Client, name: string): Promise<CategoryChannel> {
     const guild = this.getGuild(client);
     let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
     if (!category) {
@@ -220,9 +220,7 @@ export default class TeamServer {
 
   async fromRoleTeam(team_role_snowflake: string) {
     logger(`Looking for **${team_role_snowflake}**...`);
-    const {
-      rows,
-    } = await query(
+    const { rows } = await query(
       `SELECT * FROM teams WHERE (team_role_snowflake_team_server = $1 or team_role_snowflake_main = $1) and team_server_id = ${this.row.id} `,
       [team_role_snowflake],
     );
@@ -231,11 +229,10 @@ export default class TeamServer {
   }
 
   async fromChannelTeam(text_channel_snowflake: string) {
-    const {
-      rows,
-    } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`, [
-      text_channel_snowflake,
-    ]);
+    const { rows } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`,
+      [text_channel_snowflake],
+    );
     if (rows.length === 0) throw new Error('no team associated with that channel');
     return new Team(rows[0] as TeamRow);
   }
