@@ -1,6 +1,6 @@
-import CommandInteraction from '../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
 import { CTF } from '../../../database/models';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'addserver',
@@ -9,29 +9,33 @@ export default {
     {
       name: 'limit',
       description: 'The max number of teams allowed to be in the server',
-      type: ApplicationCommandOptionType.INTEGER,
+      type: ApplicationCommandOptionTypes.INTEGER,
       required: true,
     },
     {
       name: 'ctf_name',
       description: 'The name of the CTF to add the guild to',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
     {
       name: 'name',
       description: 'The unique identifier the server will be referred to as',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const ctf = await (options.ctf_name
-      ? CTF.fromNameCTF(options.ctf_name as string)
-      : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+  async execute(interaction: PopulatedCommandInteraction) {
+    const ctfname = interaction.options.getString('ctf_name');
+    const ctf = await (ctfname ? CTF.fromNameCTF(ctfname) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
 
-    const name = options.name ? (options.name as string) : interaction.guild.name;
-    const server = await ctf.createTeamServer(interaction.guild, name, options.limit as number, interaction.member);
+    const name = interaction.options.getString('name') ?? interaction.guild.name;
+    const server = await ctf.createTeamServer(
+      interaction.guild,
+      name,
+      interaction.options.getNumber('limit', true),
+      interaction.member,
+    );
     return `Added Team Server **${server.row.name}** to CTF **${ctf.row.name}** with limit **${server.row.team_limit}**`;
   },
-} as ApplicationCommandDefinition;
+} as ChatInputCommandDefinition;

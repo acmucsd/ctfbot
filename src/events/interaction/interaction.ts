@@ -1,105 +1,123 @@
-import { Client } from 'discord.js';
-import { category, challenge, ctf, ping, scoreboard, team } from './commands';
-import CommandInteraction from './compat/CommandInteraction';
-import { logger, embedify } from '../../log';
 import {
-  ApplicationCommandDefinition,
-  ApplicationCommandResponse,
-  ApplicationCommandResponseOption,
-  CommandOptionMap,
-  InteractionType,
-} from './compat/types';
+  ApplicationCommandSubCommandData,
+  ApplicationCommandSubGroupData,
+  BaseGuildCommandInteraction,
+  ChatInputApplicationCommandData,
+  Client,
+  CommandInteraction,
+  Interaction,
+} from 'discord.js';
+import { category, challenge, ctf, ping, scoreboard, team } from './commands';
+import { embedify, logger } from '../../log';
 import addctf from './commands/addctf';
 import addserver from './commands/addserver';
-import { setCommands } from './compat/commands';
 import submit from './commands/submit';
 import invite from './commands/invite';
 import setcolor from './commands/setcolor';
 import setname from './commands/setname';
-import { CTF } from '../../database/models';
 import standing from './commands/standing';
+import { createCommandNotCachedError, createCommandNotFoundError } from '../../errors/CommandInteractionError';
 
 // our canonical list of application definitions
-export const topLevelCommands: ApplicationCommandDefinition[] = [addctf, addserver];
-export const adminCommands: ApplicationCommandDefinition[] = [ctf, team, category, challenge, scoreboard];
-export const userCommands: ApplicationCommandDefinition[] = [ping, submit, invite, setname, setcolor, standing];
-const commands: ApplicationCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
+export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
+export const adminCommands: ChatInputCommandDefinition[] = [ctf, team, category, challenge, scoreboard];
+export const userCommands: ChatInputCommandDefinition[] = [ping, submit, invite, setname, setcolor, standing];
+const commands: ChatInputCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
-// utility to help us access passed options more intuitively
-const mapToCommandOptionMap = (options: ApplicationCommandResponseOption[]): CommandOptionMap =>
-  options?.reduce((obj, opt) => ({ ...obj, [opt.name]: opt.value }), {}) ?? {};
+const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandler => {
+  const definition = commands.find((def) => def.name === interaction.commandName);
+  if (!definition || !definition) throw createCommandNotFoundError(interaction);
 
-// recursive function to find the execute command that corresponds with this interaction
-const executeCommand = (
-  interaction: CommandInteraction,
-  response: ApplicationCommandResponse,
-  subcommands: ApplicationCommandDefinition[],
-): Promise<string> | Promise<void> | string | void => {
-  const command = subcommands.find((com) => com.name === response.name);
-  if (!command) return 'Command not recognized';
-  // if this command definition contains a function, we should just execute it with the options we have
-  if (command.execute) {
-    return command.execute(interaction, mapToCommandOptionMap(response.options));
+  // handle the case where its a root-level command
+  if ('execute' in definition) return definition.execute;
+
+  const subcommandGroupName = interaction.options.getSubcommandGroup();
+  const subcommandName = interaction.options.getSubcommand(true);
+
+  // handle the case where its command -> subcommand group -> subcommand
+  if (subcommandGroupName) {
+    const groupDefinition = definition.options
+      .filter((opt): opt is ExecutableSubGroupData => opt.type === 'SUB_COMMAND_GROUP')
+      .find((opt) => opt.name === subcommandGroupName);
+    if (!groupDefinition) throw createCommandNotFoundError(interaction);
+    const commandDefinition = groupDefinition.options.find((opt) => opt.name === subcommandName);
+    if (!commandDefinition) throw createCommandNotFoundError(interaction);
+    return commandDefinition.execute;
   }
-  // if function not found yet, traverse further down the tree
-  return executeCommand(interaction, response.options[0], command.options);
+
+  // handle the case where its command -> subcommand
+  const commandDefinition = definition.options
+    .filter((opt): opt is ExecutableSubCommandData => opt.type === 'SUB_COMMAND')
+    .find((opt) => opt.name === subcommandName);
+  if (!commandDefinition) throw createCommandNotFoundError(interaction);
+  return commandDefinition.execute;
 };
 
 // handler for interaction events
-export const interactionEvent = async (interaction: CommandInteraction) => {
-  if (interaction.type !== InteractionType.APPLICATION_COMMAND) return;
+export const interactionEvent = async (interaction: Interaction) => {
+  // for now, we're only interested in ApplicationCommands that occur in a Guild and are of the type 'CHAT_INPUT'
+  if (!interaction.isCommand()) return;
+  if (!interaction.inCachedGuild()) return;
+  if (!interaction.command) throw createCommandNotCachedError(interaction);
+  if (interaction.command.type !== 'CHAT_INPUT') return;
 
   try {
-    await interaction.sendLoading();
-    const response = await executeCommand(
-      interaction,
-      { name: interaction.commandName, options: interaction.options },
-      commands,
-    );
-    if (response) {
-      logger(response);
-      await interaction.reply({
-        embeds: [
-          embedify({
-            description: response,
-            title: 'Command',
-            color: '50c0bf',
-          }),
-        ],
-      });
-    }
+    // send that we're loading the response to this, but we aren't ready to send it.
+    await interaction.deferReply({ ephemeral: true });
+
+    const handler = getHandlerForInteraction(interaction);
+    const response = await handler(interaction);
+
+    logger.info(response);
+
+    await interaction.editReply({
+      embeds: [
+        embedify({
+          description: response,
+          title: 'Command',
+          color: '#50c0bf',
+        }),
+      ],
+    });
   } catch (_e) {
-    logger(_e);
+    logger.error(_e);
     // pretty print errors B)
     const e = _e as Error;
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [
         embedify({
           description: e.message ?? 'Unknown cause',
           title: e.name ?? 'Error',
-          footer: e.stack.split('\n')[1],
+          footer: e.stack?.split('\n')[1],
         }),
       ],
     });
   }
 };
 
-export const registerCommands = async (client: Client) => {
-  logger('registering commands...');
+export const registerCommands = async (client: Client<true>) => {
+  logger.info('registering commands...');
   // first, register global commands
-  await setCommands(client, topLevelCommands);
-  logger(`registered global commands`);
-  // register commands for all current guilds
-  // TODO: we probably don't actually need this, lol
-  // for (const guildID of client.guilds.cache.map((guild) => guild.id)) {
-  //   try {
-  //     const ts = await CTF.fromTeamServerGuildSnowflakeTeamServer(guildID);
-  //     await ts.registerCommands(client);
-  //     logger(`registered commands for guild ${guildID}`);
-  //   } catch (e) {
-  //     logger(e);
-  //     logger(`no ctf in guild ${guildID}`);
-  //   }
-  // }
-  logger('commands registered');
+  const results = await client.application.commands.set(topLevelCommands);
+
+  logger.info(`registered global commands`);
 };
+
+// types for adding execution information to the existing ChatInputApplicationCommand types
+
+type CommandHandler = (interaction: PopulatedCommandInteraction) => Promise<string> | string;
+type ExecutableCommandData = { execute: CommandHandler };
+
+export type ExecutableTopLevelCommandData = ChatInputApplicationCommandData & ExecutableCommandData;
+export type ExecutableSubCommandData = ApplicationCommandSubCommandData & ExecutableCommandData;
+export type ExecutableSubGroupData = Omit<ApplicationCommandSubGroupData, 'options'> & {
+  options: ExecutableSubCommandData[];
+};
+
+type CommandWithExecutableSubCommands = Omit<ChatInputApplicationCommandData, 'options'> & {
+  options: (ExecutableSubGroupData | ExecutableSubCommandData)[];
+};
+
+export type ChatInputCommandDefinition = ExecutableTopLevelCommandData | CommandWithExecutableSubCommands;
+
+export type PopulatedCommandInteraction = BaseGuildCommandInteraction<'cached'> & CommandInteraction;

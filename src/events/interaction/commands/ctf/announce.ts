@@ -1,19 +1,20 @@
-import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { ExecutableSubCommandData } from '../../interaction';
+import { CommandInteraction } from 'discord.js';
 
 export default {
   name: 'announce',
   description: 'Posts the message provided to the official CTF #announcements channel',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'message',
       description: 'The message to post to #announcements',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
   ],
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return `this command (${interaction.commandID}) has not been implemented yet`;
+  execute(interaction: CommandInteraction) {
+    return `this command (${interaction.commandId}) has not been implemented yet`;
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

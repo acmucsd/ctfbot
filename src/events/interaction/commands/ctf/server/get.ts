@@ -1,24 +1,24 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 
 export default {
   name: 'get',
   description: "Lists all of the team servers belonging to the indicated CTF (defaults to current guild's CTF)",
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The name of the CTF',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const ctf = await (options?.name
-      ? CTF.fromNameCTF(options.name as string)
-      : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+  async execute(interaction: PopulatedCommandInteraction) {
+    const ctfname = interaction.options.getString('name');
+    const ctf = await (ctfname ? CTF.fromNameCTF(ctfname) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
     ctf.throwErrorUnlessAdmin(interaction);
+
     return ctf.printAllTeamServers();
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

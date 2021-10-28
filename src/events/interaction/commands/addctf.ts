@@ -1,6 +1,7 @@
-import CommandInteraction from '../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
 import { CTF } from '../../../database/models';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { createCommandNotExecutedInGuildError } from '../../../errors/CommandInteractionError';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 
 export default {
   name: 'addctf',
@@ -9,19 +10,22 @@ export default {
     {
       name: 'name',
       description: 'The name of the CTF',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
     {
       name: 'description',
       description: 'An optional description of the CTF',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    const name = options && options.name ? (options.name as string) : interaction.guild.name;
-    const description = options && options.description ? (options.description as string) : '';
+  async execute(interaction: PopulatedCommandInteraction) {
+    if (!interaction.inCachedGuild()) throw createCommandNotExecutedInGuildError(interaction);
+
+    const name = interaction.options.getString('name') ?? interaction.guild.name;
+    const description = interaction.options.getString('description') ?? '';
+
     const newCTF = await CTF.createCTF(interaction.client, name, interaction.guild.id, interaction.member);
     await newCTF.setDescription(description);
     const printString = `Created new CTF **${newCTF.row.name}** with `;
@@ -29,4 +33,4 @@ export default {
       .concat(description ? `description **${description}**` : `no description`)
       .concat(' in this server');
   },
-} as ApplicationCommandDefinition;
+} as ChatInputCommandDefinition;

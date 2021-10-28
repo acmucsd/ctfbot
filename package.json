@@ -37,6 +37,7 @@
     "erlpack": "github:discord/erlpack",
     "pg": "^8.5.1",
     "utf-8-validate": "^5.0.7",
+    "winston": "^3.3.3",
     "zlib-sync": "^0.1.7"
   },
   "devDependencies": {

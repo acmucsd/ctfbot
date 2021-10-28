@@ -1,25 +1,25 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF } from '../../../../../database/models';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 
 export default {
   name: 'admin',
   description: 'Set the admin role for the CTF',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'admin_role',
       description: 'The desired role',
-      type: ApplicationCommandOptionType.ROLE,
+      type: ApplicationCommandOptionTypes.ROLE,
       required: true,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const role = options.admin_role.toString();
-    await ctf.setAdminRoleSnowflake(role);
-    return `CTF admin role has been set to <@${role}>`;
+    const role = interaction.options.getRole('admin_role', true);
+    await ctf.setAdminRoleSnowflake(role.id);
+    return `CTF admin role has been set to <@${role.id}>`;
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;
