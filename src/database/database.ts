@@ -8,9 +8,9 @@ const pool = new Pool(postgresConfig);
 
 // initialize each table
 initTables(pool)
-  .then(() => logger('tables initialized'))
+  .then(() => logger.info('tables initialized'))
   .catch((err) => {
-    logger('database initialization failed', err);
+    logger.info('database initialization failed', err);
     process.exit(1);
   });
 

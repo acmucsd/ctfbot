@@ -2,8 +2,9 @@ import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Challenge, CTF, Invite, TeamServer, User } from '.';
 import { ChallengeRow, InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
-import { logger } from '../../log';
 import { NoRoomError } from '../../errors';
+import { logger } from '../../log';
+import { createDatabaseNullError } from '../../errors/DatabaseNullError';
 
 export default class Team {
   row: TeamRow;
@@ -32,21 +33,25 @@ export default class Team {
   async deleteTeam(client: Client) {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    await teamServer.getGuild(client).channels.resolve(this.row.text_channel_snowflake)?.delete();
+    if (this.row.text_channel_snowflake)
+      await teamServer.getGuild(client).channels.resolve(this.row.text_channel_snowflake)?.delete();
     /** TODO: Remove every team member's team roles */
-    await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
-      /* Do nothing, because it means the team server already deleted*/
-    });
-    await ctf.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
-      /* Do nothing, because it means the team server already deleted*/
-    });
-    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      await ctf.deleteRole(client, this.row.team_role_snowflake_main).catch(() => {
-        /* Do nothing, because it means the team server part of the main server already deleted*/
+    if (this.row.team_role_snowflake_team_server)
+      await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+        /* Do nothing, because it means the team server already deleted*/
       });
-    }
+    if (this.row.team_role_snowflake_team_server)
+      await ctf.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+        /* Do nothing, because it means the team server already deleted*/
+      });
+    if (this.row.team_role_snowflake_main)
+      if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
+        await ctf.deleteRole(client, this.row.team_role_snowflake_main).catch(() => {
+          /* Do nothing, because it means the team server part of the main server already deleted*/
+        });
+      }
     await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
-    logger(`Deleted team **${this.row.name}** from ctf **${ctf.row.name}**`);
+    logger.info(`Deleted team **${this.row.name}** from ctf **${ctf.row.name}**`);
     /** TODO: Make and assign each member a new team */
   }
 
@@ -70,16 +75,18 @@ export default class Team {
     this.row.text_channel_snowflake = text_channel_snowflake;
   }
 
-  async setTeamCaptain() {}
+  // async setTeamCaptain() {}
 
   async setTeamServerID(client: Client, team_server_id: number) {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
     if (!(await newTeamServer.hasSpace(true))) throw new NoRoomError();
 
+    if (!this.row.team_role_snowflake_team_server) throw createDatabaseNullError('team_role_snowflake_team_server');
+
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role
       const oldTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-      oldTeamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
+      if (this.row.text_channel_snowflake) oldTeamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
       await oldTeamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
     }
 
@@ -99,15 +106,17 @@ export default class Team {
     description +=
       "\n\nTo **invite** another person onto your team, you'll need to use `/invite @username`. You should do this in the Main Guild. Then, they will need to accept your invite. Similarly, to **join** another team, they will have to invite you first.";
     description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
-    description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
+    description += `\n\nPlease look for any users with the <@&${
+      newTeamServer.row.admin_role_snowflake ?? 'MISSING ADMIN ROLE'
+    }> role if you have any questions, and happy hacking!`;
 
     // // Move team channel to team category
     // await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
-    //   logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
+    //   logger.info("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
     // });
 
     // Make sure only the team can view their own team channel
-    await textChannel.overwritePermissions([
+    await textChannel.permissionOverwrites.set([
       {
         id: textChannel.guild.roles.everyone,
         deny: ['VIEW_CHANNEL'],
@@ -236,10 +245,10 @@ export default class Team {
         )
         .then(async () => {
           await guildMember.send(`https://discord.gg/${newTeamServer.row.server_invite}`);
-          logger(`DM'd ${guildMember.user.username} that they must move to ${newTeamServerGuild.name}`);
+          logger.info(`DM'd ${guildMember.user.username} that they must move to ${newTeamServerGuild.name}`);
         })
         .catch(() => {
-          logger(`Unable to DM ${guildMember.user.username}`);
+          logger.info(`Unable to DM ${guildMember.user.username}`);
         });
       await guildMember.kick('User was moved to a different team server');
       // we'll also need to make sure we get the right TS role in the main guild
@@ -255,7 +264,7 @@ export default class Team {
         .setDescription(`Go forth and solve challenges!`)
         .setColor('50c0bf'),
     );
-    logger(
+    logger.info(
       `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
         this.row.id
       })**`,

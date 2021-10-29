@@ -8,7 +8,7 @@ export default async (client: Client) => {
   // update challenge channels in every CTF
   const ctfs = await CTF.allCTFs();
   for (const ctf of ctfs) {
-    // logger(`Updating challenge channels of ${ctf.row.name}...`);
+    // logger.info(`Updating challenge channels of ${ctf.row.name}...`);
     // const challenges = await ctf.getAllChallenges();
     // await Promise.all(challenges.map((chal) => chal.updateChallengeChannels(client)));
 

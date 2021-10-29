@@ -1,11 +1,10 @@
 import { CTF } from '../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { PopulatedCommandInteraction } from '../interaction';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 
 export default {
   name: 'submit',
   description: "Submits a challenge's flag",
-  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'challenge_channel',
@@ -32,4 +31,4 @@ export default {
 
     return attempt.row.successful ? 'Flag submission was **correct**!' : 'Flag submission was **incorrect**...';
   },
-};
+} as ChatInputCommandDefinition;
