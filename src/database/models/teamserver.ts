@@ -4,7 +4,6 @@ import { CTF, Team } from '.';
 import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
 import { DupeTeamError } from '../../errors';
-import { setCommands } from '../../events/interaction/compat/commands';
 import { adminCommands, userCommands } from '../../events/interaction/interaction';
 
 export default class TeamServer {

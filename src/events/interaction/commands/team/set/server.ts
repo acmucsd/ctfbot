@@ -1,36 +1,36 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF, Team } from '../../../../../database/models';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'server',
   description: 'Changes the server the team belongs to',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'server_name',
       description: 'The name of the server to move the team to',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
     {
       name: 'team_role',
       description: 'The team to move',
-      type: ApplicationCommandOptionType.ROLE,
+      type: ApplicationCommandOptionTypes.ROLE,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
-    let team: Team;
-    if (options?.team_role) {
-      team = await ctf.fromRoleTeam(options.team_role as string);
-    } else {
-      team = await ctf.fromUnspecifiedTeam(interaction.user.id, interaction.channel.id);
-    }
-    const teamServer = ctf.fromNameTeamServer(options.server_name as string);
+
+    const teamRole = interaction.options.getRole('team_role');
+    const team = teamRole
+      ? await ctf.fromRoleTeam(teamRole.id)
+      : await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);
+
+    const teamServer = ctf.fromNameTeamServer(interaction.options.getString('server_name', true));
     await team.setTeamServerID(interaction.client, (await teamServer).row.id);
     return `Moved **${team.row.name}** to **${(await teamServer).row.name}**`;
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

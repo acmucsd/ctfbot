@@ -1,34 +1,34 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF, Team } from '../../../../../database/models';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { CommandInteraction } from 'discord.js';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 
 export default {
   name: 'description',
   description: "Changes the team's description",
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'description',
       description: 'The desired description',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
     {
       name: 'team_role',
       description: 'The team to set the description of',
-      type: ApplicationCommandOptionType.ROLE,
+      type: ApplicationCommandOptionTypes.ROLE,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    let team: Team;
-    if (options?.team_role) {
-      ctf.throwErrorUnlessAdmin(interaction);
-      team = await ctf.fromRoleTeam(options.team_role as string);
-    } else {
-      team = await ctf.fromUnspecifiedTeam(interaction.user.id, interaction.channel.id);
-    }
-    return await team.setDescription(options.description as string);
+    const teamRole = interaction.options.getRole('team_role');
+    if (teamRole) ctf.throwErrorUnlessAdmin(interaction);
+    const team = teamRole
+      ? await ctf.fromRoleTeam(teamRole.id)
+      : await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);
+
+    return await team.setDescription(interaction.options.getString('description', true));
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

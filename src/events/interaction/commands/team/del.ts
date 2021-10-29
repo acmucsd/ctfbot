@@ -1,30 +1,32 @@
-import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
 import { CTF, Team } from '../../../../database/models';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'del',
   description: 'Removes the indicated team from the CTF',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'team_role',
       description: 'The team to remove',
-      type: ApplicationCommandOptionType.ROLE,
+      type: ApplicationCommandOptionTypes.ROLE,
       required: false,
     },
   ],
-  // async
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     let teamToDelete: Team;
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
-    if (options?.team_role) {
-      teamToDelete = await ctf.fromRoleTeam(options.team_role as string);
+
+    const teamRole = interaction.options.getRole('team_role');
+
+    if (teamRole) {
+      teamToDelete = await ctf.fromRoleTeam(teamRole.name);
     } else {
-      teamToDelete = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
+      teamToDelete = await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);
     }
     await teamToDelete.deleteTeam(interaction.client);
     return `Deleted team **${teamToDelete.row.name}** from CTF **${ctf.row.name}**`;
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

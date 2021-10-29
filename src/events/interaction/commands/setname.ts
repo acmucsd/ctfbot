@@ -1,27 +1,26 @@
-import CommandInteraction from '../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
 import { CTF } from '../../../database/models';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 
 export default {
   name: 'setname',
   description: "Changes the team's name",
-  type: ApplicationCommandOptionType.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The desired name',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
 
-    const team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
+    const team = await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);
     const oldName = team.row.name;
 
-    await team.setName(interaction.client, options.name.toString());
+    await team.setName(interaction.client, interaction.options.getString('name', true));
 
-    return `Changed **Team ${oldName}**'s name to **Team ${options.name.toString()}**`;
+    return `Changed **Team ${oldName}**'s name to **Team ${interaction.options.getString('name', true)}**`;
   },
-} as ApplicationCommandDefinition;
+} as ChatInputCommandDefinition;

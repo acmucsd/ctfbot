@@ -1,7 +1,6 @@
 import standing from './standing';
 import team from './team';
 import top from './top';
-import { ApplicationCommandDefinition } from '../../compat/types';
 
 export default {
   name: 'scoreboard',

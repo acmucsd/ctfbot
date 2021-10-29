@@ -1,21 +1,19 @@
-import CommandInteraction from '../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import { CTF } from '../../../../database/models';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'join',
   description: 'Sends a request to join the indicated team.',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'team_name',
       description: 'The team you wish to join',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
   ],
-  // async
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
-    return 'a';
+  execute(interaction: PopulatedCommandInteraction) {
+    return 'this command is not implemented';
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

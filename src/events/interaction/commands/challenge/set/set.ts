@@ -8,11 +8,12 @@ import minimumpoints from './minimumpoints';
 import pointdecay from './pointdecay';
 import flag from './flag';
 import publish from './publish';
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
+import { ExecutableSubGroupData } from '../../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'set',
   description: 'Challenge info management',
-  type: ApplicationCommandOptionType.SUB_COMMAND_GROUP,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND_GROUP,
   options: [name, author, prompt, difficulty, points, initialpoints, minimumpoints, pointdecay, flag, publish],
-};
+} as ExecutableSubGroupData;

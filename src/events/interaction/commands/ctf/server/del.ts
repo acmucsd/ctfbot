@@ -1,34 +1,32 @@
-import CommandInteraction from '../../../compat/CommandInteraction';
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
 import { CTF, TeamServer } from '../../../../../database/models';
 
 export default {
   name: 'del',
   description: 'Removes the indicated team server from the indicated CTF',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The name of the team server',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
     {
       name: 'ctf_name',
       description: 'The name of the CTF to remove the guild from',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     let teamServer: TeamServer;
     let ctf: CTF;
 
     if (options && options.name) {
       ctf = await (options.ctf_name
-        ? CTF.fromNameCTF(options.ctf_name as string)
+        ? CTF.fromNameCTF(interaction.options.getString('ctf_name'))
         : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
-      teamServer = await ctf.fromNameTeamServer(options.name as string);
+      teamServer = await ctf.fromNameTeamServer(interaction.options.getString('name'));
     } else {
       teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);
       ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);

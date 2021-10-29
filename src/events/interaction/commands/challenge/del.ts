@@ -1,25 +1,25 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
 import { UnknownChallengeError } from '../../../../errors/UnknownChallengeError';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'del',
   description: 'Removes the indicated challenge. Otherwise, the challenge is inferred from the current channel',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'challenge_channel',
       description: "The challenge's current name",
-      type: ApplicationCommandOptionType.CHANNEL,
+      type: ApplicationCommandOptionTypes.CHANNEL,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    const challengeChannelSnowflake = interaction.options.getChannel('challenge_channel')?.id ?? interaction.channelId;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
 
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
@@ -27,4 +27,4 @@ export default {
 
     return `The challenge **${challenge.row.name}** has been deleted.`;
   },
-};
+} as ExecutableSubCommandData;

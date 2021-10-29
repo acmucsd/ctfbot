@@ -1,18 +1,17 @@
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../compat/types';
-import CommandInteraction from '../compat/CommandInteraction';
 import { CTF } from '../../../database/models';
 import { MessageEmbed, TextChannel } from 'discord.js';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 
 export default {
   name: 'standing',
   description: "Fetch your team's solved challenges and current ranking",
-  type: ApplicationCommandOptionType.SUB_COMMAND,
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
+    const team = await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);
 
-    const team = await ctf.fromUnspecifiedTeam(interaction.member.id, interaction.channel.id);
+    if (!team.row.text_channel_snowflake) throw new Error('mysteriously not able to find the teams text channel');
 
-    const { challengePointMap, sortedTeams, pointsPossible } = await ctf.computeStatistics();
+    const { challengePointMap, sortedTeams } = await ctf.computeStatistics();
 
     const solvedChallenges = await team.getSolvedChallenges();
     const challenges = await ctf.getAllChallenges();
@@ -21,7 +20,7 @@ export default {
       (challenge) =>
         `${solvedChallenges.find((c) => c.row.id === challenge.row.id) ? ':green_circle:' : ':red_circle:'} **${
           challenge.row.name
-        }** (${challengePointMap[challenge.row.id] as number})`,
+        }** (${challengePointMap[challenge.row.id]})`,
     );
 
     const userRank = sortedTeams.findIndex((t) => t.id === team.row.id.toString());
@@ -40,7 +39,7 @@ export default {
     const message = new MessageEmbed();
     message
       .setTitle(`Team ${team.row.name} Current Standing`)
-      .setColor('50c0bf')
+      .setColor('#50c0bf')
       .setDescription(
         `\`\`\`java\n${scoreboardLines.join('\n') || 'No challenges submitted'}\n\`\`\`\n${challengeSummary.join(
           '\n',
@@ -48,8 +47,8 @@ export default {
       );
 
     const teamChannel = interaction.client.channels.resolve(team.row.text_channel_snowflake) as TextChannel;
-    await teamChannel.send(message);
+    await teamChannel.send({ embeds: [message] });
 
     return `Team standing sent to team channel <#${team.row.text_channel_snowflake}>.`;
   },
-} as ApplicationCommandDefinition;
+} as ChatInputCommandDefinition;

@@ -55,7 +55,7 @@ const guildMemberAddEvent = async (member: GuildMember) => {
       teamServer.row.admin_role_snowflake &&
       member.client.guilds
         .resolve(ctf.row.guild_snowflake)
-        ?.members.resolve(member.id)
+        ?.members.resolve(member.user.id)
         ?.roles.resolve(ctf.row.admin_role_snowflake)
     ) {
       await member.roles.add(teamServer.row.admin_role_snowflake);

@@ -1,17 +1,17 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
-import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 
 export default {
   name: 'difficulty',
   description: 'Sets the difficulty of the indicated challenge',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'difficulty',
       description: "The challenge's difficulty",
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
       choices: [
         {
@@ -35,20 +35,20 @@ export default {
     {
       name: 'challenge_channel',
       description: "The challenge's current name",
-      type: ApplicationCommandOptionType.CHANNEL,
+      type: ApplicationCommandOptionTypes.CHANNEL,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const difficulty = options.difficulty.toString();
-    const challengeChannelSnowflake = options.challenge_channel?.toString() ?? interaction.channel.id;
+    const difficulty = interaction.options.getString('difficulty', true);
+    const challengeChannelSnowflake = interaction.options.getString('challenge_channel') ?? interaction.channelId;
     if (!challengeChannelSnowflake) throw new UnknownChallengeError();
     const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
     await challenge.setDifficulty(interaction.client, difficulty);
 
     return `Challenge difficulty has been set to **${difficulty}**.`;
   },
-};
+} as ExecutableSubCommandData;

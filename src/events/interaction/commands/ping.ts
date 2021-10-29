@@ -1,10 +1,9 @@
-import CommandInteraction from '../compat/CommandInteraction';
-import { ApplicationCommandDefinition, CommandOptionMap } from '../compat/types';
+import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 
 export default {
   name: 'ping',
   description: 'sends a ping command',
-  execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  execute(interaction: PopulatedCommandInteraction) {
     return 'pong';
   },
-} as ApplicationCommandDefinition;
+} as ChatInputCommandDefinition;

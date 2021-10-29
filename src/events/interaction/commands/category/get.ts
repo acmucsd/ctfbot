@@ -1,31 +1,33 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
+import { PopulatedCommandInteraction } from '../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'get',
   description: 'Lists all challenges within the category. If none is specified, lists all categories within the CTF.',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The category name',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     // no admin check ctf.throwErrorUnlessAdmin(interaction);
 
+    const name = interaction.options.getString('name');
+
     // list all categories
-    if (!options.name) {
+    if (!name) {
       const categories = (await ctf.getAllCategories()).map((cat) => `**${cat.row.name}**`).join();
       return `**${ctf.row.name}** has the following categories: ${categories}`;
     }
 
     // otherwise, list all challenges in a category
-    const category = await ctf.fromNameCategory(options.name.toString());
+    const category = await ctf.fromNameCategory(name);
     const challenges = (await category.getAllChallenges()).map((chal) => `**${chal.row.name}**`).join();
     return `**${category.row.name}** has the following challenges: ${challenges}`;
   },

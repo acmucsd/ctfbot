@@ -1,12 +1,10 @@
-import { ApplicationCommandDefinition, ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import CommandInteraction from '../../compat/CommandInteraction';
 import { Challenge, CTF } from '../../../../database/models';
 
 export default {
   name: 'top',
   description: 'Show the top 100 players in this CTF',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
@@ -25,7 +23,7 @@ export default {
       (accum: { [key: number]: { [key: string]: { points: number } } }, curr) => {
         accum[curr.team_id] = accum[curr.team_id] || {};
         const chal = challengeMap[curr.challenge_id];
-        accum[curr.team_id][chal.row.name] = { points: challengePointMap[curr.challenge_id] as number };
+        accum[curr.team_id][chal.row.name] = { points: challengePointMap[curr.challenge_id] };
         return accum;
       },
       {},

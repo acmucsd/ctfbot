@@ -2,7 +2,6 @@ import {
   CategoryChannel,
   Client,
   ColorResolvable,
-  CommandInteraction,
   Guild,
   GuildMember,
   MessageEmbed,
@@ -18,7 +17,7 @@ import { NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 import { adminCommands, PopulatedCommandInteraction, userCommands } from '../../events/interaction/interaction';
 import { deleteReactionListener } from '../../events/messageReactionAdd/messageReactionAddEvent';
-import { ApplicationCommandPermissionTypes, ChannelTypes } from 'discord.js/typings/enums';
+import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 
 export default class CTF {
   row: CTFRow;
@@ -81,7 +80,6 @@ export default class CTF {
 
     const tosWebhook = await tosChannel.createWebhook('Terms of Service');
     const tosMessage = await tosWebhook.send(TOSMessage);
-    await tosMessage.react('👍');
 
     await ctf.setTOSWebhook(tosWebhook.id);
 

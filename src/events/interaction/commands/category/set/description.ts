@@ -1,32 +1,34 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../../compat/types';
-import CommandInteraction from '../../../compat/CommandInteraction';
 import { CTF } from '../../../../../database/models';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'description',
   description: 'Changes the description of the indicated category',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'category_name',
       description: 'The current category name',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
     {
       name: 'description',
       description: 'The new category description',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const category = await ctf.fromNameCategory(options.category_name.toString());
-    await category.setDescription(options.description.toString());
+    const description = interaction.options.getString('description', true);
 
-    return `Category **${category.row.name}** description has been set to **${category.row.description}**.`;
+    const category = await ctf.fromNameCategory(interaction.options.getString('category_name', true));
+    await category.setDescription(description);
+
+    return `Category **${category.row.name}** description has been set to **${description}**.`;
   },
-};
+} as ExecutableSubCommandData;

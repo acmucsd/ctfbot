@@ -1,27 +1,27 @@
-import { ApplicationCommandOptionType, CommandOptionMap } from '../../compat/types';
-import CommandInteraction from '../../compat/CommandInteraction';
 import { CTF } from '../../../../database/models';
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 export default {
   name: 'del',
   description: 'Removes the provided category from the current CTF.',
-  type: ApplicationCommandOptionType.SUB_COMMAND,
+  type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
       name: 'name',
       description: 'The category name',
-      type: ApplicationCommandOptionType.STRING,
+      type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
   ],
-  async execute(interaction: CommandInteraction, options: CommandOptionMap) {
+  async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     ctf.throwErrorUnlessAdmin(interaction);
 
-    const name = options.name.toString();
+    const name = interaction.options.getString('name', true);
     const category = await ctf.fromNameCategory(name);
     await category.deleteCategory(interaction.client);
 
     return `Category **${name}** has been removed`;
   },
-};
+} as ExecutableSubCommandData;
