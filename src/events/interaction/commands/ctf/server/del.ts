@@ -1,4 +1,6 @@
 import { CTF, TeamServer } from '../../../../../database/models';
+import { ApplicationCommandOptionTypes } from "discord.js/typings/enums";
+import { ExecutableSubCommandData, PopulatedCommandInteraction } from "../../../interaction";
 
 export default {
   name: 'del',
@@ -22,11 +24,14 @@ export default {
     let teamServer: TeamServer;
     let ctf: CTF;
 
-    if (options && options.name) {
-      ctf = await (options.ctf_name
-        ? CTF.fromNameCTF(interaction.options.getString('ctf_name'))
+    const name = interaction.options.getString('name');
+    const ctf_name = interaction.options.getString('ctf_name');
+
+    if (name) {
+      ctf = await (ctf_name
+        ? CTF.fromNameCTF(ctf_name)
         : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
-      teamServer = await ctf.fromNameTeamServer(interaction.options.getString('name'));
+      teamServer = await ctf.fromNameTeamServer(name);
     } else {
       teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);
       ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
@@ -35,4 +40,4 @@ export default {
     await teamServer.deleteTeamServer(interaction.client);
     return `Removed **${teamServer.row.name}** from CTf **${ctf.row.name}**`;
   },
-} as ApplicationCommandDefinition;
+} as ExecutableSubCommandData;

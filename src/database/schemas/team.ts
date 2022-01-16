@@ -11,9 +11,6 @@ export const schema = `CREATE TABLE IF NOT EXISTS teams (
   PRIMARY KEY( id )
 );`;
 
-// no captain user yet due to an initialization error
-// captain_user_id integer REFERENCES users,
-
 export interface TeamRow {
   id: number;
   team_role_snowflake_main: string | null;

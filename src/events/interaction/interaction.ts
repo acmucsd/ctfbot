@@ -4,8 +4,8 @@ import {
   ChatInputApplicationCommandData,
   Client,
   CommandInteraction,
-  Interaction,
-} from 'discord.js';
+  Interaction
+} from "discord.js";
 import { category, challenge, ctf, ping, scoreboard, team } from './commands';
 import { embedify, logger } from '../../log';
 import addctf from './commands/addctf';
@@ -119,5 +119,4 @@ type CommandWithExecutableSubCommands = Omit<ChatInputApplicationCommandData, 'o
 };
 
 export type ChatInputCommandDefinition = ExecutableTopLevelCommandData | CommandWithExecutableSubCommands;
-
-export type PopulatedCommandInteraction = CommandInteraction;
+export type PopulatedCommandInteraction = CommandInteraction<'cached'>;

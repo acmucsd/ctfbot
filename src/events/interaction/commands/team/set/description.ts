@@ -1,6 +1,5 @@
-import { CTF, Team } from '../../../../../database/models';
+import { CTF } from '../../../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { CommandInteraction } from 'discord.js';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 
 export default {

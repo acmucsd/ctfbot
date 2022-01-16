@@ -16,7 +16,6 @@ import { logger } from '../../log';
 import { NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
 import { adminCommands, PopulatedCommandInteraction, userCommands } from '../../events/interaction/interaction';
-import { deleteReactionListener } from '../../events/messageReactionAdd/messageReactionAddEvent';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 
 export default class CTF {
@@ -79,7 +78,7 @@ export default class CTF {
     await ctf.setScoreboardChannel(scoreboardChannel.id);
 
     const tosWebhook = await tosChannel.createWebhook('Terms of Service');
-    const tosMessage = await tosWebhook.send(TOSMessage);
+    await tosWebhook.send(TOSMessage);
 
     await ctf.setTOSWebhook(tosWebhook.id);
 
@@ -101,7 +100,6 @@ export default class CTF {
       } catch (e) {
         logger.warn("Couldn't remove TOS webhook from the server! (maybe it was deleted?)");
       }
-      deleteReactionListener(this.row.tos_webhook_snowflake);
     }
 
     if (this.row.tos_channel_snowflake) {
@@ -548,8 +546,7 @@ export default class CTF {
 
       const challenges = await category.getAllChallenges();
       for (const challenge of challenges) {
-        const challengeChannel = await guild.channels.create(challenge.row.name);
-        await challengeChannel.setParent(categoryChannel.id);
+        const challengeChannel = await guild.channels.create(challenge.row.name, { parent: categoryChannel.id, type: 'GUILD_TEXT' });
         challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id})`);
       }
     }
@@ -934,7 +931,7 @@ export default class CTF {
     }
     channel = await guild.channels.create(`${name}`, { type: 'GUILD_TEXT' });
     logger.debug(`Created **${name}** channel`);
-    return channel as TextChannel;
+    return channel;
   }
 }
 

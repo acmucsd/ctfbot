@@ -155,7 +155,6 @@ export default class Challenge {
       if (solves === 1) await this.setFirstBlood(client, user.row.id);
 
       const channel = await team.getTeamChannel(client);
-      const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
 
       const congratsMessage = new MessageEmbed();
       congratsMessage.setTitle('🎉 Congratulations! 🎉');

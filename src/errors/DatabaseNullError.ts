@@ -1,6 +1,6 @@
 import CTFBotError from './index';
 
-class DatabaseNullError extends CTFBotError {
+export class DatabaseNullError extends CTFBotError {
   fieldName: string;
 
   constructor(fieldName: string, message: string) {

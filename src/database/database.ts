@@ -14,4 +14,5 @@ initTables(pool)
     process.exit(1);
   });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async (text: string, params?: any[]) => pool.query(text, params);

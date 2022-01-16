@@ -86,9 +86,9 @@ export default class User {
   }
 
   // returns true if this user is the only person on their team
-  async isAlone() {
+  async isAlone(): Promise<boolean> {
     const { rows } = await query(`SELECT COUNT(*) FROM users WHERE team_id = ${this.row.team_id}`);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
     return rows && rows[0].count && rows[0].count === '1';
   }
 
