@@ -96,7 +96,7 @@ export const interactionEvent = async (interaction: Interaction) => {
 };
 
 export const registerCommands = async (client: Client<true>) => {
-  logger.info('registering commands...');
+  logger.info('registering commands....');
   // first, register global commands
   await client.application.commands.set(topLevelCommands);
 
