@@ -1,7 +1,6 @@
 import {
   ApplicationCommandSubCommandData,
   ApplicationCommandSubGroupData,
-  BaseGuildCommandInteraction,
   ChatInputApplicationCommandData,
   Client,
   CommandInteraction,
@@ -121,4 +120,4 @@ type CommandWithExecutableSubCommands = Omit<ChatInputApplicationCommandData, 'o
 
 export type ChatInputCommandDefinition = ExecutableTopLevelCommandData | CommandWithExecutableSubCommands;
 
-export type PopulatedCommandInteraction = BaseGuildCommandInteraction<'cached'> & CommandInteraction;
+export type PopulatedCommandInteraction = CommandInteraction;

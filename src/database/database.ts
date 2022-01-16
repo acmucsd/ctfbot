@@ -14,4 +14,4 @@ initTables(pool)
     process.exit(1);
   });
 
-export default (text: string, params?) => pool.query(text, params);
+export default async (text: string, params?: any[]) => pool.query(text, params);

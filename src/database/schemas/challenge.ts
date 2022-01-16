@@ -18,13 +18,13 @@ export interface ChallengeRow {
   id: number;
   category_id: number;
   name: string;
-  author: string | null;
-  prompt: string | null;
-  difficulty: string | null;
-  initial_points: number | null;
-  point_decay: number | null;
-  min_points: number | null;
-  flag: string | null;
+  author: string;
+  prompt: string;
+  difficulty: string;
+  initial_points: number;
+  point_decay: number;
+  min_points: number;
+  flag: string;
   first_blood_id: number | null;
   publish_time: Date | null;
 }

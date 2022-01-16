@@ -133,7 +133,7 @@ export default class Challenge {
   // returns the attempt
   async submitFlag(client: Client, user: User, flag: string) {
     // is after the publish date
-    if (this.ctf.row?.start_date > new Date()) throw new Error('ctf has not yet been published');
+    if (this.ctf.row.start_date == null || this.ctf.row.start_date > new Date()) throw new Error('ctf has not yet been published');
 
     // has this team already solved this challenge?
     const team = await user.getTeam();
@@ -157,23 +157,6 @@ export default class Challenge {
       const channel = await team.getTeamChannel(client);
       const teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(channel.guild.id);
 
-      // add a check in /submit that, after a successful submit, give that team role permission to
-      // view the unlocked challenges. Also, add that channels were unlocked to the congrats message.
-      // TODO: doesn't handle the case where there are multiple dependencies for one challenge
-      const newChallengeIDs = await this.getChallengeDependencies();
-      const newChallengeIDSet = new Set(newChallengeIDs);
-
-      const challengeChannels = await teamServer.getAllChallengeChannels();
-      const relevantChallengeChannels = challengeChannels.filter((chal) => newChallengeIDSet.has(chal.challenge_id));
-
-      for (const c of relevantChallengeChannels) {
-        await channel.guild.channels
-          .resolve(c.channel_snowflake)
-          .updateOverwrite(channel.guild.roles.resolve(team.row.team_role_snowflake_team_server), {
-            VIEW_CHANNEL: true,
-          });
-      }
-
       const congratsMessage = new MessageEmbed();
       congratsMessage.setTitle('🎉 Congratulations! 🎉');
       congratsMessage.description = `Player <@${user.row.user_snowflake}> submitted the **correct** flag for the challenge **${this.row.name}**, and your team has been awarded ${points} points.`;
@@ -181,19 +164,12 @@ export default class Challenge {
       congratsMessage.addField('Team Points', `${await team.calculatePoints()}`);
       // TODO this caused problems in production, can we figure out a way to get it to work?
       // congratsMessage.addField('Place Overall', `${21}`);
-      // if (relevantChallengeChannels)
-      //   congratsMessage.addField(
-      //     'Challenges Unlocked',
-      //     `${relevantChallengeChannels.map((c) => `<#${c.channel_snowflake}>`).join(', ')}`,
-      //   );
       congratsMessage.setTimestamp();
-      congratsMessage.setColor('50c0bf');
-
-      await channel.send(congratsMessage);
+      congratsMessage.setColor('#50c0bf');
+      await channel.send({ embeds: [congratsMessage] });
 
       // update points and such
       await this.updateChallengeChannels(client);
-
       return attempt;
     }
 
@@ -221,7 +197,8 @@ export default class Challenge {
     const { rows } = await query(
       `SELECT COUNT(id) FROM attempts WHERE challenge_id = ${this.row.id} AND successful = true`,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
+    // TODO: fix this nasty computation
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-argument
     return rows && rows[0].count && parseInt(rows[0].count);
   }
 
@@ -313,16 +290,16 @@ export default class Challenge {
     return rows.map((row) => row as ChallengeChannelRow);
   }
 
-  async updateChallengeChannels(client: Client) {
+  async updateChallengeChannels(client: Client<true>) {
     const category = await this.getCategory();
 
     const challengeMessage = new MessageEmbed();
     challengeMessage.setTitle(this.row.name);
     challengeMessage.setDescription(this.row.prompt);
-    challengeMessage.setAuthor(`${category.row.name} - ${this.row.difficulty}`);
-    challengeMessage.setFooter(`By ${this.row.author}`);
+    challengeMessage.setAuthor({ name: `${category.row.name} - ${this.row.difficulty}` });
+    challengeMessage.setFooter({ text: `By ${this.row.author}` });
     challengeMessage.setTimestamp();
-    challengeMessage.setColor('50c0bf');
+    challengeMessage.setColor('#50c0bf');
 
     const attachments = await this.getAllAttachments();
     attachments.forEach((attachment) => challengeMessage.addField(attachment.row.name, attachment.row.url));
@@ -330,7 +307,7 @@ export default class Challenge {
     const solvesMessage = new MessageEmbed();
     const solves = await this.getSolves();
     // if there are no solves, the message is slightly different
-    if (solves === 0) {
+    if (this.row.first_blood_id === null) {
       solvesMessage.setTitle('🚨 This challenge currently has no solves! 🚨');
       solvesMessage.setDescription('Do you have what it takes to be the first?');
     } else {
@@ -338,8 +315,8 @@ export default class Challenge {
       const team = await user.getTeam();
       // try and pull the display name from the main guild, otherwise use their username
       const username =
-        this.ctf.getGuild(client).members.resolve(user.row.user_snowflake).displayName ||
-        client.users.resolve(user.row.user_snowflake).username;
+        this.ctf.getGuild(client).members.resolve(user.row.user_snowflake)?.displayName ||
+        client.users.resolve(user.row.user_snowflake)?.username || 'UNRESOLVABLE NAME';
       solvesMessage.setTitle('🔓 This challenge has been solved 🔓');
       solvesMessage.setDescription(
         `The first to solve this challenge was **${username}** from **Team ${team.row.name}**`,
@@ -348,7 +325,7 @@ export default class Challenge {
     solvesMessage.addField('Current # of Solves', `${solves}`, true);
     solvesMessage.addField('Current Point Value', `${this.getCurrentPoints(solves)}`, true);
     solvesMessage.setTimestamp();
-    solvesMessage.setColor('e91e63');
+    solvesMessage.setColor('#e91e63');
 
     const channels = await this.getChallengeChannels();
     for (const channel of channels) {
@@ -359,14 +336,14 @@ export default class Challenge {
       const botMessages = messages.filter((message) => message.author.id === client.user.id);
       // if the challenge messages don't already exist, we need to send them
       if (!botMessages || botMessages.size === 0) {
-        await guildChannel.send(challengeMessage);
-        await guildChannel.send(solvesMessage);
+        await guildChannel.send({ embeds: [challengeMessage] });
+        await guildChannel.send({ embeds: [solvesMessage] });
         return;
       }
 
       // otherwise, we need to edit them
-      await botMessages.array()[0].edit(solvesMessage);
-      await botMessages.array()[1].edit(challengeMessage);
+      await botMessages.at(1)?.edit({ embeds: [solvesMessage] });
+      await botMessages.at(1)?.edit({ embeds: [challengeMessage] });
     }
   }
 }
