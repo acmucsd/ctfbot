@@ -18,6 +18,7 @@ services:
     environment:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       PGPASSWORD: "${PGPASSWORD}"
+      PGUSER: "ctfbot"
       PGHOST: "postgres"
     volumes:
       - ./:/app
