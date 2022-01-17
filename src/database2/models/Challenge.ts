@@ -2,6 +2,8 @@ import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Category } from './Category';
 import { User } from './User';
 import { Flag, initFlag } from './Flag';
+import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
+import { TeamServer } from './TeamServer';
 
 interface ChallengeAttributes {
   id: number;
@@ -43,6 +45,18 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;
   declare readonly category?: Category;
+
+  // declare getChallengeChannels: HasManyGetAssociationsMixin<ChallengeChannel>;
+  // declare countChallengeChannels: HasManyCountAssociationsMixin;
+  // declare hasChallengeChannel: HasManyHasAssociationMixin<ChallengeChannel, number>;
+  // declare hasChallengeChannels: HasManyHasAssociationsMixin<ChallengeChannel, number>;
+  // declare setChallengeChannels: HasManySetAssociationsMixin<ChallengeChannel, number>;
+  // declare addChallengeChannel: HasManyAddAssociationMixin<ChallengeChannel, number>;
+  // declare addChallengeChannels: HasManyAddAssociationsMixin<ChallengeChannel, number>;
+  // declare removeChallengeChannel: HasManyRemoveAssociationMixin<ChallengeChannel, number>;
+  // declare removeChallengeChannels: HasManyRemoveAssociationsMixin<ChallengeChannel, number>;
+  // declare createChallengeChannel: HasManyCreateAssociationMixin<ChallengeChannel>;
+  // declare readonly challengeChannels?: ChallengeChannel[];
 
   // declare getFlags: HasManyGetAssociationsMixin<Flag>;
   // declare countFlags: HasManyCountAssociationsMixin;
@@ -116,6 +130,9 @@ export function initChallenge(sequelize: Sequelize) {
       allowNull: false,
     },
   });
+
+  initChallengeChannel(sequelize);
+  Challenge.hasMany(ChallengeChannel);
 
   initFlag(sequelize);
   Challenge.hasMany(Flag);

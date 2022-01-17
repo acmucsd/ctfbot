@@ -105,9 +105,9 @@ export function initCTF(sequelize: Sequelize) {
     },
   );
 
-  initCategory(sequelize);
-  CTF.hasMany(Category);
-
   initTeamServer(sequelize);
   CTF.hasMany(TeamServer);
+
+  initCategory(sequelize);
+  CTF.hasMany(Category);
 }

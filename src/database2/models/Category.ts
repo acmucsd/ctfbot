@@ -1,6 +1,8 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { CTF } from './CTF';
 import { Challenge, initChallenge } from './Challenge';
+import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
+import { TeamServer } from './TeamServer';
 
 interface CategoryAttributes {
   id: number;
@@ -20,6 +22,18 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
+
+  // declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
+  // declare countCategoryChannels: HasManyCountAssociationsMixin;
+  // declare hasCategoryChannel: HasManyHasAssociationMixin<CategoryChannel, number>;
+  // declare hasCategoryChannels: HasManyHasAssociationsMixin<CategoryChannel, number>;
+  // declare setCategoryChannels: HasManySetAssociationsMixin<CategoryChannel, number>;
+  // declare addCategoryChannel: HasManyAddAssociationMixin<CategoryChannel, number>;
+  // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
+  // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
+  // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
+  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
+  // declare readonly categoryChannels?: CategoryChannel[];
 
   // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
   // declare countChallenges: HasManyCountAssociationsMixin;
@@ -58,6 +72,9 @@ export function initCategory(sequelize: Sequelize) {
       allowNull: false,
     },
   });
+
+  initCategoryChannel(sequelize);
+  Category.hasMany(CategoryChannel);
 
   initChallenge(sequelize);
   Category.hasMany(Challenge);

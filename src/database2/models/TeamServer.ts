@@ -58,18 +58,6 @@ export class TeamServer
   // declare removeTeams: HasManyRemoveAssociationsMixin<Team, number>;
   // declare createTeam: HasManyCreateAssociationMixin<Team>;
   declare readonly teams?: Team[];
-
-  // declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
-  // declare countCategoryChannels: HasManyCountAssociationsMixin;
-  // declare hasCategoryChannel: HasManyHasAssociationMixin<CategoryChannel, number>;
-  // declare hasCategoryChannels: HasManyHasAssociationsMixin<CategoryChannel, number>;
-  // declare setCategoryChannels: HasManySetAssociationsMixin<CategoryChannel, number>;
-  // declare addCategoryChannel: HasManyAddAssociationMixin<CategoryChannel, number>;
-  // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
-  // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
-  // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
-  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
-  // declare readonly categoryChannels?: CategoryChannel[];
 }
 
 export function initTeamServer(sequelize: Sequelize) {
@@ -109,10 +97,4 @@ export function initTeamServer(sequelize: Sequelize) {
 
   initTeam(sequelize);
   TeamServer.hasMany(Team);
-
-  initCategoryChannel(sequelize);
-  TeamServer.hasMany(CategoryChannel);
-
-  initChallengeChannel(sequelize);
-  TeamServer.hasMany(ChallengeChannel);
 }
