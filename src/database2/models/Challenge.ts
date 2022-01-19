@@ -3,7 +3,6 @@ import { Category } from './Category';
 import { User } from './User';
 import { Flag, initFlag } from './Flag';
 import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
-import { TeamServer } from './TeamServer';
 
 interface ChallengeAttributes {
   id: number;

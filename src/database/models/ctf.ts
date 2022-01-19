@@ -15,7 +15,7 @@ import TOSMessage from '../../tos.json';
 import { logger } from '../../log';
 import { NoRoomError, NoTeamUserError, NoUserError } from '../../errors';
 import Challenge from './challenge';
-import { adminCommands, PopulatedCommandInteraction, userCommands } from '../../events/interaction/interaction';
+import { adminCommands, PopulatedCommandInteraction, userCommands } from '../../discord/events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 
 export default class CTF {
@@ -546,7 +546,10 @@ export default class CTF {
 
       const challenges = await category.getAllChallenges();
       for (const challenge of challenges) {
-        const challengeChannel = await guild.channels.create(challenge.row.name, { parent: categoryChannel.id, type: 'GUILD_TEXT' });
+        const challengeChannel = await guild.channels.create(challenge.row.name, {
+          parent: categoryChannel.id,
+          type: 'GUILD_TEXT',
+        });
         challengeChannels.push(`(${challenge.row.id}, ${teamServer.row.id}, ${challengeChannel.id})`);
       }
     }

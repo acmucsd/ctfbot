@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "CTF embedded into a Discord bot",
   "scripts": {
-    "start": "ts-node-dev --respawn -r dotenv/config ./src",
+    "start": "node-dev -r dotenv/config ./src/index.ts",
     "start:prod": "node ./dist/index.js",
     "build": "npm run build-ts",
     "build-ts": "tsc",
@@ -50,9 +50,10 @@
     "@typescript-eslint/parser": "^5.9.1",
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^8.3.0",
+    "node-dev": "^7.1.0",
     "prettier": "^2.5.1",
     "prettier-eslint-cli": "^5.0.1",
-    "ts-node-dev": "^1.1.8",
+    "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   }
 }

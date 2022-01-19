@@ -1,6 +1,6 @@
 import { Client, Intents } from 'discord.js';
 import { discordConfig } from './config';
-import { eventLoader } from './events';
+import { eventLoader } from './discord/events';
 import sequelize from './database2';
 import { logger } from './log';
 

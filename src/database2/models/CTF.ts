@@ -11,18 +11,17 @@ interface CTFAttributes {
   // when endDate is null, submission is allowed indefinitely
   endDate?: Date;
   // discord stuff to be defined later
-  adminRoleSnowflake?: string;
-  participantRoleSnowflake?: string;
-  announcementsChannelSnowflake?: string;
-  scoreboardChannelSnowflake?: string;
-  tosChannelSnowflake?: string;
-  infoCategorySnowflake?: string;
+  adminRoleSnowflake: string;
+  participantRoleSnowflake: string;
+  announcementsChannelSnowflake: string;
+  scoreboardChannelSnowflake: string;
+  tosChannelSnowflake: string;
+  infoCategorySnowflake: string;
 }
 
 type CTFCreationAttributes = Optional<
   CTFAttributes,
   | 'id'
-  | 'name'
   | 'startDate'
   | 'endDate'
   | 'adminRoleSnowflake'
@@ -39,12 +38,12 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   declare guildSnowflake: string;
   declare startDate?: Date;
   declare endDate?: Date;
-  declare adminRoleSnowflake?: string;
-  declare participantRoleSnowflake?: string;
-  declare announcementsChannelSnowflake?: string;
-  declare scoreboardChannelSnowflake?: string;
-  declare tosChannelSnowflake?: string;
-  declare infoCategorySnowflake?: string;
+  declare adminRoleSnowflake: string;
+  declare participantRoleSnowflake: string;
+  declare announcementsChannelSnowflake: string;
+  declare scoreboardChannelSnowflake: string;
+  declare tosChannelSnowflake: string;
+  declare infoCategorySnowflake: string;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -84,21 +83,45 @@ export function initCTF(sequelize: Sequelize) {
       },
       name: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       guildSnowflake: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       startDate: DataTypes.DATE,
       endDate: DataTypes.DATE,
-      adminRoleSnowflake: DataTypes.STRING,
-      participantRoleSnowflake: DataTypes.STRING,
-      announcementsChannelSnowflake: DataTypes.STRING,
-      scoreboardChannelSnowflake: DataTypes.STRING,
-      tosChannelSnowflake: DataTypes.STRING,
-      infoCategorySnowflake: DataTypes.STRING,
+      adminRoleSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      participantRoleSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      announcementsChannelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      scoreboardChannelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      tosChannelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      infoCategorySnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
     },
     {
       sequelize,

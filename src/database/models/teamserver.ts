@@ -1,10 +1,10 @@
-import { CategoryChannel, Client, ColorResolvable, Guild, GuildChannel, Role, TextChannel } from "discord.js";
-import { logger } from "../../log";
-import { CTF, Team } from ".";
-import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from "../schemas";
-import query from "../database";
-import { adminCommands, userCommands } from "../../events/interaction/interaction";
-import { createDiscordNullError } from "../../errors/DiscordNullError";
+import { CategoryChannel, Client, ColorResolvable, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
+import { logger } from '../../log';
+import { CTF, Team } from '.';
+import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
+import query from '../database';
+import { adminCommands, userCommands } from '../../discord/events/interaction/interaction';
+import { createDiscordNullError } from '../../errors/DiscordNullError';
 
 export default class TeamServer {
   row: TeamServerRow;
@@ -22,14 +22,12 @@ export default class TeamServer {
     // TODO: Does deleting a team server delete all of the associated teams just like with a ctf?
     const teams = await this.getAllTeams();
     const guild = client.guilds.resolve(this.row.guild_snowflake);
-    if (!guild)
-      throw createDiscordNullError("teamserver_guild");
+    if (!guild) throw createDiscordNullError('teamserver_guild');
     const mainGuild = this.ctf.getGuild(client);
 
     // Delete all team roles and channels
     teams.forEach((team) => {
-      if (team.row.text_channel_snowflake)
-        void guild.channels.resolve(team.row.text_channel_snowflake)?.delete();
+      if (team.row.text_channel_snowflake) void guild.channels.resolve(team.row.text_channel_snowflake)?.delete();
       if (team.row.team_role_snowflake_team_server)
         void guild.roles.resolve(team.row.team_role_snowflake_team_server)?.delete();
     });
@@ -39,23 +37,22 @@ export default class TeamServer {
 
     // async queue these for deleting
     await Promise.all(
-      (await this.getAllChallengeChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete())
+      (await this.getAllChallengeChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
     );
     await Promise.all(
-      (await this.getAllCategoryChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete())
+      (await this.getAllCategoryChannels()).map((chan) => guild.channels.resolve(chan.channel_snowflake)?.delete()),
     );
 
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
     await guild.roles.resolve(this.row.participant_role_snowflake)?.delete();
     this.deleteChannel(client, this.row.info_channel_snowflake, this.row.team_category_snowflake);
-    logger.info("Deleted CTF-Related roles, channels, and categories");
+    logger.info('Deleted CTF-Related roles, channels, and categories');
 
     if (this.row.invite_channel_snowflake)
       await mainGuild.channels.resolve(this.row.invite_channel_snowflake)?.delete();
-    if (this.row.invite_role_snowflake)
-      await mainGuild.roles.resolve(this.row.invite_role_snowflake)?.delete();
-    logger.info("Deleted TeamServer-related channels from main guild");
+    if (this.row.invite_role_snowflake) await mainGuild.roles.resolve(this.row.invite_role_snowflake)?.delete();
+    logger.info('Deleted TeamServer-related channels from main guild');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
     logger.info(`Deleted **${this.row.name}** TeamServer`);
@@ -68,14 +65,15 @@ export default class TeamServer {
   }
 
   async setServerInvite(client: Client) {
-    if (!this.row.info_channel_snowflake)
-      throw createDiscordNullError("info_channel_snowflake");
-    const infoChannel = client.guilds.resolve(this.row.guild_snowflake)?.channels.resolve(this.row.info_channel_snowflake);
+    if (!this.row.info_channel_snowflake) throw createDiscordNullError('info_channel_snowflake');
+    const infoChannel = client.guilds
+      .resolve(this.row.guild_snowflake)
+      ?.channels.resolve(this.row.info_channel_snowflake);
     if (!infoChannel || !infoChannel.isText() || infoChannel.isThread())
-      throw createDiscordNullError("info_channel_snowflake");
+      throw createDiscordNullError('info_channel_snowflake');
     const invite = await infoChannel.createInvite({
       temporary: false,
-      maxAge: 0
+      maxAge: 0,
     });
     await query(`UPDATE team_servers SET server_invite = $1 WHERE id = ${this.row.id}`, [invite.code]);
     this.row.server_invite = invite.code;
@@ -84,7 +82,7 @@ export default class TeamServer {
 
   async setInviteChannelSnowflake(invite_channel_snowflake: string) {
     await query(
-      `UPDATE team_servers SET invite_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`
+      `UPDATE team_servers SET invite_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.invite_channel_snowflake = invite_channel_snowflake;
     logger.info(`Set invite channel for **${this.row.name}** in main CTF`);
@@ -101,7 +99,7 @@ export default class TeamServer {
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
   async setTeamCategorySnowflake(team_category_snowflake: string) {
     await query(
-      `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`
+      `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.team_category_snowflake = team_category_snowflake;
     logger.info(`Set info channel for **${this.row.name}** as ${team_category_snowflake}`);
@@ -120,7 +118,7 @@ export default class TeamServer {
 
   async getAllChallengeChannels() {
     const { rows: challenge_rows } = await query(
-      `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`
+      `SELECT * FROM challenge_channels WHERE teamserver_id = ${this.row.id}`,
     );
     return challenge_rows as ChallengeChannelRow[];
   }
@@ -143,7 +141,7 @@ export default class TeamServer {
       await channel.delete();
       logger.info(`**${name}** found: deleted **${name}** channel`);
     }
-    channel = await guild.channels.create(`${name}`, { type: "GUILD_TEXT" });
+    channel = await guild.channels.create(`${name}`, { type: 'GUILD_TEXT' });
     logger.info(`Created **${name}** channel`);
     return channel;
   }
@@ -153,10 +151,10 @@ export default class TeamServer {
     const channel = guild.channels.resolve(channel_snowflake);
     if (channel) {
       const oldName = channel.name;
-      await channel.setName(newName.toLowerCase().replace(" ", "-"));
+      await channel.setName(newName.toLowerCase().replace(' ', '-'));
       logger.info(`Renamed **${oldName}** channel to **${newName}**`);
     } else {
-      throw new Error("channel not found");
+      throw new Error('channel not found');
     }
   }
 
@@ -186,7 +184,7 @@ export default class TeamServer {
     const guild = this.getGuild(client);
     let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'GUILD_CATEGORY');
     if (!category) {
-      category = await guild.channels.create(`${name}`, { type: "GUILD_CATEGORY" });
+      category = await guild.channels.create(`${name}`, { type: 'GUILD_CATEGORY' });
       logger.info(`**${name}** category not found: created **${name}** category`);
     }
     return category as CategoryChannel;
@@ -200,7 +198,7 @@ export default class TeamServer {
     //     team.row.name.toLowerCase().replace(' ', '-') === name.toLowerCase().replace(' ', '-'),
     // );
     // if (teams.length !== 0) throw new DupeTeamError();
-    const { rows } = await query("INSERT INTO teams(name) VALUES ($1) RETURNING *", [name]);
+    const { rows } = await query('INSERT INTO teams(name) VALUES ($1) RETURNING *', [name]);
     const team = new Team(rows[0] as TeamRow);
     await team.setTeamServerID(client, this.row.id);
 
@@ -216,7 +214,7 @@ export default class TeamServer {
   /** Team Retrieval */
   async fromNameTeam(name: string) {
     const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and name = $1`, [name]);
-    if (rows.length === 0) throw new Error("no team with that name in this ctf");
+    if (rows.length === 0) throw new Error('no team with that name in this ctf');
     return new Team(rows[0] as TeamRow);
   }
 
@@ -224,18 +222,18 @@ export default class TeamServer {
     logger.info(`Looking for **${team_role_snowflake}**...`);
     const { rows } = await query(
       `SELECT * FROM teams WHERE (team_role_snowflake_team_server = $1 or team_role_snowflake_main = $1) and team_server_id = ${this.row.id} `,
-      [team_role_snowflake]
+      [team_role_snowflake],
     );
     if (rows.length !== 0) return new Team(rows[0] as TeamRow);
-    throw new Error("no team with that role in this server");
+    throw new Error('no team with that role in this server');
   }
 
   async fromChannelTeam(text_channel_snowflake: string) {
     const { rows } = await query(
       `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`,
-      [text_channel_snowflake]
+      [text_channel_snowflake],
     );
-    if (rows.length === 0) throw new Error("no team associated with that channel");
+    if (rows.length === 0) throw new Error('no team associated with that channel');
     return new Team(rows[0] as TeamRow);
   }
 
@@ -247,7 +245,7 @@ export default class TeamServer {
   /** Misc */
   getGuild(client: Client): Guild {
     const guild = client.guilds.resolve(this.row.guild_snowflake);
-    if (!guild) throw Error("No guild corresponds with the current CTF id");
+    if (!guild) throw Error('No guild corresponds with the current CTF id');
     return guild;
   }
 
@@ -292,35 +290,38 @@ export default class TeamServer {
       await roleToChange.setName(new_name);
       logger.info(`Renamed **${roleToChange.name}** role to **${new_name}**`);
     } else {
-      throw new Error("role not found in ctf");
+      throw new Error('role not found in ctf');
     }
   }
 
   async registerCommands(client: Client) {
     const guild = this.getGuild(client);
     const applicationAdminCommands = await guild.commands.set(adminCommands);
-    if(!this.row.admin_role_snowflake)
-      throw createDiscordNullError('admin_role_snowflake');
+    if (!this.row.admin_role_snowflake) throw createDiscordNullError('admin_role_snowflake');
     // ensure only admins can use admin commands
     for (const com of applicationAdminCommands.values()) {
-      await com.permissions.add({ permissions: [{ id: this.row.admin_role_snowflake, type: "ROLE", permission: true }] })
+      await com.permissions.add({
+        permissions: [{ id: this.row.admin_role_snowflake, type: 'ROLE', permission: true }],
+      });
     }
     const applicationUserCommands = await guild.commands.set(userCommands);
     // ensure only users can use user commands
     for (const com of applicationUserCommands.values()) {
-      await com.permissions.add({ permissions: [{ id: this.row.participant_role_snowflake, type: "ROLE", permission: true }] })
+      await com.permissions.add({
+        permissions: [{ id: this.row.participant_role_snowflake, type: 'ROLE', permission: true }],
+      });
     }
   }
 
   async hasSpace(print?: boolean) {
     const hasSpace = (await this.getAllTeams()).length < this.row.team_limit;
-    if (print) logger.info(`Team server **${this.row.name}** has${hasSpace ? " " : " no "}space`);
+    if (print) logger.info(`Team server **${this.row.name}** has${hasSpace ? ' ' : ' no '}space`);
     return hasSpace;
   }
 
   async fromIdTeam(team_id: number) {
     const { rows } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and id = ${team_id}`);
-    if (rows.length === 0) throw new Error("no team associated with that id in this server");
+    if (rows.length === 0) throw new Error('no team associated with that id in this server');
     return new Team(rows[0] as TeamRow);
   }
 
