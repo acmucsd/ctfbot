@@ -38,6 +38,8 @@ export async function refreshCTF(ctf: CTF, client: Client<true>) {
     })),
   });
 
+  // TODO: take into account startDate and endDate when setting command permissions
+
   // create info category
   const infoCategory =
     (ctf.infoCategorySnowflake && (await guild.channels.fetch(ctf.infoCategorySnowflake))) ||
