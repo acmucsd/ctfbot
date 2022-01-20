@@ -5,6 +5,7 @@ import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../inte
 export default {
   name: 'submit',
   description: "Submits a challenge's flag",
+  default_permission: false,
   options: [
     {
       name: 'challenge_channel',

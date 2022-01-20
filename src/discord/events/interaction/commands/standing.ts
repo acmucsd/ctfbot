@@ -5,6 +5,7 @@ import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../inte
 export default {
   name: 'standing',
   description: "Fetch your team's solved challenges and current ranking",
+  default_permission: false,
   async execute(interaction: PopulatedCommandInteraction) {
     const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
     const team = await ctf.fromUnspecifiedTeam(interaction.member.user.id, interaction.channelId);

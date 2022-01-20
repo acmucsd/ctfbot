@@ -5,6 +5,7 @@ import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../inte
 export default {
   name: 'setname',
   description: "Changes the team's name",
+  default_permission: false,
   options: [
     {
       name: 'name',

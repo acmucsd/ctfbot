@@ -5,6 +5,7 @@ import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../inte
 export default {
   name: 'setcolor',
   description: "Changes the team's role color",
+  default_permission: false,
   options: [
     {
       name: 'color',

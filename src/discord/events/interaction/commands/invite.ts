@@ -5,6 +5,7 @@ import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../inte
 export default {
   name: 'invite',
   description: 'Invites the indicated user to join your team. You must be Team Captain to do this',
+  default_permission: false,
   options: [
     {
       name: 'user',
