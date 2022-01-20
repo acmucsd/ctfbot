@@ -10,7 +10,7 @@ export const eventLoader = (client: Client) => {
     logger.info('ready event received');
     await registerCommands(client);
     initHooks(client);
-    initializePeriodicUpdate(client);
+    //initializePeriodicUpdate(client);
 
     // todo: we need to change these from reaction listeners to message components
     //void initializeReactionListeners();
