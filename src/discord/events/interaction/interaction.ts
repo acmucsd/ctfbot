@@ -15,7 +15,8 @@ import invite from './commands/invite';
 import setcolor from './commands/setcolor';
 import setname from './commands/setname';
 import standing from './commands/standing';
-import { createCommandNotCachedError, createCommandNotFoundError } from '../../../errors/CommandInteractionError';
+import { createCommandNotFoundError } from '../../../errors/CommandInteractionError';
+import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
@@ -30,13 +31,13 @@ const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandl
   // handle the case where its a root-level command
   if ('execute' in definition) return definition.execute;
 
-  const subcommandGroupName = interaction.options.getSubcommandGroup();
-  const subcommandName = interaction.options.getSubcommand();
+  const subcommandGroupName = interaction.options.getSubcommandGroup(false);
+  const subcommandName = interaction.options.getSubcommand(false);
 
   // handle the case where its command -> subcommand
   if (!subcommandGroupName) {
     const commandDefinition = definition.options
-      .filter((opt): opt is ExecutableSubCommandData => opt.type === 'SUB_COMMAND')
+      .filter((opt): opt is ExecutableSubCommandData => opt.type === ApplicationCommandOptionTypes.SUB_COMMAND)
       .find((opt) => opt.name === subcommandName);
     if (!commandDefinition) throw createCommandNotFoundError(interaction);
     return commandDefinition.execute;
@@ -44,7 +45,7 @@ const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandl
 
   // handle the case where its command -> subcommand group -> subcommand
   const groupDefinition = definition.options
-    .filter((opt): opt is ExecutableSubGroupData => opt.type === 'SUB_COMMAND_GROUP')
+    .filter((opt): opt is ExecutableSubGroupData => opt.type === ApplicationCommandOptionTypes.SUB_COMMAND_GROUP)
     .find((opt) => opt.name === subcommandGroupName);
   if (!groupDefinition) throw createCommandNotFoundError(interaction);
   const commandDefinition = groupDefinition.options.find((opt) => opt.name === subcommandName);
@@ -57,8 +58,6 @@ export const interactionEvent = async (interaction: Interaction) => {
   // for now, we're only interested in ApplicationCommands that occur in a Guild and are of the type 'CHAT_INPUT'
   if (!interaction.isCommand()) return;
   if (!interaction.inCachedGuild()) return;
-  if (!interaction.command) throw createCommandNotCachedError(interaction);
-  if (interaction.command.type !== 'CHAT_INPUT') return;
 
   try {
     // send that we're loading the response to this, but we aren't ready to send it.
