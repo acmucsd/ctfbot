@@ -94,32 +94,26 @@ export function initCTF(sequelize: Sequelize) {
       endDate: DataTypes.DATE,
       adminRoleSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       participantRoleSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       announcementsChannelSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       scoreboardChannelSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       tosChannelSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
       infoCategorySnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
     },

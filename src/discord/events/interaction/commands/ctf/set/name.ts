@@ -1,6 +1,6 @@
-import { CTF } from '../../../../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { CTF } from '../../../../../../database2/models/CTF';
 
 export default {
   name: 'name',
@@ -15,13 +15,14 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await CTF.findOne({ where: { guildSnowflake: interaction.guild.id }, attributes: ['name'] });
+    if (!ctf) return `This guild is not the main server for any CTFs`;
 
     const name = interaction.options.getString('name', true);
-    const oldName = ctf.row.name;
+    const oldName = ctf.name;
 
-    await ctf.setName(name);
+    ctf.name = name;
+    await ctf.save();
     return `CTF name has been changed from **${oldName}** to **${name}**`;
   },
 } as ExecutableSubCommandData;

@@ -1,18 +1,16 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { CTF } from './CTF';
 import { initTeam, Team } from './Team';
-import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
-import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
 
 interface TeamServerAttributes {
   id: number;
   name: string;
   guildSnowflake: string;
-  infoChannelSnowflake?: string;
-  inviteChannelSnowflake?: string;
-  adminRoleSnowflake?: string;
-  participantRoleSnowflake?: string;
-  serverInvite?: string;
+  infoChannelSnowflake: string;
+  inviteChannelSnowflake: string;
+  adminRoleSnowflake: string;
+  participantRoleSnowflake: string;
+  serverInvite: string;
 }
 
 type TeamServerCreationAttributes = Optional<
@@ -33,11 +31,11 @@ export class TeamServer
   declare id: number;
   declare name: string;
   declare guildSnowflake: string;
-  declare infoChannelSnowflake?: string;
-  declare inviteChannelSnowflake?: string;
-  declare adminRoleSnowflake?: string;
-  declare participantRoleSnowflake?: string;
-  declare serverInvite?: string;
+  declare infoChannelSnowflake: string;
+  declare inviteChannelSnowflake: string;
+  declare adminRoleSnowflake: string;
+  declare participantRoleSnowflake: string;
+  declare serverInvite: string;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -77,11 +75,26 @@ export function initTeamServer(sequelize: Sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      infoChannelSnowflake: DataTypes.STRING,
-      inviteChannelSnowflake: DataTypes.STRING,
-      adminRoleSnowflake: DataTypes.STRING,
-      participantRoleSnowflake: DataTypes.STRING,
-      serverInvite: DataTypes.STRING,
+      infoChannelSnowflake: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      inviteChannelSnowflake: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      adminRoleSnowflake: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      participantRoleSnowflake: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      serverInvite: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     },
     {
       sequelize,

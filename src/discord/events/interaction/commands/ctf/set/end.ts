@@ -1,7 +1,7 @@
 import { parse } from 'date-fns';
-import { CTF } from '../../../../../../database/models';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { CTF } from '../../../../../../database2/models/CTF';
 
 export default {
   name: 'end',
@@ -16,14 +16,16 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await CTF.findOne({ where: { guildSnowflake: interaction.guild.id }, attributes: ['endDate'] });
+    if (!ctf) return `This guild is not the main server for any CTFs`;
 
     const endDate = interaction.options.getString('end_date');
     const date = parse(endDate ?? '', 'yyyy MM dd HH:mm', new Date());
     if (date.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
 
-    await ctf.setEndDate(date);
+    ctf.endDate = date;
+    await ctf.save();
+
     return `CTF end date has been changed to **${date.toString()}**`;
   },
 } as ExecutableSubCommandData;
