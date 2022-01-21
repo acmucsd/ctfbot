@@ -20,23 +20,24 @@ export async function refreshCTF(ctf: CTF, client: Client<true>) {
     (await guild.roles.create({ name: 'Participant' }));
   ctf.participantRoleSnowflake = participantRole.id;
 
-  // register CTF commands in this guild using the above roles
-  const guildCommands =
-    (await guild.commands.fetch()) || (await guild.commands.set(adminCommands.concat(userCommands)));
-
-  // ensure only admins can use admin commands and participants can use user commands
-  await guild.commands.permissions.set({
-    fullPermissions: guildCommands.map((com) => ({
-      id: com.id,
-      permissions: [
-        {
-          id: userCommands.find((ucom) => ucom.name === com.name) ? participantRole.id : adminRole.id,
-          type: ApplicationCommandPermissionTypes.ROLE,
-          permission: true,
-        },
-      ],
-    })),
-  });
+  // only create new commands if they aren't already defined
+  await guild.commands.fetch();
+  if (guild.commands.cache.filter((com) => com.applicationId === client.application.id).size === 0) {
+    await guild.commands.set(adminCommands.concat(userCommands));
+    // ensure only admins can use admin commands and participants can use user commands
+    await guild.commands.permissions.set({
+      fullPermissions: guild.commands.cache.map((com) => ({
+        id: com.id,
+        permissions: [
+          {
+            id: userCommands.find((ucom) => ucom.name === com.name) ? participantRole.id : adminRole.id,
+            type: ApplicationCommandPermissionTypes.ROLE,
+            permission: true,
+          },
+        ],
+      })),
+    });
+  }
 
   // TODO: take into account startDate and endDate when setting command permissions
 
