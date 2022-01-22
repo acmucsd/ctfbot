@@ -77,22 +77,27 @@ export function initTeamServer(sequelize: Sequelize) {
       },
       infoChannelSnowflake: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
       inviteChannelSnowflake: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
       adminRoleSnowflake: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
       participantRoleSnowflake: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
       serverInvite: {
         type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
     },
