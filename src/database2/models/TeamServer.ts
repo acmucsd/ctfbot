@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { CTF } from './CTF';
 import { initTeam, Team } from './Team';
 
@@ -40,7 +40,7 @@ export class TeamServer
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getCTF: BelongsToGetAssociationMixin<CTF>;
+  declare getCTF: BelongsToGetAssociationMixin<CTF>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
