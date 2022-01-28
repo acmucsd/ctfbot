@@ -2,7 +2,7 @@ import { CategoryChannel, Client, Guild, MessageEmbed, Permissions, Role, TextCh
 import { adminCommands, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 
-export async function createTextChannel(
+export async function createTextChannelOrFetchIfExists(
   guild: Guild,
   snowflake: string,
   name: string,
@@ -22,18 +22,22 @@ export async function createTextChannel(
   );
 }
 
-export async function createCategoryChannel(guild: Guild, snowflake: string, name: string): Promise<CategoryChannel> {
+export async function createCategoryChannelOrFetchIfExists(
+  guild: Guild,
+  snowflake: string,
+  name: string,
+): Promise<CategoryChannel> {
   return (
     (snowflake && ((await guild.channels.fetch(snowflake)) as CategoryChannel)) ||
     (await guild.channels.create(name, { type: 'GUILD_CATEGORY' }))
   );
 }
 
-export async function createRole(guild: Guild, snowflake: string, name: string): Promise<Role> {
+export async function createRoleOrFetchIfExists(guild: Guild, snowflake: string, name: string): Promise<Role> {
   return (snowflake && (await guild.roles.fetch(snowflake))) || (await guild.roles.create({ name }));
 }
 
-export async function createInvite(channel: TextChannel, code: string) {
+export async function createInviteOrFetchIfExists(channel: TextChannel, code: string) {
   return (await channel.fetchInvites()).get(code) || (await channel.createInvite({ temporary: false, maxAge: 0 }));
 }
 
@@ -47,7 +51,12 @@ export async function destroyChannels(guild: Guild, ...channelSnowflakes: string
   );
 }
 
-export async function registerGuildCommands(client: Client<true>, guild: Guild, userRole: Role, adminRole: Role) {
+export async function registerGuildCommandsIfChanged(
+  client: Client<true>,
+  guild: Guild,
+  userRole: Role,
+  adminRole: Role,
+) {
   // only create new commands if they aren't already defined
   await guild.commands.fetch();
   if (guild.commands.cache.filter((com) => com.applicationId === client.application.id).size === 0) {

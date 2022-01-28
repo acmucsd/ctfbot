@@ -2,14 +2,18 @@ import { Client } from 'discord.js';
 import { TeamServer } from '../../database2/models/TeamServer';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import { setTeamServerInfoMessage } from '../messages/TeamServerInfoMessage';
-import { createInvite, createRole, createTextChannel } from '../util/ResourceManager';
+import {
+  createInviteOrFetchIfExists,
+  createRoleOrFetchIfExists,
+  createTextChannelOrFetchIfExists,
+} from '../util/ResourceManager';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // create infoChannel
-  const infoChannel = await createTextChannel(guild, teamServer.infoChannelSnowflake, 'info');
+  const infoChannel = await createTextChannelOrFetchIfExists(guild, teamServer.infoChannelSnowflake, 'info');
   teamServer.infoChannelSnowflake = infoChannel.id;
 
   // set the content of the infoChannel
@@ -17,7 +21,7 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   await setTeamServerInfoMessage(client, infoChannel, ctf, teamServer);
 
   // create serverInvite
-  const serverInvite = await createInvite(infoChannel, teamServer.serverInvite);
+  const serverInvite = await createInviteOrFetchIfExists(infoChannel, teamServer.serverInvite);
   teamServer.serverInvite = serverInvite.code;
 
   // create inviteChannel
@@ -29,11 +33,11 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   // if this guild is also the main server, this will naturally resolve to those existing roles
 
   // create adminRole
-  const adminRole = await createRole(guild, teamServer.adminRoleSnowflake, 'CTF Admin');
+  const adminRole = await createRoleOrFetchIfExists(guild, teamServer.adminRoleSnowflake, 'CTF Admin');
   teamServer.adminRoleSnowflake = adminRole.id;
 
   // create participant role
-  const participantRole = await createRole(guild, teamServer.participantRoleSnowflake, 'Participant');
+  const participantRole = await createRoleOrFetchIfExists(guild, teamServer.participantRoleSnowflake, 'Participant');
   teamServer.participantRoleSnowflake = participantRole.id;
 }
 
