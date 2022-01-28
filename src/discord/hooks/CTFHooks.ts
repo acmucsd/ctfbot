@@ -1,68 +1,51 @@
 import { CTF } from '../../database2/models/CTF';
 import { Client } from 'discord.js';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
-import { adminCommands, userCommands } from '../events/interaction/interaction';
-import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
+import {
+  createCategoryChannel,
+  createRole,
+  createTextChannel,
+  destroyChannels,
+  destroyRoles,
+  registerGuildCommands,
+} from '../util/ResourceManager';
 
 export async function refreshCTF(ctf: CTF, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // create admin role
-  const adminRole =
-    (ctf.adminRoleSnowflake && (await guild.roles.fetch(ctf.adminRoleSnowflake))) ||
-    (await guild.roles.create({ name: 'CTF Admin' }));
+  const adminRole = await createRole(guild, ctf.adminRoleSnowflake, 'CTF Admin');
   ctf.adminRoleSnowflake = adminRole.id;
 
   // create participant role
-  const participantRole =
-    (ctf.participantRoleSnowflake && (await guild.roles.fetch(ctf.participantRoleSnowflake))) ||
-    (await guild.roles.create({ name: 'Participant' }));
+  const participantRole = await createRole(guild, ctf.participantRoleSnowflake, 'Participant');
   ctf.participantRoleSnowflake = participantRole.id;
 
-  // only create new commands if they aren't already defined
-  await guild.commands.fetch();
-  if (guild.commands.cache.filter((com) => com.applicationId === client.application.id).size === 0) {
-    await guild.commands.set(adminCommands.concat(userCommands));
-    // ensure only admins can use admin commands and participants can use user commands
-    await guild.commands.permissions.set({
-      fullPermissions: guild.commands.cache.map((com) => ({
-        id: com.id,
-        permissions: [
-          {
-            id: userCommands.find((ucom) => ucom.name === com.name) ? participantRole.id : adminRole.id,
-            type: ApplicationCommandPermissionTypes.ROLE,
-            permission: true,
-          },
-        ],
-      })),
-    });
-  }
-
+  // register commands
   // TODO: take into account startDate and endDate when setting command permissions
+  await registerGuildCommands(client, guild, participantRole, adminRole);
 
   // create info category
-  const infoCategory =
-    (ctf.infoCategorySnowflake && (await guild.channels.fetch(ctf.infoCategorySnowflake))) ||
-    (await guild.channels.create('INFO', { type: 'GUILD_CATEGORY' }));
+  const infoCategory = await createCategoryChannel(guild, ctf.infoCategorySnowflake, 'INFO');
   ctf.infoCategorySnowflake = infoCategory.id;
 
   // create announcements channel
-  const announcementsChannel =
-    (ctf.announcementsChannelSnowflake && (await guild.channels.fetch(ctf.announcementsChannelSnowflake))) ||
-    (await guild.channels.create('announcements', { type: 'GUILD_TEXT', parent: infoCategory.id }));
+  const announcementsChannel = await createTextChannel(guild, ctf.announcementsChannelSnowflake, 'announcements', {
+    parent: infoCategory,
+  });
   ctf.announcementsChannelSnowflake = announcementsChannel.id;
 
   // create TOS channel
-  const tosChannel =
-    (ctf.tosChannelSnowflake && (await guild.channels.fetch(ctf.tosChannelSnowflake))) ||
-    (await guild.channels.create('terms-of-service', { type: 'GUILD_TEXT', parent: infoCategory.id }));
+  const tosChannel = await createTextChannel(guild, ctf.tosChannelSnowflake, 'terms-of-service', {
+    parent: infoCategory,
+  });
   ctf.tosChannelSnowflake = tosChannel.id;
 
   // create scoreboard channel
-  const scoreboardChannel =
-    (ctf.scoreboardChannelSnowflake && (await guild.channels.fetch(ctf.scoreboardChannelSnowflake))) ||
-    (await guild.channels.create('scoreboard', { type: 'GUILD_TEXT', parent: infoCategory.id }));
+  const scoreboardChannel = await createTextChannel(guild, ctf.scoreboardChannelSnowflake, 'scoreboard', {
+    parent: infoCategory,
+  });
   ctf.scoreboardChannelSnowflake = scoreboardChannel.id;
 }
 
@@ -71,15 +54,14 @@ export async function destroyCTF(ctf: CTF, client: Client<true>) {
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // delete all the roles and channels
-  const resources = await Promise.all([
-    guild.roles.fetch(ctf.adminRoleSnowflake),
-    guild.roles.fetch(ctf.participantRoleSnowflake),
-    guild.channels.fetch(ctf.announcementsChannelSnowflake),
-    guild.channels.fetch(ctf.tosChannelSnowflake),
-    guild.channels.fetch(ctf.scoreboardChannelSnowflake),
-    guild.channels.fetch(ctf.infoCategorySnowflake),
-  ]);
-  await Promise.all(resources.map((resource) => resource?.delete()));
+  await destroyRoles(guild, ctf.adminRoleSnowflake, ctf.participantRoleSnowflake);
+  await destroyChannels(
+    guild,
+    ctf.infoCategorySnowflake,
+    ctf.announcementsChannelSnowflake,
+    ctf.tosChannelSnowflake,
+    ctf.scoreboardChannelSnowflake,
+  );
 
   // oh yeah the commands too
   await guild.commands.set([]);

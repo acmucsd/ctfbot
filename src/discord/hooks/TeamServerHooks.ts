@@ -1,37 +1,23 @@
-import { Client, TextChannel } from 'discord.js';
+import { Client } from 'discord.js';
 import { TeamServer } from '../../database2/models/TeamServer';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
-import { setChannelContent } from '../util/setChannelContent';
-import { getTeamServerInfoMessage } from '../messages/TeamServerInfoMessage';
+import { setTeamServerInfoMessage } from '../messages/TeamServerInfoMessage';
+import { createInvite, createRole, createTextChannel } from '../util/ResourceManager';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // create infoChannel
-  const infoChannel =
-    (teamServer.infoChannelSnowflake &&
-      ((await guild.channels.fetch(teamServer.infoChannelSnowflake)) as TextChannel)) ||
-    (await guild.channels.create('info', { type: 'GUILD_TEXT' }));
+  const infoChannel = await createTextChannel(guild, teamServer.infoChannelSnowflake, 'info');
   teamServer.infoChannelSnowflake = infoChannel.id;
-
-  // set channel permissions
-  await infoChannel.permissionOverwrites.create(infoChannel.guild.roles.everyone, {
-    SEND_MESSAGES: false,
-    ADD_REACTIONS: false,
-  });
 
   // set the content of the infoChannel
   const ctf = await teamServer.getCTF({ attributes: ['name'] });
-  await setChannelContent(client, infoChannel, getTeamServerInfoMessage(ctf, teamServer));
+  await setTeamServerInfoMessage(client, infoChannel, ctf, teamServer);
 
   // create serverInvite
-  const serverInvite =
-    (await infoChannel.fetchInvites()).get(teamServer.serverInvite) ||
-    (await infoChannel.createInvite({
-      temporary: false,
-      maxAge: 0,
-    }));
+  const serverInvite = await createInvite(infoChannel, teamServer.serverInvite);
   teamServer.serverInvite = serverInvite.code;
 
   // create inviteChannel
@@ -43,15 +29,11 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   // if this guild is also the main server, this will naturally resolve to those existing roles
 
   // create adminRole
-  const adminRole =
-    (teamServer.adminRoleSnowflake && (await guild.roles.fetch(teamServer.adminRoleSnowflake))) ||
-    (await guild.roles.create({ name: 'CTF Admin' }));
+  const adminRole = await createRole(guild, teamServer.adminRoleSnowflake, 'CTF Admin');
   teamServer.adminRoleSnowflake = adminRole.id;
 
   // create participant role
-  const participantRole =
-    (teamServer.participantRoleSnowflake && (await guild.roles.fetch(teamServer.participantRoleSnowflake))) ||
-    (await guild.roles.create({ name: 'Participant' }));
+  const participantRole = await createRole(guild, teamServer.participantRoleSnowflake, 'Participant');
   teamServer.participantRoleSnowflake = participantRole.id;
 }
 
