@@ -1,4 +1,11 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import {
+  DataTypes,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { initTeamServer, TeamServer } from './TeamServer';
 import { Category, initCategory } from './Category';
 
@@ -60,7 +67,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare createCategory: HasManyCreateAssociationMixin<Category>;
   // declare readonly Categories?: Category[];
 
-  // declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
+  declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
   // declare countTeamServers: HasManyCountAssociationsMixin;
   // declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
   // declare hasTeamServers: HasManyHasAssociationsMixin<TeamServer, number>;
@@ -69,7 +76,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare addTeamServers: HasManyAddAssociationsMixin<TeamServer, number>;
   // declare removeTeamServer: HasManyRemoveAssociationMixin<TeamServer, number>;
   // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
-  // declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
+  declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   // declare readonly teamServers?: TeamServer[];
 }
 

@@ -1,22 +1,17 @@
-import { CTF } from '../../../../database/models';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { createCommandNotExecutedInGuildError } from '../../../../errors/CommandInteractionError';
+import { CTF } from '../../../../database2/models/CTF';
 
 export default {
   name: 'addserver',
   description: 'Adds the current guild as a team server for the indicated CTF',
   options: [
     {
-      name: 'limit',
-      description: 'The max number of teams allowed to be in the server',
-      type: ApplicationCommandOptionTypes.INTEGER,
-      required: true,
-    },
-    {
       name: 'ctf_name',
       description: 'The name of the CTF to add the guild to',
       type: ApplicationCommandOptionTypes.STRING,
-      required: false,
+      required: true,
     },
     {
       name: 'name',
@@ -26,16 +21,21 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctfname = interaction.options.getString('ctf_name');
-    const ctf = await (ctfname ? CTF.fromNameCTF(ctfname) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
+    if (!interaction.inCachedGuild()) throw createCommandNotExecutedInGuildError(interaction);
 
-    const name = interaction.options.getString('name') ?? interaction.guild.name;
-    const server = await ctf.createTeamServer(
-      interaction.guild,
+    const ctfname = interaction.options.getString('ctf_name');
+    const ctf = await CTF.findOne({ where: { name: ctfname } });
+
+    if (!ctf) throw Error('no CTF by that name');
+
+    const name = interaction.options.getString('name') || interaction.guild.name;
+    const newTeamServer = await ctf.createTeamServer({
       name,
-      interaction.options.getNumber('limit', true),
-      interaction.member,
-    );
-    return `Added Team Server **${server.row.name}** to CTF **${ctf.row.name}** with limit **${server.row.team_limit}**`;
+      guildSnowflake: interaction.guild.id,
+      adminRoleSnowflake: ctf.adminRoleSnowflake,
+      participantRoleSnowflake: ctf.participantRoleSnowflake,
+    });
+
+    return `Added Team Server **${newTeamServer.name}** to CTF **${ctf.name}**`;
   },
 } as ChatInputCommandDefinition;

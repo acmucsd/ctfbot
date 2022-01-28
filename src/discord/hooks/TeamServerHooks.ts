@@ -6,6 +6,9 @@ import {
   createInviteOrFetchIfExists,
   createRoleOrFetchIfExists,
   createTextChannelOrFetchIfExists,
+  destroyChannels,
+  destroyRoles,
+  registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
@@ -39,23 +42,17 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   // create participant role
   const participantRole = await createRoleOrFetchIfExists(guild, teamServer.participantRoleSnowflake, 'Participant');
   teamServer.participantRoleSnowflake = participantRole.id;
+
+  await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
 }
 
 export async function destroyTeamServer(teamServer: TeamServer, client: Client<true>) {
-  // const guild = await client.guilds.fetch(ctf.guildSnowflake);
-  // if (!guild) throw createDiscordNullError('guildSnowflake');
-  //
-  // // delete all the roles and channels
-  // const resources = await Promise.all([
-  //   guild.roles.fetch(ctf.adminRoleSnowflake),
-  //   guild.roles.fetch(ctf.participantRoleSnowflake),
-  //   guild.channels.fetch(ctf.announcementsChannelSnowflake),
-  //   guild.channels.fetch(ctf.tosChannelSnowflake),
-  //   guild.channels.fetch(ctf.scoreboardChannelSnowflake),
-  //   guild.channels.fetch(ctf.infoCategorySnowflake),
-  // ]);
-  // await Promise.all(resources.map((resource) => resource?.delete()));
-  //
-  // // oh yeah the commands too
-  // await guild.commands.set([]);
+  const guild = await client.guilds.fetch(teamServer.guildSnowflake);
+  if (!guild) throw createDiscordNullError('guildSnowflake');
+
+  await destroyRoles(guild, teamServer.adminRoleSnowflake, teamServer.participantRoleSnowflake);
+  await destroyChannels(guild, teamServer.infoChannelSnowflake);
+
+  // oh yeah the commands too
+  await guild.commands.set([]);
 }

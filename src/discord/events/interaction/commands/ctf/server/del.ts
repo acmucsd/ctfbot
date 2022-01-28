@@ -1,41 +1,30 @@
-import { CTF, TeamServer } from '../../../../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { CTF } from '../../../../../../database2/models/CTF';
 
 export default {
   name: 'del',
-  description: 'Removes the indicated team server from the indicated CTF',
+  description: 'Removes the current team server from the indicated CTF',
   type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
-    {
-      name: 'name',
-      description: 'The name of the team server',
-      type: ApplicationCommandOptionTypes.STRING,
-      required: false,
-    },
     {
       name: 'ctf_name',
       description: 'The name of the CTF to remove the guild from',
       type: ApplicationCommandOptionTypes.STRING,
-      required: false,
+      required: true,
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    let teamServer: TeamServer;
-    let ctf: CTF;
+    const ctfname = interaction.options.getString('ctf_name');
+    const ctf = await CTF.findOne({ where: { name: ctfname } });
+    if (!ctf) throw Error('no CTF by that name');
 
-    const name = interaction.options.getString('name');
-    const ctf_name = interaction.options.getString('ctf_name');
+    const [teamServer] = await ctf.getTeamServers({ where: { guildSnowflake: interaction.guild.id } });
+    if (!teamServer) throw Error('this team server does not belong to that CTF');
 
-    if (name) {
-      ctf = await (ctf_name ? CTF.fromNameCTF(ctf_name) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
-      teamServer = await ctf.fromNameTeamServer(name);
-    } else {
-      teamServer = await CTF.fromTeamServerGuildSnowflakeTeamServer(interaction.guild.id);
-      ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    }
-    ctf.throwErrorUnlessAdmin(interaction);
-    await teamServer.deleteTeamServer(interaction.client);
-    return `Removed **${teamServer.row.name}** from CTf **${ctf.row.name}**`;
+    const { name } = teamServer;
+    await teamServer.destroy();
+
+    return `Removed team server **${name}** from CTF **${ctf.name}**`;
   },
 } as ExecutableSubCommandData;
