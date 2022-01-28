@@ -4,5 +4,6 @@ import { destroyCTF, refreshCTF } from './CTFHooks';
 
 export function initHooks(client: Client<true>) {
   CTF.beforeCreate((ctf) => refreshCTF(ctf, client));
+  CTF.beforeUpdate((ctf) => refreshCTF(ctf, client));
   CTF.beforeDestroy((ctf) => destroyCTF(ctf, client));
 }
