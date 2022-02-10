@@ -9,7 +9,9 @@ import {
   destroyChannels,
   destroyRoles,
   registerGuildCommandsIfChanged,
+  setChannelContent,
 } from '../util/ResourceManager';
+import { setTeamServerInviteChannelMessage } from '../messages/TeamServerInviteChannelMessage';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
@@ -52,6 +54,9 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
     { readRoles: [inviteRole.id] },
   );
   teamServer.inviteChannelSnowflake = inviteChannel.id;
+
+  // set content of the invite channel
+  await setTeamServerInviteChannelMessage(client, inviteChannel, ctf, teamServer);
 
   // register guild commands
   await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
