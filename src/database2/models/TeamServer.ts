@@ -8,6 +8,7 @@ interface TeamServerAttributes {
   guildSnowflake: string;
   infoChannelSnowflake: string;
   inviteChannelSnowflake: string;
+  inviteRoleSnowflake: string;
   adminRoleSnowflake: string;
   participantRoleSnowflake: string;
   serverInvite: string;
@@ -19,6 +20,7 @@ type TeamServerCreationAttributes = Optional<
   | 'name'
   | 'infoChannelSnowflake'
   | 'inviteChannelSnowflake'
+  | 'inviteRoleSnowflake'
   | 'adminRoleSnowflake'
   | 'participantRoleSnowflake'
   | 'serverInvite'
@@ -33,6 +35,7 @@ export class TeamServer
   declare guildSnowflake: string;
   declare infoChannelSnowflake: string;
   declare inviteChannelSnowflake: string;
+  declare inviteRoleSnowflake: string;
   declare adminRoleSnowflake: string;
   declare participantRoleSnowflake: string;
   declare serverInvite: string;
@@ -81,6 +84,11 @@ export function initTeamServer(sequelize: Sequelize) {
         allowNull: false,
       },
       inviteChannelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
+      inviteRoleSnowflake: {
         type: DataTypes.STRING,
         defaultValue: '',
         allowNull: false,

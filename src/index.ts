@@ -9,7 +9,7 @@ if (!discordConfig.token)
 
 export const client = new Client({
   partials: ['MESSAGE', 'CHANNEL'],
-  intents: [Intents.FLAGS.GUILD_MEMBERS],
+  intents: [Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILDS],
 });
 
 eventLoader(client);

@@ -1,4 +1,16 @@
-import { CategoryChannel, Client, Guild, MessageEmbed, Permissions, Role, TextChannel } from 'discord.js';
+import {
+  CategoryChannel,
+  Client,
+  Guild,
+  MessageEmbed,
+  OverwriteResolvable,
+  PermissionResolvable,
+  Permissions,
+  Role,
+  RoleResolvable,
+  Snowflake,
+  TextChannel,
+} from 'discord.js';
 import { adminCommands, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 
@@ -6,19 +18,42 @@ export async function createTextChannelOrFetchIfExists(
   guild: Guild,
   snowflake: string,
   name: string,
-  options: { parent?: CategoryChannel } = {},
+  options: { parent?: CategoryChannel; readRoles?: Snowflake[]; writeRoles?: Snowflake[] } = {},
 ): Promise<TextChannel> {
-  const permissionOverwrites = [];
+  const permissionOverwrites: { [key: Snowflake]: { deny?: PermissionResolvable[]; allow?: PermissionResolvable[] } } =
+    {};
 
-  // deny write permissions by default
-  permissionOverwrites.push({
-    id: guild.roles.everyone.id,
-    deny: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ADD_REACTIONS],
-  });
+  // everyone can read by default, but only if not specified
+  if (!options.readRoles) options.readRoles = [guild.roles.everyone.id];
 
+  // nobody can write by default
+  if (!options.writeRoles) options.writeRoles = [];
+
+  // deny all permissions first
+  permissionOverwrites[guild.roles.everyone.id] = {
+    deny: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.ADD_REACTIONS],
+  };
+
+  // add readRole perms
+  for (const role of options.readRoles) {
+    permissionOverwrites[role] = permissionOverwrites[role] || {};
+    permissionOverwrites[role].allow = [Permissions.FLAGS.VIEW_CHANNEL];
+  }
+
+  // add writeRole perms
+  for (const role of options.writeRoles) {
+    permissionOverwrites[role] = permissionOverwrites[role] || {};
+    permissionOverwrites[role].allow = [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ADD_REACTIONS];
+  }
+
+  // create the channel if it doesn't exist
   return (
     (snowflake && ((await guild.channels.fetch(snowflake)) as TextChannel)) ||
-    (await guild.channels.create(name, { type: 'GUILD_TEXT', parent: options.parent }))
+    (await guild.channels.create(name, {
+      type: 'GUILD_TEXT',
+      parent: options.parent,
+      permissionOverwrites: Object.entries(permissionOverwrites).map(([id, overwrite]) => ({ ...overwrite, id })),
+    }))
   );
 }
 
