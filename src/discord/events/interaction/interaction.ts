@@ -84,15 +84,17 @@ export const interactionEvent = async (interaction: Interaction) => {
     logger.error(_e);
     // pretty print errors B)
     const e = _e as Error;
-    await interaction.editReply({
-      embeds: [
-        embedify({
-          description: e.message ?? 'Unknown cause',
-          title: e.name ?? 'Error',
-          footer: e.stack?.split('\n')[1],
-        }),
-      ],
-    });
+    await interaction
+      .editReply({
+        embeds: [
+          embedify({
+            description: e.message ?? 'Unknown cause',
+            title: e.name ?? 'Error',
+            footer: e.stack?.split('\n')[1],
+          }),
+        ],
+      })
+      .catch(() => logger.error('failed to respond with error code, the original channel was probably deleted'));
   }
 };
 
