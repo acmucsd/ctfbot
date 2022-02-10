@@ -15,6 +15,16 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
+  // if this guild is also the main server, this will naturally resolve to those existing roles
+
+  // create adminRole
+  const adminRole = await createRoleOrFetchIfExists(guild, teamServer.adminRoleSnowflake, 'CTF Admin');
+  teamServer.adminRoleSnowflake = adminRole.id;
+
+  // create participant role
+  const participantRole = await createRoleOrFetchIfExists(guild, teamServer.participantRoleSnowflake, 'Participant');
+  teamServer.participantRoleSnowflake = participantRole.id;
+
   // create infoChannel
   const infoChannel = await createTextChannelOrFetchIfExists(guild, teamServer.infoChannelSnowflake, 'info');
   teamServer.infoChannelSnowflake = infoChannel.id;
@@ -33,16 +43,7 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   //   (await guild.channels.create('info', { type: 'GUILD_TEXT' }));
   // teamServer.inviteChannelSnowflake = inviteChannel.id;
 
-  // if this guild is also the main server, this will naturally resolve to those existing roles
-
-  // create adminRole
-  const adminRole = await createRoleOrFetchIfExists(guild, teamServer.adminRoleSnowflake, 'CTF Admin');
-  teamServer.adminRoleSnowflake = adminRole.id;
-
-  // create participant role
-  const participantRole = await createRoleOrFetchIfExists(guild, teamServer.participantRoleSnowflake, 'Participant');
-  teamServer.participantRoleSnowflake = participantRole.id;
-
+  // register guild commands
   await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
 }
 

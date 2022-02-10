@@ -58,11 +58,11 @@ export async function registerGuildCommandsIfChanged(
   adminRole: Role,
 ) {
   // only create new commands if they aren't already defined
-  await guild.commands.fetch();
   if (
     guild.commands.cache.filter((com) => com.applicationId === client.application.id).size !==
     userCommands.length + adminCommands.length
   ) {
+    await guild.commands.fetch();
     await guild.commands.set(adminCommands.concat(userCommands));
     // ensure only admins can use admin commands and users can use user commands
     await guild.commands.permissions.set({
