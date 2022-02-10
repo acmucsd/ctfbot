@@ -1,6 +1,8 @@
 import { CTF } from '../../../../../database/models';
 import { PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getCTFByGuildContext } from '../../../../util/ResourceManager';
+import { Challenge } from '../../../../../database2/models/Challenge';
 
 export default {
   name: 'get',
@@ -15,20 +17,23 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    // no admin check ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw new Error('this server is not associated with a CTF');
 
     const name = interaction.options.getString('name');
 
     // list all categories
     if (!name) {
-      const categories = (await ctf.getAllCategories()).map((cat) => `**${cat.row.name}**`).join();
-      return `**${ctf.row.name}** has the following categories: ${categories}`;
+      const categories = await ctf.getCategories({ attributes: ['name'] });
+      return `**${ctf.name}** has the following categories: ${categories.map((cat) => `**${cat.name}**`).join(', ')}`;
     }
 
     // otherwise, list all challenges in a category
-    const category = await ctf.fromNameCategory(name);
-    const challenges = (await category.getAllChallenges()).map((chal) => `**${chal.row.name}**`).join();
-    return `**${category.row.name}** has the following challenges: ${challenges}`;
+    const categories = await ctf.getCategories({ where: { name }, include: { model: Challenge } });
+    if (!categories || !categories[0].challenges) throw new Error('no challenges in that category by that name');
+
+    return `**${categories[0].name}** has the following challenges: ${categories[0].challenges
+      .map((chal) => `**${chal.name}**`)
+      .join(', ')}`;
   },
 };

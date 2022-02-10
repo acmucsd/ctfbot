@@ -1,6 +1,6 @@
-import { CTF } from '../../../../../database/models';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getCTFByGuildContext } from '../../../../util/ResourceManager';
 
 export default {
   name: 'del',
@@ -15,12 +15,14 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw new Error('this server is not associated with a CTF');
 
-    const name = interaction.options.getString('name', true);
-    const category = await ctf.fromNameCategory(name);
-    await category.deleteCategory(interaction.client);
+    const categories = await ctf.getCategories({ where: { name: interaction.options.getString('name', true) } });
+    if (!categories) throw new Error('no category with that name');
+
+    const name = categories[0].name;
+    await categories[0].destroy();
 
     return `Category **${name}** has been removed`;
   },

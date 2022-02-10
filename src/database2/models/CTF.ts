@@ -55,7 +55,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getCategories: HasManyGetAssociationsMixin<Category>;
+  declare getCategories: HasManyGetAssociationsMixin<Category>;
   // declare countCategories: HasManyCountAssociationsMixin;
   // declare hasCategory: HasManyHasAssociationMixin<Category, number>;
   // declare hasCategories: HasManyHasAssociationsMixin<Category, number>;
@@ -64,7 +64,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare addCategories: HasManyAddAssociationsMixin<Category, number>;
   // declare removeCategory: HasManyRemoveAssociationMixin<Category, number>;
   // declare removeCategories: HasManyRemoveAssociationsMixin<Category, number>;
-  // declare createCategory: HasManyCreateAssociationMixin<Category>;
+  declare createCategory: HasManyCreateAssociationMixin<Category>;
   // declare readonly Categories?: Category[];
 
   declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;

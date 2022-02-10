@@ -11,6 +11,8 @@ import {
 } from 'discord.js';
 import { adminCommands, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
+import { CTF } from '../../database2/models/CTF';
+import { TeamServer } from '../../database2/models/TeamServer';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -135,4 +137,17 @@ export async function setChannelContent(client: Client<true>, channel: TextChann
 
   // whatever messages are left in the array need to be deleted
   while (botMessages.length > 0) await botMessages.pop()?.delete();
+}
+
+export async function getCTFByGuildContext(guild: Guild) {
+  const ctf = await CTF.findOne({ where: { guildSnowflake: guild.id } });
+  if (ctf) return ctf;
+
+  // otherwise, see if this is a team server guild and return the original ctf
+  return (
+    await TeamServer.findOne({
+      where: { guildSnowflake: guild.id },
+      include: { model: CTF, required: true },
+    })
+  )?.ctf;
 }

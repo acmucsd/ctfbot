@@ -1,6 +1,6 @@
-import { CTF } from '../../../../../database/models';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getCTFByGuildContext } from '../../../../util/ResourceManager';
 
 export default {
   name: 'add',
@@ -13,22 +13,13 @@ export default {
       type: ApplicationCommandOptionTypes.STRING,
       required: true,
     },
-    {
-      name: 'description',
-      description: 'The desired category description',
-      type: ApplicationCommandOptionTypes.STRING,
-      required: false,
-    },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw new Error('this server is not associated with a CTF');
 
-    const name = interaction.options.getString('name', true);
-    const description = interaction.options.getString('description');
-    const category = await ctf.createCategory(interaction.client, name);
-    if (description) await category.setDescription(description);
+    const category = await ctf.createCategory({ name: interaction.options.getString('name', true) });
 
-    return `New category **${name}** has been created.`;
+    return `New category **${category.name}** has been created.`;
   },
 } as ExecutableSubCommandData;
