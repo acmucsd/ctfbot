@@ -1,6 +1,8 @@
-import { CTF } from '../../../../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { createCommandNotExecutedInGuildError } from '../../../../../../errors/CommandInteractionError';
+import { CTF } from '../../../../../../database2/models/CTF';
+import { Op } from 'sequelize';
 
 export default {
   name: 'get',
@@ -15,10 +17,15 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctfname = interaction.options.getString('name');
-    const ctf = await (ctfname ? CTF.fromNameCTF(ctfname) : CTF.fromGuildSnowflakeCTF(interaction.guild.id));
-    ctf.throwErrorUnlessAdmin(interaction);
+    if (!interaction.inCachedGuild()) throw createCommandNotExecutedInGuildError(interaction);
 
-    return ctf.printAllTeamServers();
+    const ctfname = interaction.options.getString('name');
+    const ctf = await CTF.findOne({
+      where: { [Op.or]: [{ name: ctfname }, { guildSnowflake: interaction.guild.id }] },
+    });
+    if (!ctf) throw Error('no CTF found');
+
+    const teamServers = await ctf.getTeamServers();
+    return teamServers.map((ts) => ts.name).join(', ');
   },
 } as ExecutableSubCommandData;
