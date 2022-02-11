@@ -9,7 +9,6 @@ import {
   destroyChannels,
   destroyRoles,
   registerGuildCommandsIfChanged,
-  setChannelContent,
 } from '../util/ResourceManager';
 import { setTeamServerInviteChannelMessage } from '../messages/TeamServerInviteChannelMessage';
 

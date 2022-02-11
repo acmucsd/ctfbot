@@ -1,4 +1,12 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  DataTypes,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { CTF } from './CTF';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
@@ -17,12 +25,12 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getCTF: BelongsToGetAssociationMixin<CTF>;
+  declare getCTF: BelongsToGetAssociationMixin<CTF>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
 
-  // declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
+  declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;
   // declare hasCategoryChannel: HasManyHasAssociationMixin<CategoryChannel, number>;
   // declare hasCategoryChannels: HasManyHasAssociationsMixin<CategoryChannel, number>;
@@ -31,7 +39,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
   // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
   // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
-  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
+  declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
   // declare readonly categoryChannels?: CategoryChannel[];
 
   // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;

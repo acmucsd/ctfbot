@@ -77,13 +77,17 @@ export async function createInviteOrFetchIfExists(channel: TextChannel, code: st
 }
 
 export async function destroyRoles(guild: Guild, ...roleSnowflakes: string[]) {
-  await Promise.all(roleSnowflakes.map((snowflake) => guild.roles.fetch(snowflake).then((role) => role?.delete())));
+  await Promise.all(
+    roleSnowflakes
+      .filter((snowflake) => snowflake)
+      .map((snowflake) => guild.roles.fetch(snowflake).then((role) => role?.delete())),
+  );
 }
 
 export async function destroyChannels(guild: Guild, ...channelSnowflakes: string[]) {
-  await Promise.all(channelSnowflakes.map((snowflake) => guild.channels.fetch(snowflake))).then((channels) =>
-    Promise.all(channels.map((channel) => channel?.delete())),
-  );
+  await Promise.all(
+    channelSnowflakes.filter((snowflake) => snowflake).map((snowflake) => guild.channels.fetch(snowflake)),
+  ).then((channels) => Promise.all(channels.map((channel) => channel?.delete())));
 }
 
 export async function registerGuildCommandsIfChanged(
