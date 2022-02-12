@@ -124,7 +124,6 @@ export function initChallenge(sequelize: Sequelize) {
   });
 
   Challenge.belongsTo(Category, {
-    onDelete: 'CASCADE',
     foreignKey: {
       allowNull: false,
     },

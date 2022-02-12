@@ -1,7 +1,6 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
-  HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
   Optional,
@@ -10,6 +9,7 @@ import {
 import { CTF } from './CTF';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
+import { TeamServer } from './TeamServer';
 
 interface CategoryAttributes {
   id: number;
@@ -30,6 +30,18 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
 
+  // declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
+  // declare countTeamServers: HasManyCountAssociationsMixin;
+  // declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
+  // declare hasTeamServers: HasManyHasAssociationsMixin<TeamServer, number>;
+  // declare setTeamServers: HasManySetAssociationsMixin<TeamServer, number>;
+  // declare addTeamServer: HasManyAddAssociationMixin<TeamServer, number>;
+  // declare addTeamServers: HasManyAddAssociationsMixin<TeamServer, number>;
+  // declare removeTeamServer: HasManyRemoveAssociationMixin<TeamServer, number>;
+  // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
+  // declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
+  // declare readonly TeamServers?: TeamServer[];
+
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;
   // declare hasCategoryChannel: HasManyHasAssociationMixin<CategoryChannel, number>;
@@ -39,7 +51,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
   // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
   // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
-  declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
+  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
   // declare readonly categoryChannels?: CategoryChannel[];
 
   // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
@@ -74,14 +86,19 @@ export function initCategory(sequelize: Sequelize) {
   );
 
   Category.belongsTo(CTF, {
-    onDelete: 'CASCADE',
+    onDelete: 'RESTRICT',
     foreignKey: {
       allowNull: false,
     },
   });
 
+  // categories and team servers are super many-to-many via category channel
+  // https://sequelize.org/v6/manual/advanced-many-to-many.html
   initCategoryChannel(sequelize);
+  Category.belongsToMany(TeamServer, { through: CategoryChannel });
+  TeamServer.belongsToMany(Category, { through: CategoryChannel });
   Category.hasMany(CategoryChannel);
+  TeamServer.hasMany(CategoryChannel);
 
   initChallenge(sequelize);
   Category.hasMany(Challenge);

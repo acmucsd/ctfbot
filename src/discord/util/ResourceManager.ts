@@ -148,10 +148,10 @@ export async function getCTFByGuildContext(guild: Guild) {
   if (ctf) return ctf;
 
   // otherwise, see if this is a team server guild and return the original ctf
-  return (
-    await TeamServer.findOne({
-      where: { guildSnowflake: guild.id },
-      include: { model: CTF, required: true },
-    })
-  )?.ctf;
+  const teamServer = await TeamServer.findOne({
+    where: { guildSnowflake: guild.id },
+    include: { model: CTF, required: true },
+  });
+
+  return teamServer?.CTF;
 }

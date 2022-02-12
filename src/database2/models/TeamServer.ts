@@ -1,6 +1,20 @@
-import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyHasAssociationMixin,
+  DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { CTF } from './CTF';
 import { initTeam, Team } from './Team';
+import { Category } from './Category';
 
 interface TeamServerAttributes {
   id: number;
@@ -46,7 +60,19 @@ export class TeamServer
   declare getCTF: BelongsToGetAssociationMixin<CTF>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly ctf?: CTF;
+  declare readonly CTF?: CTF;
+
+  // declare getCategories: BelongsToManyGetAssociationsMixin<Category>;
+  // declare countCategories: BelongsToManyCountAssociationsMixin;
+  declare hasCategory: BelongsToManyHasAssociationMixin<Category, number>;
+  // declare hasCategories: BelongsToManyHasAssociationsMixin<Category, number>;
+  // declare setCategories: BelongsToManySetAssociationsMixin<Category, number>;
+  declare addCategory: BelongsToManyAddAssociationMixin<Category, number>;
+  // declare addCategories: BelongsToManyAddAssociationsMixin<Category, number>;
+  // declare removeCategory: BelongsToManyRemoveAssociationMixin<Category, number>;
+  // declare removeCategories: BelongsToManyRemoveAssociationsMixin<Category, number>;
+  // declare createCategory: BelongsToManyCreateAssociationMixin<Category>;
+  // declare readonly Categories?: Category[];
 
   // declare getTeams: HasManyGetAssociationsMixin<Team>;
   // declare countTeams: HasManyCountAssociationsMixin;
@@ -58,7 +84,7 @@ export class TeamServer
   // declare removeTeam: HasManyRemoveAssociationMixin<Team, number>;
   // declare removeTeams: HasManyRemoveAssociationsMixin<Team, number>;
   // declare createTeam: HasManyCreateAssociationMixin<Team>;
-  declare readonly teams?: Team[];
+  declare readonly Teams?: Team[];
 }
 
 export function initTeamServer(sequelize: Sequelize) {
@@ -115,7 +141,7 @@ export function initTeamServer(sequelize: Sequelize) {
   );
 
   TeamServer.belongsTo(CTF, {
-    onDelete: 'CASCADE',
+    onDelete: 'RESTRICT',
     foreignKey: {
       allowNull: false,
     },

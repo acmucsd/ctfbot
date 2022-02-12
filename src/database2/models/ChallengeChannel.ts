@@ -46,14 +46,12 @@ export function initChallengeChannel(sequelize: Sequelize) {
   );
 
   ChallengeChannel.belongsTo(TeamServer, {
-    onDelete: 'CASCADE',
     foreignKey: {
       allowNull: false,
     },
   });
 
   ChallengeChannel.belongsTo(Challenge, {
-    onDelete: 'CASCADE',
     foreignKey: {
       allowNull: false,
     },

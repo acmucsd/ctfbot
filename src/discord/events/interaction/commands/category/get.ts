@@ -1,4 +1,3 @@
-import { CTF } from '../../../../../database/models';
 import { PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { getCTFByGuildContext } from '../../../../util/ResourceManager';

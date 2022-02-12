@@ -17,8 +17,9 @@ export function initHooks(client: Client<true>) {
   TeamServer.beforeUpdate((ts) => refreshTeamServer(ts, client));
   TeamServer.beforeDestroy((ts) => destroyTeamServer(ts, client));
 
-  Category.beforeCreate((cat) => refreshCategory(cat));
-  Category.beforeUpdate((cat) => refreshCategory(cat));
+  // this one is after create because we need categoryID to be defined before creating CategoryChannels
+  Category.afterCreate((cat) => refreshCategory(cat, client));
+  Category.beforeUpdate((cat) => refreshCategory(cat, client));
 
   CategoryChannel.beforeCreate((chan) =>
     refreshCategoryChannel(chan, client).catch(() => destroyCategoryChannel(chan, client)),

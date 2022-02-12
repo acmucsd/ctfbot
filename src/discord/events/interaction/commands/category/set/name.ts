@@ -1,6 +1,7 @@
-import { CTF } from '../../../../../../database/models';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getCTFByGuildContext } from '../../../../../util/ResourceManager';
+import { createDiscordNullError } from '../../../../../../errors/DiscordNullError';
 
 export default {
   name: 'name',
@@ -21,15 +22,18 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw createDiscordNullError('ctf');
 
     const categoryName = interaction.options.getString('category_name', true);
     const newName = interaction.options.getString('new_name', true);
 
-    const category = await ctf.fromNameCategory(categoryName);
-    await category.setName(interaction.client, newName);
+    const categories = await ctf.getCategories({ where: { name: categoryName } });
+    if (!categories) throw new Error('no category by that name');
 
-    return `Category **${categoryName}** name has been set to **${category.row.name}**.`;
+    categories[0].name = categoryName;
+    await categories[0].save();
+
+    return `Category **${categoryName}** name has been set to **${newName}**.`;
   },
 } as ExecutableSubCommandData;

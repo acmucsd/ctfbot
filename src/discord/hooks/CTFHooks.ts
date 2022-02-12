@@ -63,6 +63,10 @@ export async function destroyCTF(ctf: CTF, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
+  // destroy all associated team servers as a side effect
+  const teamServers = await ctf.getTeamServers();
+  await Promise.all(teamServers.map((ts) => ts.destroy()));
+
   // delete all the roles and channels
   await destroyRoles(guild, ctf.adminRoleSnowflake, ctf.participantRoleSnowflake);
   await destroyChannels(

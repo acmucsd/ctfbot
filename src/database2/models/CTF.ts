@@ -77,7 +77,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare removeTeamServer: HasManyRemoveAssociationMixin<TeamServer, number>;
   // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
-  declare readonly teamServers?: TeamServer[];
+  declare readonly TeamServers?: TeamServer[];
 }
 
 export function initCTF(sequelize: Sequelize) {

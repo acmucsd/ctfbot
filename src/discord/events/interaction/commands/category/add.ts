@@ -4,7 +4,7 @@ import { getCTFByGuildContext } from '../../../../util/ResourceManager';
 
 export default {
   name: 'add',
-  description: 'Creates a new category with the indicated name and description.',
+  description: 'Creates a new category with the indicated name.',
   type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
