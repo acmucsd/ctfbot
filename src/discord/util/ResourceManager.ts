@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   CategoryChannel,
   Client,
@@ -96,12 +97,24 @@ export async function registerGuildCommandsIfChanged(
   userRole: Role,
   adminRole: Role,
 ) {
-  // only create new commands if they aren't already defined
-  if (
-    guild.commands.cache.filter((com) => com.applicationId === client.application.id).size !==
-    userCommands.length + adminCommands.length
-  ) {
-    await guild.commands.fetch();
+  // hash of currently registered commands in this guild
+  await guild.commands.fetch();
+  const registeredCommandsHash = crypto.createHash('sha256');
+  guild.commands.cache
+    .filter((com) => com.applicationId === client.application.id)
+    .map((com) => com.name)
+    .sort()
+    .forEach((comName) => registeredCommandsHash.update(comName));
+
+  // hash of internal commands that we want registered in this guild
+  const internalCommandsHash = crypto.createHash('sha256');
+  [...userCommands, ...adminCommands]
+    .map((com) => com.name)
+    .sort()
+    .forEach((comName) => internalCommandsHash.update(comName));
+
+  // only overwrite existing commands if they don't match
+  if (registeredCommandsHash.digest('hex') !== internalCommandsHash.digest('hex')) {
     await guild.commands.set(adminCommands.concat(userCommands));
     // ensure only admins can use admin commands and users can use user commands
     await guild.commands.permissions.set({

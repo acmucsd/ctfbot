@@ -21,5 +21,3 @@ export async function destroyCategoryChannel(categoryChannel: CategoryChannel, c
 
   await destroyChannels(guild, categoryChannel.channelSnowflake);
 }
-
-// TODO: remove many-to-many between TS and categories since its not useful, keep one-to-one

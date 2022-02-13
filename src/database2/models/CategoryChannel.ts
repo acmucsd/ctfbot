@@ -5,6 +5,7 @@ import { Category } from './Category';
 interface CategoryChannelAttributes {
   id: number;
   channelSnowflake: string;
+  teamServerId: number;
 }
 
 type CategoryChannelCreationAttributes = Optional<CategoryChannelAttributes, 'id' | 'channelSnowflake'>;
@@ -15,6 +16,7 @@ export class CategoryChannel
 {
   declare id: number;
   declare channelSnowflake: string;
+  declare teamServerId: number;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -43,6 +45,10 @@ export function initCategoryChannel(sequelize: Sequelize) {
         defaultValue: '',
         allowNull: false,
       },
+      teamServerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
@@ -50,12 +56,15 @@ export function initCategoryChannel(sequelize: Sequelize) {
   );
 
   CategoryChannel.belongsTo(TeamServer, {
+    onDelete: 'RESTRICT',
     foreignKey: {
+      name: 'teamServerId',
       allowNull: false,
     },
   });
 
   CategoryChannel.belongsTo(Category, {
+    onDelete: 'RESTRICT',
     foreignKey: {
       allowNull: false,
     },

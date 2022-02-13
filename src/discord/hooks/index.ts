@@ -8,7 +8,7 @@ import { refreshCategory } from './CategoryHooks';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
 import { destroyCategoryChannel, refreshCategoryChannel } from './CategoryChannelHooks';
 
-export function initHooks(client: Client<true>) {
+export async function initHooks(client: Client<true>) {
   CTF.beforeCreate((ctf) => refreshCTF(ctf, client).catch(() => destroyCTF(ctf, client)));
   CTF.beforeUpdate((ctf) => refreshCTF(ctf, client));
   CTF.beforeDestroy((ctf) => destroyCTF(ctf, client));
@@ -26,4 +26,8 @@ export function initHooks(client: Client<true>) {
   );
   CategoryChannel.beforeUpdate((chan) => refreshCategoryChannel(chan, client));
   CategoryChannel.beforeDestroy((chan) => destroyCategoryChannel(chan, client));
+
+  // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
+  const ctfs = await CTF.findAll();
+  await Promise.all(ctfs.map((ctf) => refreshCTF(ctf, client)));
 }

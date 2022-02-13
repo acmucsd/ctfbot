@@ -11,10 +11,10 @@ export async function refreshCategory(category: Category, client: Client<true>) 
   const channels = await category.getCategoryChannels();
 
   for (const teamServer of ctf.TeamServers) {
-    if (await teamServer.hasCategory(category)) continue;
+    if (channels.find((chan) => chan.teamServerId === teamServer.id)) continue;
     // there isn't a category channel for this teamserver + category combo
     // so we gotta create it
-    await teamServer.addCategory(category);
+    await category.createCategoryChannel({ teamServerId: teamServer.id });
   }
 
   // now we want to trigger a refresh of our dependant categoryChannels as well

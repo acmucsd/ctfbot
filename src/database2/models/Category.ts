@@ -1,6 +1,7 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
+  HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
   Optional,
@@ -9,7 +10,6 @@ import {
 import { CTF } from './CTF';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
-import { TeamServer } from './TeamServer';
 
 interface CategoryAttributes {
   id: number;
@@ -51,7 +51,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
   // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
   // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
-  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
+  declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
   // declare readonly categoryChannels?: CategoryChannel[];
 
   // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
@@ -92,13 +92,8 @@ export function initCategory(sequelize: Sequelize) {
     },
   });
 
-  // categories and team servers are super many-to-many via category channel
-  // https://sequelize.org/v6/manual/advanced-many-to-many.html
   initCategoryChannel(sequelize);
-  Category.belongsToMany(TeamServer, { through: CategoryChannel });
-  TeamServer.belongsToMany(Category, { through: CategoryChannel });
   Category.hasMany(CategoryChannel);
-  TeamServer.hasMany(CategoryChannel);
 
   initChallenge(sequelize);
   Category.hasMany(Challenge);

@@ -1,7 +1,6 @@
 import { Client } from 'discord.js';
 import { logger } from '../../log';
 import { interactionEvent, registerCommands } from './interaction/interaction';
-import { initializePeriodicUpdate } from './periodicUpdate';
 import rateLimitEvent from './rateLimit';
 import { initHooks } from '../hooks';
 
@@ -9,7 +8,7 @@ export const eventLoader = (client: Client) => {
   client.on('ready', async (client) => {
     logger.info('ready event received');
     await registerCommands(client);
-    initHooks(client);
+    await initHooks(client);
     //initializePeriodicUpdate(client);
 
     // todo: we need to change these from reaction listeners to message components

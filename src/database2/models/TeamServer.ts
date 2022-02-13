@@ -62,18 +62,6 @@ export class TeamServer
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly CTF?: CTF;
 
-  // declare getCategories: BelongsToManyGetAssociationsMixin<Category>;
-  // declare countCategories: BelongsToManyCountAssociationsMixin;
-  declare hasCategory: BelongsToManyHasAssociationMixin<Category, number>;
-  // declare hasCategories: BelongsToManyHasAssociationsMixin<Category, number>;
-  // declare setCategories: BelongsToManySetAssociationsMixin<Category, number>;
-  declare addCategory: BelongsToManyAddAssociationMixin<Category, number>;
-  // declare addCategories: BelongsToManyAddAssociationsMixin<Category, number>;
-  // declare removeCategory: BelongsToManyRemoveAssociationMixin<Category, number>;
-  // declare removeCategories: BelongsToManyRemoveAssociationsMixin<Category, number>;
-  // declare createCategory: BelongsToManyCreateAssociationMixin<Category>;
-  // declare readonly Categories?: Category[];
-
   // declare getTeams: HasManyGetAssociationsMixin<Team>;
   // declare countTeams: HasManyCountAssociationsMixin;
   // declare hasTeam: HasManyHasAssociationMixin<Team, number>;
