@@ -7,6 +7,7 @@ import {
   createRoleOrFetchIfExists,
   createTextChannelOrFetchIfExists,
   destroyChannels,
+  destroyRegisteredGuildCommands,
   destroyRoles,
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
@@ -62,7 +63,6 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
 
   // TODO: creating a new ts needs to refresh categories in the guild somehow
-  // TODO: command registration is being rate limited atm
 }
 
 export async function destroyTeamServer(teamServer: TeamServer, client: Client<true>) {
@@ -83,8 +83,5 @@ export async function destroyTeamServer(teamServer: TeamServer, client: Client<t
   await destroyRoles(ctfGuild, teamServer.inviteRoleSnowflake);
   await destroyChannels(ctfGuild, teamServer.inviteChannelSnowflake);
 
-  // oh yeah the commands too
-  await guild.commands.set([]);
-  // this doesn't clear the cache for some reason so we do that manually
-  guild.commands.cache.clear();
+  await destroyRegisteredGuildCommands(guild);
 }

@@ -6,6 +6,7 @@ import {
   createRoleOrFetchIfExists,
   createTextChannelOrFetchIfExists,
   destroyChannels,
+  destroyRegisteredGuildCommands,
   destroyRoles,
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
@@ -81,8 +82,5 @@ export async function destroyCTF(ctf: CTF, client: Client<true>) {
     ctf.scoreboardChannelSnowflake,
   );
 
-  // oh yeah the commands too
-  await guild.commands.set([]);
-  // this doesn't clear the cache for some reason so we do that manually
-  guild.commands.cache.clear();
+  await destroyRegisteredGuildCommands(guild);
 }

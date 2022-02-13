@@ -105,6 +105,12 @@ export async function destroyChannels(guild: Guild, ...channelSnowflakes: string
   await Promise.all(channels.map((chan) => chan?.delete()));
 }
 
+export async function destroyRegisteredGuildCommands(guild: Guild) {
+  await guild.commands.set([]);
+  // this doesn't clear the cache for some reason so we do that manually
+  guild.commands.cache.clear();
+}
+
 export async function registerGuildCommandsIfChanged(
   client: Client<true>,
   guild: Guild,
@@ -112,7 +118,7 @@ export async function registerGuildCommandsIfChanged(
   adminRole: Role,
 ) {
   // hash of currently registered commands in this guild
-  await guild.commands.fetch();
+  if (guild.commands.cache.size === 0) await guild.commands.fetch();
   const registeredCommandsHash = crypto.createHash('sha256');
   guild.commands.cache
     .filter((com) => com.applicationId === client.application.id)
