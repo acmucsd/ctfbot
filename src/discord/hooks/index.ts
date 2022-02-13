@@ -4,7 +4,7 @@ import { destroyCTF, refreshCTF } from './CTFHooks';
 import { destroyTeamServer, refreshTeamServer } from './TeamServerHooks';
 import { TeamServer } from '../../database2/models/TeamServer';
 import { Category } from '../../database2/models/Category';
-import { destroyCategory, refreshCategory } from './CategoryHooks';
+import { destroyCategory, refreshAllCategories, refreshCategory } from './CategoryHooks';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
 import { destroyCategoryChannel, refreshCategoryChannel } from './CategoryChannelHooks';
 
@@ -14,6 +14,8 @@ export async function initHooks(client: Client<true>) {
   CTF.beforeDestroy((ctf) => destroyCTF(ctf, client));
 
   TeamServer.beforeCreate((ts) => refreshTeamServer(ts, client).catch(() => destroyTeamServer(ts, client)));
+  // special case, when a new TS is created, we have to make sure the corresponding category channels are created
+  TeamServer.afterCreate((ts) => refreshAllCategories(ts, client));
   TeamServer.beforeUpdate((ts) => refreshTeamServer(ts, client));
   TeamServer.beforeDestroy((ts) => destroyTeamServer(ts, client));
 

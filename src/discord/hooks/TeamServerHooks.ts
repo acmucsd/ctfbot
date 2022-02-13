@@ -61,8 +61,6 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
 
   // register guild commands
   await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
-
-  // TODO: creating a new ts needs to refresh categories in the guild somehow
 }
 
 export async function destroyTeamServer(teamServer: TeamServer, client: Client<true>) {

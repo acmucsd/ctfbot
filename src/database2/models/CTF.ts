@@ -65,7 +65,7 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare removeCategory: HasManyRemoveAssociationMixin<Category, number>;
   // declare removeCategories: HasManyRemoveAssociationsMixin<Category, number>;
   declare createCategory: HasManyCreateAssociationMixin<Category>;
-  // declare readonly Categories?: Category[];
+  declare readonly Categories?: Category[];
 
   declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
   // declare countTeamServers: HasManyCountAssociationsMixin;

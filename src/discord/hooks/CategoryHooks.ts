@@ -4,6 +4,11 @@ import { createDatabaseNullError } from '../../errors/DatabaseNullError';
 import { refreshCategoryChannel } from './CategoryChannelHooks';
 import { Client } from 'discord.js';
 
+export async function refreshAllCategories(teamServer: TeamServer, client: Client<true>) {
+  const ctf = await teamServer.getCTF({ include: Category });
+  if (ctf.Categories) await Promise.all(ctf.Categories.map((cat) => refreshCategory(cat, client)));
+}
+
 export async function refreshCategory(category: Category, client: Client<true>) {
   const ctf = await category.getCTF({ include: { model: TeamServer, attributes: ['id'] } });
   if (!ctf.TeamServers) throw createDatabaseNullError('ctf.teamServers');
