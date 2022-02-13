@@ -29,9 +29,9 @@ export default {
     const newName = interaction.options.getString('new_name', true);
 
     const categories = await ctf.getCategories({ where: { name: categoryName } });
-    if (!categories) throw new Error('no category by that name');
+    if (!categories || !categories[0]) throw new Error('no category by that name');
 
-    categories[0].name = categoryName;
+    categories[0].name = newName;
     await categories[0].save();
 
     return `Category **${categoryName}** name has been set to **${newName}**.`;

@@ -21,8 +21,8 @@ export async function refreshCategory(category: Category, client: Client<true>) 
   await Promise.all(channels.map((chan) => refreshCategoryChannel(chan, client)));
 }
 
-// i shouldn't have to do anything when a category is destroyed because of the cascade policies
-// ie when a category is deleted, the corresponding category channels will be destroyed as well
-
-// export async function destroyCategory(category: Category) {
-// }
+// mainly we just need to destroy all category channels first
+export async function destroyCategory(category: Category) {
+  const channels = await category.getCategoryChannels();
+  await Promise.all(channels.map((chan) => chan.destroy()));
+}

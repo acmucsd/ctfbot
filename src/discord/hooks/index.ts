@@ -4,7 +4,7 @@ import { destroyCTF, refreshCTF } from './CTFHooks';
 import { destroyTeamServer, refreshTeamServer } from './TeamServerHooks';
 import { TeamServer } from '../../database2/models/TeamServer';
 import { Category } from '../../database2/models/Category';
-import { refreshCategory } from './CategoryHooks';
+import { destroyCategory, refreshCategory } from './CategoryHooks';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
 import { destroyCategoryChannel, refreshCategoryChannel } from './CategoryChannelHooks';
 
@@ -19,7 +19,8 @@ export async function initHooks(client: Client<true>) {
 
   // this one is after create because we need categoryID to be defined before creating CategoryChannels
   Category.afterCreate((cat) => refreshCategory(cat, client));
-  Category.beforeUpdate((cat) => refreshCategory(cat, client));
+  Category.afterUpdate((cat) => refreshCategory(cat, client));
+  Category.beforeDestroy((cat) => destroyCategory(cat));
 
   CategoryChannel.beforeCreate((chan) =>
     refreshCategoryChannel(chan, client).catch(() => destroyCategoryChannel(chan, client)),

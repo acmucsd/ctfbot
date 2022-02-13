@@ -63,10 +63,17 @@ export async function createCategoryChannelOrFetchIfExists(
   snowflake: string,
   name: string,
 ): Promise<CategoryChannel> {
-  return (
-    (snowflake && ((await guild.channels.fetch(snowflake)) as CategoryChannel)) ||
-    (await guild.channels.create(name, { type: 'GUILD_CATEGORY' }))
-  );
+  if (snowflake) {
+    const categoryChannel = (await guild.channels.fetch(snowflake)) as CategoryChannel;
+    if (categoryChannel) {
+      // set the name of the existing channel if it doesn't match
+      if (categoryChannel.name !== name) await categoryChannel.setName(name);
+
+      return categoryChannel;
+    }
+  }
+
+  return await guild.channels.create(name, { type: 'GUILD_CATEGORY' });
 }
 
 export async function createRoleOrFetchIfExists(guild: Guild, snowflake: string, name: string): Promise<Role> {
