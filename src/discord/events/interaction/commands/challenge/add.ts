@@ -1,6 +1,7 @@
-import { CTF } from '../../../../../database/models';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getCTFByGuildContext } from '../../../../util/ResourceManager';
+import { CTF } from '../../../../../database2/models/CTF';
 
 export default {
   name: 'add',
@@ -21,12 +22,18 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw new Error('this discord guild is not associated with any CTF');
 
-    const category = await ctf.fromNameCategory(interaction.options.getString('category', true));
-    const challenge = await category.createChallenge(interaction.client, interaction.options.getString('name', true));
+    const challengeName = interaction.options.getString('category', true);
+    const categories = await ctf.getCategories({ where: { name: challengeName } });
+    if (!categories || !categories[0]) throw new Error('no category by that name in this CTF');
 
-    return `Challenge **${challenge.row.name}** has been created in category **${category.row.name}**.`;
+    const challenge = await ctf.createChallenge({
+      name: interaction.options.getString('name', true),
+      categoryId: categories[0].id,
+    });
+
+    return `Challenge **${challenge.name}** has been created in category **${challengeName}**.`;
   },
 } as ExecutableSubCommandData;

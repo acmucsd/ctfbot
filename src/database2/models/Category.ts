@@ -52,7 +52,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
   // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
   declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
-  // declare readonly categoryChannels?: CategoryChannel[];
+  declare readonly CategoryChannels?: CategoryChannel[];
 
   // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
   // declare countChallenges: HasManyCountAssociationsMixin;
@@ -63,8 +63,8 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addChallenges: HasManyAddAssociationsMixin<Challenge, number>;
   // declare removeChallenge: HasManyRemoveAssociationMixin<Challenge, number>;
   // declare removeChallenges: HasManyRemoveAssociationsMixin<Challenge, number>;
-  // declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
-  declare readonly challenges?: Challenge[];
+  declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
+  declare readonly Challenges?: Challenge[];
 }
 
 export function initCategory(sequelize: Sequelize) {

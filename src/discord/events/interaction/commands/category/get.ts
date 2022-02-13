@@ -29,10 +29,10 @@ export default {
 
     // otherwise, list all challenges in a category
     const categories = await ctf.getCategories({ where: { name }, include: { model: Challenge } });
-    if (!categories || !categories[0].challenges) throw new Error('no challenges in that category by that name');
+    if (!categories || !categories[0].Challenges) throw new Error('no challenges in that category by that name');
 
-    return `**${categories[0].name}** has the following challenges: ${categories[0].challenges
-      .map((chal) => `**${chal.name}**`)
-      .join(', ')}`;
+    return `**${categories[0].name}** has the following challenges: ${categories[0].Challenges.map(
+      (chal) => `**${chal.name}**`,
+    ).join(', ')}`;
   },
 };

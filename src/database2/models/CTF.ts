@@ -8,6 +8,7 @@ import {
 } from 'sequelize';
 import { initTeamServer, TeamServer } from './TeamServer';
 import { Category, initCategory } from './Category';
+import { Challenge } from './Challenge';
 
 interface CTFAttributes {
   id: number;
@@ -66,6 +67,18 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   // declare removeCategories: HasManyRemoveAssociationsMixin<Category, number>;
   declare createCategory: HasManyCreateAssociationMixin<Category>;
   declare readonly Categories?: Category[];
+
+  declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
+  // declare countChallenges: HasManyCountAssociationsMixin;
+  // declare hasChallenge: HasManyHasAssociationMixin<Challenge, number>;
+  // declare hasChallenges: HasManyHasAssociationsMixin<Challenge, number>;
+  // declare setChallenges: HasManySetAssociationsMixin<Challenge, number>;
+  // declare addChallenge: HasManyAddAssociationMixin<Challenge, number>;
+  // declare addChallenges: HasManyAddAssociationsMixin<Challenge, number>;
+  // declare removeChallenge: HasManyRemoveAssociationMixin<Challenge, number>;
+  // declare removeChallenges: HasManyRemoveAssociationsMixin<Challenge, number>;
+  declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
+  declare readonly Challenges?: Challenge[];
 
   declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
   // declare countTeamServers: HasManyCountAssociationsMixin;
@@ -140,4 +153,5 @@ export function initCTF(sequelize: Sequelize) {
 
   initCategory(sequelize);
   CTF.hasMany(Category);
+  CTF.hasMany(Challenge);
 }
