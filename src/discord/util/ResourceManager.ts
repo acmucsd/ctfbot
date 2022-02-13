@@ -93,9 +93,16 @@ export async function destroyRoles(guild: Guild, ...roleSnowflakes: string[]) {
 }
 
 export async function destroyChannels(guild: Guild, ...channelSnowflakes: string[]) {
-  await Promise.all(
-    channelSnowflakes.filter((snowflake) => snowflake).map((snowflake) => guild.channels.fetch(snowflake)),
-  ).then((channels) => Promise.all(channels.map((channel) => channel?.delete())));
+  const channels = await Promise.all(
+    channelSnowflakes
+      .filter((snowflake) => snowflake)
+      .map((snowflake) =>
+        guild.channels.fetch(snowflake).catch(() => {
+          /** for some reason, this can throw an error if the channel isn't found */
+        }),
+      ),
+  );
+  await Promise.all(channels.map((chan) => chan?.delete()));
 }
 
 export async function registerGuildCommandsIfChanged(

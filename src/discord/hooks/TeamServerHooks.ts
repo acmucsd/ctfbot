@@ -11,6 +11,7 @@ import {
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
 import { setTeamServerInviteChannelMessage } from '../messages/TeamServerInviteChannelMessage';
+import { CategoryChannel } from '../../database2/models/CategoryChannel';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
@@ -59,11 +60,18 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
 
   // register guild commands
   await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
+
+  // TODO: creating a new ts needs to refresh categories in the guild somehow
+  // TODO: command registration is being rate limited atm
 }
 
 export async function destroyTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
+
+  // destroy dependant category channels first
+  const categoryChannels = await CategoryChannel.findAll({ where: { teamServerId: teamServer.id } });
+  await Promise.all(categoryChannels.map((chan) => chan.destroy()));
 
   const ctf = await teamServer.getCTF({ attributes: ['name', 'guildSnowflake'] });
   const ctfGuild = await client.guilds.fetch(ctf.guildSnowflake);
@@ -77,4 +85,6 @@ export async function destroyTeamServer(teamServer: TeamServer, client: Client<t
 
   // oh yeah the commands too
   await guild.commands.set([]);
+  // this doesn't clear the cache for some reason so we do that manually
+  guild.commands.cache.clear();
 }

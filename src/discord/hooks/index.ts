@@ -31,4 +31,6 @@ export async function initHooks(client: Client<true>) {
   // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
   const ctfs = await CTF.findAll();
   await Promise.all(ctfs.map((ctf) => refreshCTF(ctf, client)));
+  const teamServers = await TeamServer.findAll();
+  await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client)));
 }

@@ -63,6 +63,10 @@ export async function destroyCTF(ctf: CTF, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
+  // destroy all associated categories as a side effect
+  const categories = await ctf.getCategories();
+  await Promise.all(categories.map((cat) => cat.destroy()));
+
   // destroy all associated team servers as a side effect
   const teamServers = await ctf.getTeamServers();
   await Promise.all(teamServers.map((ts) => ts.destroy()));
@@ -79,4 +83,6 @@ export async function destroyCTF(ctf: CTF, client: Client<true>) {
 
   // oh yeah the commands too
   await guild.commands.set([]);
+  // this doesn't clear the cache for some reason so we do that manually
+  guild.commands.cache.clear();
 }
