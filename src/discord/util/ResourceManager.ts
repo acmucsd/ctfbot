@@ -3,6 +3,7 @@ import {
   CategoryChannel,
   Client,
   Guild,
+  GuildBasedChannel,
   MessageEmbed,
   PermissionResolvable,
   Permissions,
@@ -14,6 +15,9 @@ import { adminCommands, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { CTF } from '../../database2/models/CTF';
 import { TeamServer } from '../../database2/models/TeamServer';
+import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
+import { Challenge } from '../../database2/models/Challenge';
+import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -187,4 +191,15 @@ export async function getCTFByGuildContext(guild: Guild) {
   });
 
   return teamServer?.CTF;
+}
+
+export async function getChallengeByChannelContext(channel: GuildBasedChannel | null) {
+  if (!channel) throw new UnknownChallengeError();
+  const challengeChannel = await ChallengeChannel.findOne({
+    attributes: [],
+    where: { channelSnowflake: channel.id },
+    include: Challenge,
+  });
+  if (!challengeChannel || !challengeChannel.Challenge) throw new UnknownChallengeError();
+  return challengeChannel.Challenge;
 }

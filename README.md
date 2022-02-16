@@ -264,11 +264,7 @@ Creates a new CTF challenge. This also creates a challenge text channel in its c
 
 * **Author** defaults to the Discord Username of the user executing the command.
 * **Prompt** defaults to an empty string.
-* **Difficulty** defaults to *Baby*.
-* **Initial Points** defaults to 100 points.
-* **Minimum Points** defaults to 100 points. This means this challenge is statically scored by default.
-* **Point Decay** defaults to 100. This means, if Initial Points and Minimum Points are different, it will take 100 solves for the points this challenge awards to fall to the value of Minimum Points.
-* **Flag** defaults to a randomly generated string resembling `flag{9a39mHrasu8MVZ32x4Kg}`.
+* **Difficulty** defaults to *Easy*.
 
 All of these settings can be changed in further commands.
 
@@ -276,21 +272,14 @@ All of these settings can be changed in further commands.
 
 #### editing challenges
 ```java
-/challenge set name NAME [CHALLENGE_NAME]
-/challenge set author AUTHOR [CHALLENGE_NAME]
-/challenge set prompt PROMPT [CHALLENGE_NAME]
-/challenge set difficulty DIFFICULTY [CHALLENGE_NAME]
-/challenge set points POINTS [CHALLENGE_NAME]
-/challenge set initialpoints POINTS [CHALLENGE_NAME]
-/challenge set minimumpoints POINTS [CHALLENGE_NAME]
-/challenge set pointdecay DECAY [CHALLENGE_NAME]
-/challenge set flag FLAG [CHALLENGE_NAME]
-/challenge set publish [PUBLISH_TIME] [CHALLENGE_NAME]
+/challenge set name NAME
+/challenge set author AUTHOR
+/challenge set prompt PROMPT
+/challenge set difficulty DIFFICULTY
+/challenge set publish [PUBLISH_TIME]
 ```
 
-Edits the challenge variables in a predictable way. Each command allows specifying the challenge to modify, but will otherwise attempt to infer this information if you are in a challenge channel.
-
-**Note**: `set points 500` is an alias for `set initialpoints 500` and `set minimumpoints 500`. This allows setting static points with a single command.
+Edits the challenge variables in a predictable way. Each command infers the challenge from the current challenge channel.
 
 **Note 2**: Using `set publish` without specifying a publish time will set it to "now", publishing the challenge instantly.
 
@@ -309,6 +298,20 @@ While indicating a particular challenge, returns all available information about
 ```
 
 Removes the challenge indicated, or infers it from the current challenge channel if its missing. *This causes all recorded attempts to solve this challenge to be deleted forever*.
+
+#### managing flags
+```java
+/challenge flag add FLAGSTRING [POINTS]
+/challenge flag del INDEX
+/challenge flag points INDEX POINTS
+```
+
+The first command adds a flag to the current challenge. If no points are specified, it defaults to 0.
+
+The second command removes the flag at the specified index.
+This index begins at 1 instead of zero and matches the way the flags are numbered in the Discord UI.
+
+The third command changes the number of points the indicated flag is worth.
 
 #### managing attachments
 ```java

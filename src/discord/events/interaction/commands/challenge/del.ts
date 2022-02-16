@@ -1,9 +1,6 @@
-import { UnknownChallengeError } from '../../../../../errors/UnknownChallengeError';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { getCTFByGuildContext } from '../../../../util/ResourceManager';
-import { ChallengeChannel } from "../../../../../database2/models/ChallengeChannel";
-import { Challenge } from "../../../../../database2/models/Challenge";
+import { getChallengeByChannelContext, getCTFByGuildContext } from '../../../../util/ResourceManager';
 
 export default {
   name: 'del',
@@ -21,12 +18,11 @@ export default {
     const ctf = await getCTFByGuildContext(interaction.guild);
     if (!ctf) throw new Error('this discord guild is not associated with any CTF');
 
-    const challengeChannelSnowflake = interaction.options.getChannel('challenge_channel')?.id ?? interaction.channelId;
-    const challengeChannel = await ChallengeChannel.findOne({  attributes: [], where: { channelSnowflake: challengeChannelSnowflake }, include: Challenge });
-    if(!challengeChannel || !challengeChannel.Challenge) throw new UnknownChallengeError();
+    const challengeChannel = interaction.options.getChannel('challenge_channel') || interaction.channel;
+    const challenge = await getChallengeByChannelContext(challengeChannel);
 
-    await challengeChannel.Challenge.destroy();
+    await challenge.destroy();
 
-    return `The challenge **${challengeChannel.Challenge.name}** has been deleted.`;
+    return `The challenge **${challenge.name}** has been deleted.`;
   },
 } as ExecutableSubCommandData;

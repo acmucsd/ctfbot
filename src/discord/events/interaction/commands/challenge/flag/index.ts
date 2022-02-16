@@ -1,11 +1,12 @@
-import add from './add';
-import remove from './remove';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubGroupData } from '../../../interaction';
+import add from './add';
+import del from './del';
+import points from './points';
 
 export default {
-  name: 'dependency',
-  description: 'Challenge dependency management',
+  name: 'flag',
+  description: 'Challenge flag management',
   type: ApplicationCommandOptionTypes.SUB_COMMAND_GROUP,
-  options: [add, remove],
+  options: [add, del, points],
 } as ExecutableSubGroupData;

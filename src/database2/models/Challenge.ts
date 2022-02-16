@@ -70,7 +70,7 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare addFlags: HasManyAddAssociationsMixin<Flag, number>;
   // declare removeFlag: HasManyRemoveAssociationMixin<Flag, number>;
   // declare removeFlags: HasManyRemoveAssociationsMixin<Flag, number>;
-  // declare createFlag: HasManyCreateAssociationMixin<Flag>;
+  declare createFlag: HasManyCreateAssociationMixin<Flag>;
   // declare readonly flags?: Flag[];
 }
 
