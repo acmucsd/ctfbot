@@ -4,6 +4,7 @@ import { createTextChannelOrFetchIfExists, destroyChannels } from '../util/Resou
 import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
 import { Category } from '../../database2/models/Category';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
+import { setChallengeMessage } from '../messages/ChallengeMessage';
 
 export async function refreshChallengeChannel(challengeChannel: ChallengeChannel, client: Client<true>) {
   const teamServer = await challengeChannel.getTeamServer({ attributes: ['id', 'guildSnowflake'] });
@@ -31,7 +32,8 @@ export async function refreshChallengeChannel(challengeChannel: ChallengeChannel
   });
   challengeChannel.channelSnowflake = channel.id;
 
-  // TODO: set the channel content
+  // set the channel content
+  await setChallengeMessage(client, channel, challenge);
 }
 
 export async function destroyChallengeChannel(challengeChannel: ChallengeChannel, client: Client<true>) {

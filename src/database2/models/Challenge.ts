@@ -8,7 +8,6 @@ import {
   Sequelize,
 } from 'sequelize';
 import { Category } from './Category';
-import { User } from './User';
 import { Flag, initFlag } from './Flag';
 import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
 import { CTF } from './CTF';
@@ -20,15 +19,12 @@ export interface ChallengeAttributes {
   author: string;
   prompt: string;
   difficulty: string;
-  initialPoints: number;
-  pointDecay: number;
-  minPoints: number;
   publishTime?: Date;
 }
 
 type ChallengeCreationAttributes = Optional<
   ChallengeAttributes,
-  'id' | 'author' | 'prompt' | 'difficulty' | 'initialPoints' | 'pointDecay' | 'minPoints' | 'publishTime'
+  'id' | 'author' | 'prompt' | 'difficulty' | 'publishTime'
 >;
 
 export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttributes> implements ChallengeAttributes {
@@ -38,25 +34,17 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   declare author: string;
   declare prompt: string;
   declare difficulty: string;
-  declare initialPoints: number;
-  declare pointDecay: number;
-  declare minPoints: number;
   declare publishTime?: Date;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
-
-  // declare getFirstBloodUser: BelongsToGetAssociationMixin<User>;
-  // declare setFirstBloodUser: BelongsToSetAssociationMixin<User, number>;
-  // declare createFirstBloodUser: BelongsToCreateAssociationMixin<User>;
-  declare readonly firstBloodUser?: User;
 
   declare getCTF: BelongsToGetAssociationMixin<CTF>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
 
-  // declare getCategory: BelongsToGetAssociationMixin<Category>;
+  declare getCategory: BelongsToGetAssociationMixin<Category>;
   // declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;
   declare readonly Category?: Category;
@@ -73,7 +61,7 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   declare createChallengeChannel: HasManyCreateAssociationMixin<ChallengeChannel>;
   // declare readonly challengeChannels?: ChallengeChannel[];
 
-  // declare getFlags: HasManyGetAssociationsMixin<Flag>;
+  declare getFlags: HasManyGetAssociationsMixin<Flag>;
   // declare countFlags: HasManyCountAssociationsMixin;
   // declare hasFlag: HasManyHasAssociationMixin<Flag, number>;
   // declare hasFlags: HasManyHasAssociationsMixin<Flag, number>;
@@ -117,31 +105,12 @@ export function initChallenge(sequelize: Sequelize) {
         defaultValue: 'EASY',
         allowNull: false,
       },
-      initialPoints: {
-        type: DataTypes.INTEGER,
-        defaultValue: 100,
-        allowNull: false,
-      },
-      pointDecay: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-        allowNull: false,
-      },
-      minPoints: {
-        type: DataTypes.INTEGER,
-        defaultValue: 100,
-        allowNull: false,
-      },
       publishTime: DataTypes.DATE,
     },
     {
       sequelize,
     },
   );
-
-  Challenge.belongsTo(User, {
-    as: 'FirstBloodUser',
-  });
 
   Challenge.belongsTo(Category, {
     onDelete: 'RESTRICT',

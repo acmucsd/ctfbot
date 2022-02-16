@@ -1,10 +1,11 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, HasManyHasAssociationsMixin, Model, Optional, Sequelize } from 'sequelize';
 import { Challenge } from './Challenge';
 import { FlagCapture, initFlagCapture } from './FlagCapture';
 
 interface FlagAttributes {
   id: number;
   flagText: string;
+  pointValue: number;
 }
 
 type FlagCreationAttributes = Optional<FlagAttributes, 'id'>;
@@ -12,6 +13,7 @@ type FlagCreationAttributes = Optional<FlagAttributes, 'id'>;
 export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implements FlagAttributes {
   declare id: number;
   declare flagText: string;
+  declare pointValue: number;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -31,7 +33,7 @@ export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implemen
   // declare removeFlagCapture: HasManyRemoveAssociationMixin<FlagCapture, number>;
   // declare removeFlagCaptures: HasManyRemoveAssociationsMixin<FlagCapture, number>;
   // declare createFlagCapture: HasManyCreateAssociationMixin<FlagCapture>;
-  // declare readonly flagCaptures?: FlagCapture[];
+  declare readonly FlagCaptures?: FlagCapture[];
 }
 
 export function initFlag(sequelize: Sequelize) {
@@ -44,6 +46,11 @@ export function initFlag(sequelize: Sequelize) {
       },
       flagText: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      pointValue: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
         allowNull: false,
       },
     },

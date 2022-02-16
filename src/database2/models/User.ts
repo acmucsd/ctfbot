@@ -19,7 +19,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare getTeam: BelongsToGetAssociationMixin<Team>;
   // declare setTeam: BelongsToSetAssociationMixin<Team, number>;
   // declare createTeam: BelongsToCreateAssociationMixin<Team>;
-  declare readonly team?: Team;
+  declare readonly Team?: Team;
 
   // declare getInvites: HasManyGetAssociationsMixin<Invite>;
   // declare countInvites: HasManyCountAssociationsMixin;

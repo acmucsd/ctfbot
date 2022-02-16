@@ -22,7 +22,7 @@ export class FlagCapture
   // declare getUser: BelongsToGetAssociationMixin<User>;
   // declare setUser: BelongsToSetAssociationMixin<User, number>;
   // declare createUser: BelongsToCreateAssociationMixin<User>;
-  declare readonly user?: User;
+  declare readonly User?: User;
 
   // declare getFlag: BelongsToGetAssociationMixin<Flag>;
   // declare setFlag: BelongsToSetAssociationMixin<Flag, number>;
