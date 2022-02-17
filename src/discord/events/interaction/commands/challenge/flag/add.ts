@@ -8,7 +8,7 @@ export default {
   type: ApplicationCommandOptionTypes.SUB_COMMAND,
   options: [
     {
-      name: 'flagText',
+      name: 'flag_text',
       description: "The flag's secret text",
       type: ApplicationCommandOptionTypes.STRING,
       required: true,
@@ -24,7 +24,7 @@ export default {
     const challenge = await getChallengeByChannelContext(interaction.channel);
 
     await challenge.createFlag({
-      flagText: interaction.options.getString('flagText', true),
+      flagText: interaction.options.getString('flag_text', true),
       pointValue: interaction.options.getNumber('points') || 0,
     });
 
