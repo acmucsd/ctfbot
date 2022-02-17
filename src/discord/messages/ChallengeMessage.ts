@@ -24,6 +24,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
   // complicated nested query to fetch the associated first blood user and team, if defined
   const flags = await challenge.getFlags({
     attributes: ['id', 'pointValue'],
+    order: [['createdAt', 'ASC']],
     include: {
       model: FlagCapture,
       limit: 1,
@@ -41,7 +42,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
 
       // if no captures
       if (!flag.FlagCaptures || flag.FlagCaptures.length === 0) {
-        flagMessage.setTitle(`🚨 Flag #${i} currently has no captures! 🚨`);
+        flagMessage.setTitle(`🚨 Flag #${i + 1} currently has no captures! 🚨`);
         flagMessage.setDescription('Do you have what it takes to be the first?');
         return flagMessage;
       }
@@ -54,7 +55,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
       if (!team) throw new Error('unable to get capture team');
       const member = await guild.members.fetch(user.userSnowflake);
 
-      flagMessage.setTitle(`🔓 Flag #${i} has been captured! 🔓`);
+      flagMessage.setTitle(`🔓 Flag #${i + 1} has been captured! 🔓`);
       flagMessage.setDescription(`The first to capture this flag was **${member.displayName}** from **${team.name}**`);
       return flagMessage;
     }),

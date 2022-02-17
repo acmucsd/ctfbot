@@ -17,12 +17,12 @@ export default {
   async execute(interaction: PopulatedCommandInteraction) {
     const challenge = await getChallengeByChannelContext(interaction.channel);
 
-    const flags = await challenge.getFlags({ attributes: ['id'], order: [['createdAt', 'ASC']] });
-    const index = interaction.options.getNumber('index', true);
+    const flags = await challenge.getFlags({ order: [['createdAt', 'ASC']] });
+    const index = interaction.options.getNumber('index', true) - 1;
 
     if (!flags || !flags[index]) throw new Error('no flag with that index');
     await flags[index].destroy();
 
-    return `Flag #${index} has been removed from challenge **${challenge.name}**.`;
+    return `Flag #${index + 1} has been removed from challenge **${challenge.name}**.`;
   },
 } as ExecutableSubCommandData;

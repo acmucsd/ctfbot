@@ -23,14 +23,14 @@ export default {
   async execute(interaction: PopulatedCommandInteraction) {
     const challenge = await getChallengeByChannelContext(interaction.channel);
 
-    const flags = await challenge.getFlags({ attributes: ['id'], order: [['createdAt', 'ASC']] });
-    const index = interaction.options.getNumber('index', true);
+    const flags = await challenge.getFlags({ order: [['createdAt', 'ASC']] });
+    const index = interaction.options.getNumber('index', true) - 1;
 
     if (!flags || !flags[index]) throw new Error('no flag with that index');
 
     flags[index].pointValue = interaction.options.getNumber('points', true);
     await flags[index].save();
 
-    return `Flag #${index} on challenge **${challenge.name}** is now worth **${flags[index].pointValue}** points.`;
+    return `Flag #${index + 1} on challenge **${challenge.name}** is now worth **${flags[index].pointValue}** points.`;
   },
 } as ExecutableSubCommandData;
