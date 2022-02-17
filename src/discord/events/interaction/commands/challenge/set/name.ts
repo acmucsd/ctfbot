@@ -2,6 +2,7 @@ import { CTF } from '../../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../../errors/UnknownChallengeError';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { getChallengeByChannelContext, getChallengeByInteraction } from '../../../../../util/ResourceManager';
 
 export default {
   name: 'name',
@@ -22,14 +23,11 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
-
+    const challenge = await getChallengeByInteraction(interaction);
     const newName = interaction.options.getString('new_name', true);
-    const challengeChannelSnowflake = interaction.options.getString('challenge_channel') ?? interaction.channelId;
-    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setName(interaction.client, newName);
+
+    challenge.name = newName;
+    await challenge.save();
 
     return `Challenge name has been set to **${newName}**.`;
   },

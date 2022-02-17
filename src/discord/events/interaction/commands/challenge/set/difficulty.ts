@@ -2,6 +2,7 @@ import { CTF } from '../../../../../../database/models';
 import { UnknownChallengeError } from '../../../../../../errors/UnknownChallengeError';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
+import { getChallengeByInteraction } from '../../../../../util/ResourceManager';
 
 export default {
   name: 'difficulty',
@@ -15,8 +16,8 @@ export default {
       required: true,
       choices: [
         {
-          name: 'Baby',
-          value: 'BABY',
+          name: 'Educational',
+          value: 'EDUCATIONAL',
         },
         {
           name: 'Easy',
@@ -40,15 +41,12 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
+    const challenge = await getChallengeByInteraction(interaction);
+    const newDifficulty = interaction.options.getString('difficulty', true);
 
-    const difficulty = interaction.options.getString('difficulty', true);
-    const challengeChannelSnowflake = interaction.options.getString('challenge_channel') ?? interaction.channelId;
-    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setDifficulty(interaction.client, difficulty);
+    challenge.difficulty = newDifficulty;
+    await challenge.save();
 
-    return `Challenge difficulty has been set to **${difficulty}**.`;
+    return `Challenge difficulty has been set to **${newDifficulty}**.`;
   },
 } as ExecutableSubCommandData;

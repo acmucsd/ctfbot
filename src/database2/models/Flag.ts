@@ -1,4 +1,11 @@
-import { DataTypes, HasManyHasAssociationsMixin, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  DataTypes,
+  HasManyHasAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { Challenge } from './Challenge';
 import { FlagCapture, initFlagCapture } from './FlagCapture';
 
@@ -18,7 +25,7 @@ export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implemen
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getChallenge: BelongsToGetAssociationMixin<Challenge>;
+  declare getChallenge: BelongsToGetAssociationMixin<Challenge>;
   // declare setChallenge: BelongsToSetAssociationMixin<Challenge, number>;
   // declare createChallenge: BelongsToCreateAssociationMixin<Challenge>;
   declare readonly challenge?: Challenge;

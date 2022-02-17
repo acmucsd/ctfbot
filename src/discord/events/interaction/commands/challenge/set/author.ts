@@ -1,7 +1,6 @@
-import { CTF } from '../../../../../../database/models';
-import { UnknownChallengeError } from '../../../../../../errors/UnknownChallengeError';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { getChallengeByInteraction } from '../../../../../util/ResourceManager';
 
 export default {
   name: 'author',
@@ -22,15 +21,11 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    ctf.throwErrorUnlessAdmin(interaction);
-
+    const challenge = await getChallengeByInteraction(interaction);
     const newAuthor = interaction.options.getString('author', true);
 
-    const challengeChannelSnowflake = interaction.options.getString('challenge_channel') ?? interaction.channelId;
-    if (!challengeChannelSnowflake) throw new UnknownChallengeError();
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
-    await challenge.setAuthor(interaction.client, newAuthor);
+    challenge.author = newAuthor;
+    await challenge.save();
 
     return `Challenge author has been set to **${newAuthor}**.`;
   },

@@ -11,7 +11,7 @@ import {
   Snowflake,
   TextChannel,
 } from 'discord.js';
-import { adminCommands, userCommands } from '../events/interaction/interaction';
+import { adminCommands, PopulatedCommandInteraction, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { CTF } from '../../database2/models/CTF';
 import { TeamServer } from '../../database2/models/TeamServer';
@@ -191,6 +191,10 @@ export async function getCTFByGuildContext(guild: Guild) {
   });
 
   return teamServer?.CTF;
+}
+
+export async function getChallengeByInteraction(interaction: PopulatedCommandInteraction) {
+  return await getChallengeByChannelContext(interaction.options.getChannel('challenge_channel') || interaction.channel);
 }
 
 export async function getChallengeByChannelContext(channel: GuildBasedChannel | null) {

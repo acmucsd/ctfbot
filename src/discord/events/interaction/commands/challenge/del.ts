@@ -1,6 +1,6 @@
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { getChallengeByChannelContext, getCTFByGuildContext } from '../../../../util/ResourceManager';
+import { getChallengeByInteraction } from '../../../../util/ResourceManager';
 
 export default {
   name: 'del',
@@ -15,12 +15,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await getCTFByGuildContext(interaction.guild);
-    if (!ctf) throw new Error('this discord guild is not associated with any CTF');
-
-    const challengeChannel = interaction.options.getChannel('challenge_channel') || interaction.channel;
-    const challenge = await getChallengeByChannelContext(challengeChannel);
-
+    const challenge = await getChallengeByInteraction(interaction);
     await challenge.destroy();
 
     return `The challenge **${challenge.name}** has been deleted.`;
