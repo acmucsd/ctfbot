@@ -54,7 +54,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
   declare readonly CategoryChannels?: CategoryChannel[];
 
-  // declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
+  declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
   // declare countChallenges: HasManyCountAssociationsMixin;
   // declare hasChallenge: HasManyHasAssociationMixin<Challenge, number>;
   // declare hasChallenges: HasManyHasAssociationsMixin<Challenge, number>;

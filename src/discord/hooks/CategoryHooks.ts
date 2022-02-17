@@ -26,8 +26,11 @@ export async function refreshCategory(category: Category, client: Client<true>) 
   await Promise.all(channels.map((chan) => refreshCategoryChannel(chan, client)));
 }
 
-// mainly we just need to destroy all category channels first
+// mainly we just need to destroy challenges and category channels first
 export async function destroyCategory(category: Category) {
+  const challenges = await category.getChallenges();
+  await Promise.all(challenges.map((chal) => chal.destroy()));
+
   const channels = await category.getCategoryChannels();
   await Promise.all(channels.map((chan) => chan.destroy()));
 }
