@@ -13,7 +13,6 @@ export async function refreshChallengeChannel(challengeChannel: ChallengeChannel
 
   // get the category channel we should nest this channel under
   const challenge = await challengeChannel.getChallenge({
-    attributes: ['name'],
     include: {
       model: Category,
       attributes: ['id'],

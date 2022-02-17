@@ -18,6 +18,7 @@ import { TeamServer } from '../../database2/models/TeamServer';
 import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
 import { Challenge } from '../../database2/models/Challenge';
 import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
+import { logger } from '../../log';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -126,19 +127,34 @@ export async function registerGuildCommandsIfChanged(
   const registeredCommandsHash = crypto.createHash('sha256');
   guild.commands.cache
     .filter((com) => com.applicationId === client.application.id)
-    .map((com) => com.name)
+    .map(
+      (com) =>
+        `${com.name} ${com.options
+          .map((opt) => opt.name)
+          .sort()
+          .join('')}`,
+    )
     .sort()
     .forEach((comName) => registeredCommandsHash.update(comName));
 
   // hash of internal commands that we want registered in this guild
   const internalCommandsHash = crypto.createHash('sha256');
   [...userCommands, ...adminCommands]
-    .map((com) => com.name)
+    .map(
+      (com) =>
+        `${com.name} ${
+          com.options
+            ?.map((opt) => opt.name)
+            .sort()
+            .join('') ?? ''
+        }`,
+    )
     .sort()
     .forEach((comName) => internalCommandsHash.update(comName));
 
   // only overwrite existing commands if they don't match
   if (registeredCommandsHash.digest('hex') !== internalCommandsHash.digest('hex')) {
+    logger.info('detected change, setting guild commands');
     await guild.commands.set(adminCommands.concat(userCommands));
     // ensure only admins can use admin commands and users can use user commands
     await guild.commands.permissions.set({

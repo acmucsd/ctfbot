@@ -6,7 +6,7 @@ import { User } from '../../database2/models/User';
 import { Team } from '../../database2/models/Team';
 
 export async function setChallengeMessage(client: Client<true>, channel: TextChannel, challenge: Challenge) {
-  const category = await challenge.getCategory();
+  const category = await challenge.getCategory({ attributes: ['name'] });
 
   const challengeMessage = new MessageEmbed();
   challengeMessage.setTitle(challenge.name);
