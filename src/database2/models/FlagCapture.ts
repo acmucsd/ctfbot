@@ -4,7 +4,6 @@ import { User } from './User';
 
 interface FlagCaptureAttributes {
   id: number;
-  timestamp: Date;
 }
 
 type FlagCaptureCreationAttributes = Optional<FlagCaptureAttributes, 'id'>;
@@ -14,9 +13,8 @@ export class FlagCapture
   implements FlagCaptureAttributes
 {
   declare id: number;
-  declare timestamp: Date;
 
-  // declare readonly createdAt: Date;
+  declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
   // declare getUser: BelongsToGetAssociationMixin<User>;
@@ -27,7 +25,7 @@ export class FlagCapture
   // declare getFlag: BelongsToGetAssociationMixin<Flag>;
   // declare setFlag: BelongsToSetAssociationMixin<Flag, number>;
   // declare createFlag: BelongsToCreateAssociationMixin<Flag>;
-  declare readonly flag?: Flag;
+  declare readonly Flag?: Flag;
 }
 
 export function initFlagCapture(sequelize: Sequelize) {
@@ -37,10 +35,6 @@ export function initFlagCapture(sequelize: Sequelize) {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-      },
-      timestamp: {
-        type: DataTypes.DATE,
-        allowNull: false,
       },
     },
     {

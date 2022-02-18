@@ -14,7 +14,7 @@ import { CTF } from './CTF';
 
 export interface ChallengeAttributes {
   id: number;
-  categoryId: number;
+  CategoryId: number;
   name: string;
   author: string;
   prompt: string;
@@ -29,7 +29,7 @@ type ChallengeCreationAttributes = Optional<
 
 export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttributes> implements ChallengeAttributes {
   declare id: number;
-  declare categoryId: number;
+  declare CategoryId: number;
   declare name: string;
   declare author: string;
   declare prompt: string;
@@ -71,7 +71,7 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare removeFlag: HasManyRemoveAssociationMixin<Flag, number>;
   // declare removeFlags: HasManyRemoveAssociationsMixin<Flag, number>;
   declare createFlag: HasManyCreateAssociationMixin<Flag>;
-  // declare readonly flags?: Flag[];
+  declare readonly Flags?: Flag[];
 }
 
 export function initChallenge(sequelize: Sequelize) {
@@ -81,10 +81,6 @@ export function initChallenge(sequelize: Sequelize) {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-      },
-      categoryId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
       },
       name: {
         type: DataTypes.STRING,
@@ -106,6 +102,10 @@ export function initChallenge(sequelize: Sequelize) {
         allowNull: false,
       },
       publishTime: DataTypes.DATE,
+      CategoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,
@@ -115,7 +115,7 @@ export function initChallenge(sequelize: Sequelize) {
   Challenge.belongsTo(Category, {
     onDelete: 'RESTRICT',
     foreignKey: {
-      name: 'categoryId',
+      name: 'CategoryId',
       allowNull: false,
     },
   });

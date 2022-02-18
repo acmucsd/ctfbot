@@ -6,7 +6,7 @@ import {
   CommandInteraction,
   Interaction,
 } from 'discord.js';
-import { category, challenge, ctf, ping, scoreboard, team } from './commands';
+import { category, challenge, ctf } from './commands';
 import { embedify, logger } from '../../../log';
 import addctf from './commands/addctf';
 import addserver from './commands/addserver';
@@ -20,8 +20,8 @@ import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
-export const adminCommands: ChatInputCommandDefinition[] = [ctf, team, category, challenge, scoreboard];
-export const userCommands: ChatInputCommandDefinition[] = [ping, submit, invite, setname, setcolor, standing];
+export const adminCommands: ChatInputCommandDefinition[] = [ctf, category, challenge];
+export const userCommands: ChatInputCommandDefinition[] = [submit, invite, setname, setcolor, standing];
 const commands: ChatInputCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
 
 const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandler => {

@@ -1,6 +1,7 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
+  HasManyCreateAssociationMixin,
   HasManyHasAssociationsMixin,
   Model,
   Optional,
@@ -8,6 +9,7 @@ import {
 } from 'sequelize';
 import { Challenge } from './Challenge';
 import { FlagCapture, initFlagCapture } from './FlagCapture';
+import { User } from './User';
 
 interface FlagAttributes {
   id: number;
@@ -30,17 +32,17 @@ export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implemen
   // declare createChallenge: BelongsToCreateAssociationMixin<Challenge>;
   declare readonly challenge?: Challenge;
 
-  // declare getFlagCaptures: HasManyGetAssociationsMixin<FlagCapture>;
-  // declare countFlagCaptures: HasManyCountAssociationsMixin;
-  // declare hasFlagCapture: HasManyHasAssociationMixin<FlagCapture, number>;
-  // declare hasFlagCaptures: HasManyHasAssociationsMixin<FlagCapture, number>;
-  // declare setFlagCaptures: HasManySetAssociationsMixin<FlagCapture, number>;
-  // declare addFlagCapture: HasManyAddAssociationMixin<FlagCapture, number>;
-  // declare addFlagCaptures: HasManyAddAssociationsMixin<FlagCapture, number>;
-  // declare removeFlagCapture: HasManyRemoveAssociationMixin<FlagCapture, number>;
-  // declare removeFlagCaptures: HasManyRemoveAssociationsMixin<FlagCapture, number>;
-  // declare createFlagCapture: HasManyCreateAssociationMixin<FlagCapture>;
-  declare readonly FlagCaptures?: FlagCapture[];
+  // declare getUsers: HasManyGetAssociationsMixin<User>;
+  // declare countUsers: HasManyCountAssociationsMixin;
+  // declare hasUser: HasManyHasAssociationMixin<User, number>;
+  // declare hasUsers: HasManyHasAssociationsMixin<User, number>;
+  // declare setUsers: HasManySetAssociationsMixin<User, number>;
+  // declare addUser: HasManyAddAssociationMixin<User, number>;
+  // declare addUsers: HasManyAddAssociationsMixin<User, number>;
+  // declare removeUser: HasManyRemoveAssociationMixin<User, number>;
+  // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
+  // declare createUser: HasManyCreateAssociationMixin<User>;
+  declare readonly Users?: User[];
 }
 
 export function initFlag(sequelize: Sequelize) {
@@ -73,6 +75,7 @@ export function initFlag(sequelize: Sequelize) {
     },
   });
 
-  initFlagCapture(sequelize);
-  Flag.hasMany(FlagCapture);
+  // many to many with users
+  Flag.belongsToMany(User, { through: 'FlagCaptures' });
+  User.belongsToMany(Flag, { through: 'FlagCaptures' });
 }
