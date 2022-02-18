@@ -1,11 +1,17 @@
-import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from "sequelize";
+import {
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  DataTypes,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { TeamServer } from './TeamServer';
 import { Challenge } from './Challenge';
 
 interface ChallengeChannelAttributes {
   id: number;
   channelSnowflake: string;
-  teamServerId: number;
 }
 
 type ChallengeChannelCreationAttributes = Optional<ChallengeChannelAttributes, 'id' | 'channelSnowflake'>;
@@ -16,18 +22,17 @@ export class ChallengeChannel
 {
   declare id: number;
   declare channelSnowflake: string;
-  declare teamServerId: number;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
   declare getTeamServer: BelongsToGetAssociationMixin<TeamServer>;
-  // declare setTeamServer: BelongsToSetAssociationMixin<TeamServer, number>;
+  declare setTeamServer: BelongsToSetAssociationMixin<TeamServer, number>;
   // declare createTeamServer: BelongsToCreateAssociationMixin<TeamServer>;
   declare readonly TeamServer?: TeamServer;
 
   declare getChallenge: BelongsToGetAssociationMixin<Challenge>;
-  // declare setChallenge: BelongsToSetAssociationMixin<Challenge, number>;
+  declare setChallenge: BelongsToSetAssociationMixin<Challenge, number>;
   // declare createChallenge: BelongsToCreateAssociationMixin<Challenge>;
   declare readonly Challenge?: Challenge;
 }
@@ -41,10 +46,6 @@ export function initChallengeChannel(sequelize: Sequelize) {
         primaryKey: true,
       },
       channelSnowflake: DataTypes.STRING,
-      teamServerId: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      }
     },
     {
       sequelize,
@@ -54,10 +55,10 @@ export function initChallengeChannel(sequelize: Sequelize) {
   ChallengeChannel.belongsTo(TeamServer, {
     onDelete: 'RESTRICT',
     foreignKey: {
-      name: 'teamServerId',
       allowNull: false,
     },
   });
+  TeamServer.hasMany(ChallengeChannel);
 
   ChallengeChannel.belongsTo(Challenge, {
     onDelete: 'RESTRICT',

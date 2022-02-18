@@ -3,6 +3,7 @@ import { createDatabaseNullError } from '../../errors/DatabaseNullError';
 import { Client } from 'discord.js';
 import { Challenge } from '../../database2/models/Challenge';
 import { refreshChallengeChannel } from './ChallengeChannelHooks';
+import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
 
 export async function refreshAllChallenges(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCTF({ include: Challenge });
@@ -10,19 +11,43 @@ export async function refreshAllChallenges(teamServer: TeamServer, client: Clien
 }
 
 export async function refreshChallenge(challenge: Challenge, client: Client<true>) {
-  const ctf = await challenge.getCTF({ attributes: [], include: { model: TeamServer, attributes: ['id'] } });
+  const ctf = await challenge.getCTF({
+    attributes: [],
+    include: {
+      model: TeamServer,
+      attributes: ['id'],
+      include: [
+        {
+          model: ChallengeChannel,
+          attributes: ['id'],
+          include: [
+            {
+              model: Challenge,
+              attributes: ['id'],
+              required: true,
+              where: { id: challenge.id },
+            },
+          ],
+        },
+      ],
+    },
+  });
   if (!ctf.TeamServers) throw createDatabaseNullError('ctf.teamServers');
 
   const channels = await challenge.getChallengeChannels();
 
-  for (const teamServer of ctf.TeamServers) {
-    if (channels.find((chan) => chan.teamServerId === teamServer.id)) continue;
-    // there isn't a category channel for this teamserver + category combo
-    // so we gotta create it
-    await challenge.createChallengeChannel({ teamServerId: teamServer.id });
+  // filter out teamservers that already have a channel for this challenge
+  const teamServersToAddTo = ctf.TeamServers.filter((ts) => !ts.ChallengeChannels || ts.ChallengeChannels.length === 0);
+
+  // create new challenge channels for the team servers that need it
+  for (const teamServer of teamServersToAddTo) {
+    const challengeChannel = ChallengeChannel.build();
+    await challengeChannel.setTeamServer(teamServer, { save: false });
+    await challengeChannel.setChallenge(challenge, { save: false });
+    await challengeChannel.save();
   }
 
-  // now we want to trigger a refresh of our dependant categoryChannels as well
+  // now we want to trigger a refresh of our dependant challengeChannels as well
   await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client)));
 }
 

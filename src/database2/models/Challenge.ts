@@ -1,5 +1,6 @@
 import {
   BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
   DataTypes,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
@@ -14,7 +15,6 @@ import { CTF } from './CTF';
 
 export interface ChallengeAttributes {
   id: number;
-  CategoryId: number;
   name: string;
   author: string;
   prompt: string;
@@ -29,7 +29,6 @@ type ChallengeCreationAttributes = Optional<
 
 export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttributes> implements ChallengeAttributes {
   declare id: number;
-  declare CategoryId: number;
   declare name: string;
   declare author: string;
   declare prompt: string;
@@ -40,12 +39,12 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare readonly updatedAt: Date;
 
   declare getCTF: BelongsToGetAssociationMixin<CTF>;
-  // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
+  declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
 
   declare getCategory: BelongsToGetAssociationMixin<Category>;
-  // declare setCategory: BelongsToSetAssociationMixin<Category, number>;
+  declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;
   declare readonly Category?: Category;
 
@@ -102,10 +101,6 @@ export function initChallenge(sequelize: Sequelize) {
         allowNull: false,
       },
       publishTime: DataTypes.DATE,
-      CategoryId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
     },
     {
       sequelize,
@@ -115,7 +110,6 @@ export function initChallenge(sequelize: Sequelize) {
   Challenge.belongsTo(Category, {
     onDelete: 'RESTRICT',
     foreignKey: {
-      name: 'CategoryId',
       allowNull: false,
     },
   });

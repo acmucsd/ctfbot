@@ -3,6 +3,7 @@ import { TeamServer } from '../../database2/models/TeamServer';
 import { createDatabaseNullError } from '../../errors/DatabaseNullError';
 import { refreshCategoryChannel } from './CategoryChannelHooks';
 import { Client } from 'discord.js';
+import { CategoryChannel } from '../../database2/models/CategoryChannel';
 
 export async function refreshAllCategories(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCTF({ include: Category });
@@ -10,16 +11,40 @@ export async function refreshAllCategories(teamServer: TeamServer, client: Clien
 }
 
 export async function refreshCategory(category: Category, client: Client<true>) {
-  const ctf = await category.getCTF({ include: { model: TeamServer, attributes: ['id'] } });
+  const ctf = await category.getCTF({
+    attributes: [],
+    include: {
+      model: TeamServer,
+      attributes: ['id'],
+      include: [
+        {
+          model: CategoryChannel,
+          attributes: ['id'],
+          include: [
+            {
+              model: Category,
+              attributes: ['id'],
+              required: true,
+              where: { id: category.id },
+            },
+          ],
+        },
+      ],
+    },
+  });
   if (!ctf.TeamServers) throw createDatabaseNullError('ctf.teamServers');
 
   const channels = await category.getCategoryChannels();
 
-  for (const teamServer of ctf.TeamServers) {
-    if (channels.find((chan) => chan.teamServerId === teamServer.id)) continue;
-    // there isn't a category channel for this teamserver + category combo
-    // so we gotta create it
-    await category.createCategoryChannel({ teamServerId: teamServer.id });
+  // filter out teamservers that already have a channel for this category
+  const teamServersToAddTo = ctf.TeamServers.filter((ts) => !ts.CategoryChannels || ts.CategoryChannels.length === 0);
+
+  // create new category channels for the team servers that need it
+  for (const teamServer of teamServersToAddTo) {
+    const categoryChannel = CategoryChannel.build();
+    await categoryChannel.setTeamServer(teamServer, { save: false });
+    await categoryChannel.setCategory(category, { save: false });
+    await categoryChannel.save();
   }
 
   // now we want to trigger a refresh of our dependant categoryChannels as well

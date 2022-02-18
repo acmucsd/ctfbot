@@ -68,8 +68,12 @@ export async function destroyTeamServer(teamServer: TeamServer, client: Client<t
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // destroy dependant category channels first
-  const categoryChannels = await CategoryChannel.findAll({ where: { teamServerId: teamServer.id } });
+  const categoryChannels = await teamServer.getCategoryChannels();
   await Promise.all(categoryChannels.map((chan) => chan.destroy()));
+
+  // destroy dependant challenge channels first
+  const challengeChannels = await teamServer.getChallengeChannels();
+  await Promise.all(challengeChannels.map((chan) => chan.destroy()));
 
   const ctf = await teamServer.getCTF({ attributes: ['name', 'guildSnowflake'] });
   const ctfGuild = await client.guilds.fetch(ctf.guildSnowflake);

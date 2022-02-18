@@ -15,6 +15,8 @@ import {
 import { CTF } from './CTF';
 import { initTeam, Team } from './Team';
 import { Category } from './Category';
+import { CategoryChannel } from './CategoryChannel';
+import { ChallengeChannel } from './ChallengeChannel';
 
 interface TeamServerAttributes {
   id: number;
@@ -73,6 +75,30 @@ export class TeamServer
   // declare removeTeams: HasManyRemoveAssociationsMixin<Team, number>;
   // declare createTeam: HasManyCreateAssociationMixin<Team>;
   declare readonly Teams?: Team[];
+
+  declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
+  // declare countCategoryChannels: HasManyCountAssociationsMixin;
+  //declare hasCategoryChannel: HasManyHasAssociationMixin<CategoryChannel, number>;
+  // declare hasCategoryChannels: HasManyHasAssociationsMixin<CategoryChannel, number>;
+  // declare setCategoryChannels: HasManySetAssociationsMixin<CategoryChannel, number>;
+  // declare addCategoryChannel: HasManyAddAssociationMixin<CategoryChannel, number>;
+  // declare addCategoryChannels: HasManyAddAssociationsMixin<CategoryChannel, number>;
+  // declare removeCategoryChannel: HasManyRemoveAssociationMixin<CategoryChannel, number>;
+  // declare removeCategoryChannels: HasManyRemoveAssociationsMixin<CategoryChannel, number>;
+  // declare createCategoryChannel: HasManyCreateAssociationMixin<CategoryChannel>;
+  declare readonly CategoryChannels?: CategoryChannel[];
+
+  declare getChallengeChannels: HasManyGetAssociationsMixin<ChallengeChannel>;
+  // declare countChallengeChannels: HasManyCountAssociationsMixin;
+  // declare hasChallengeChannel: HasManyHasAssociationMixin<ChallengeChannel, number>;
+  // declare hasChallengeChannels: HasManyHasAssociationsMixin<ChallengeChannel, number>;
+  // declare setChallengeChannels: HasManySetAssociationsMixin<ChallengeChannel, number>;
+  // declare addChallengeChannel: HasManyAddAssociationMixin<ChallengeChannel, number>;
+  // declare addChallengeChannels: HasManyAddAssociationsMixin<ChallengeChannel, number>;
+  // declare removeChallengeChannel: HasManyRemoveAssociationMixin<ChallengeChannel, number>;
+  // declare removeChallengeChannels: HasManyRemoveAssociationsMixin<ChallengeChannel, number>;
+  // declare createChallengeChannel: HasManyCreateAssociationMixin<ChallengeChannel>;
+  declare readonly ChallengeChannels?: ChallengeChannel[];
 }
 
 export function initTeamServer(sequelize: Sequelize) {

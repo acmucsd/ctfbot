@@ -3,6 +3,7 @@ import {
   DataTypes,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
   Model,
   Optional,
   Sequelize,
@@ -10,6 +11,7 @@ import {
 import { CTF } from './CTF';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
+import { TeamServer } from './TeamServer';
 
 interface CategoryAttributes {
   id: number;
@@ -32,7 +34,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
 
   // declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
   // declare countTeamServers: HasManyCountAssociationsMixin;
-  // declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
+  declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
   // declare hasTeamServers: HasManyHasAssociationsMixin<TeamServer, number>;
   // declare setTeamServers: HasManySetAssociationsMixin<TeamServer, number>;
   // declare addTeamServer: HasManyAddAssociationMixin<TeamServer, number>;
@@ -63,7 +65,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addChallenges: HasManyAddAssociationsMixin<Challenge, number>;
   // declare removeChallenge: HasManyRemoveAssociationMixin<Challenge, number>;
   // declare removeChallenges: HasManyRemoveAssociationsMixin<Challenge, number>;
-  declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
+  // declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
   declare readonly Challenges?: Challenge[];
 }
 
