@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
-import { TeamServer } from '../../../../../../database2/models/TeamServer';
+import { TeamServer } from '../../../../../../database/models/TeamServer';
 
 export default {
   name: 'del',

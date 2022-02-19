@@ -1,8 +1,8 @@
-import { Category } from '../../database2/models/Category';
-import { TeamServer } from '../../database2/models/TeamServer';
+import { Category } from '../../database/models/Category';
+import { TeamServer } from '../../database/models/TeamServer';
 import { refreshCategoryChannel } from './CategoryChannelHooks';
 import { Client } from 'discord.js';
-import { CategoryChannel } from '../../database2/models/CategoryChannel';
+import { CategoryChannel } from '../../database/models/CategoryChannel';
 
 export async function refreshAllCategories(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCTF({ include: Category });

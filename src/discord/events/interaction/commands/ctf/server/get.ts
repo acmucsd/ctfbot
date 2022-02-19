@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { createCommandNotExecutedInGuildError } from '../../../../../../errors/CommandInteractionError';
-import { CTF } from '../../../../../../database2/models/CTF';
+import { CTF } from '../../../../../../database/models/CTF';
 import { Op } from 'sequelize';
 
 export default {

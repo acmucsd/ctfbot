@@ -1,17 +1,17 @@
-import { CTF } from '../../database2/models/CTF';
+import { CTF } from '../../database/models/CTF';
 import { Client } from 'discord.js';
 import { destroyCTF, refreshCTF } from './CTFHooks';
 import { destroyTeamServer, refreshTeamServer } from './TeamServerHooks';
-import { TeamServer } from '../../database2/models/TeamServer';
-import { Category } from '../../database2/models/Category';
+import { TeamServer } from '../../database/models/TeamServer';
+import { Category } from '../../database/models/Category';
 import { destroyCategory, refreshAllCategories, refreshCategory } from './CategoryHooks';
-import { CategoryChannel } from '../../database2/models/CategoryChannel';
+import { CategoryChannel } from '../../database/models/CategoryChannel';
 import { destroyCategoryChannel, refreshCategoryChannel } from './CategoryChannelHooks';
-import { Challenge } from '../../database2/models/Challenge';
+import { Challenge } from '../../database/models/Challenge';
 import { destroyChallenge, refreshAllChallenges, refreshChallenge } from './ChallengeHooks';
-import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
+import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { destroyChallengeChannel, refreshChallengeChannel } from './ChallengeChannelHooks';
-import { Flag } from '../../database2/models/Flag';
+import { Flag } from '../../database/models/Flag';
 
 export async function initHooks(client: Client<true>) {
   CTF.beforeCreate((ctf) =>

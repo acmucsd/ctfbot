@@ -1,4 +1,4 @@
-import { CTF } from '../../database2/models/CTF';
+import { CTF } from '../../database/models/CTF';
 import { Client } from 'discord.js';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import {

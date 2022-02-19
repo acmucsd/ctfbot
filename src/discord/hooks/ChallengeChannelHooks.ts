@@ -1,11 +1,11 @@
 import { CategoryChannel as DiscordCategoryChannel, Client } from 'discord.js';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import { createTextChannelOrFetchIfExists, destroyChannels } from '../util/ResourceManager';
-import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
-import { Category } from '../../database2/models/Category';
-import { CategoryChannel } from '../../database2/models/CategoryChannel';
+import { ChallengeChannel } from '../../database/models/ChallengeChannel';
+import { Category } from '../../database/models/Category';
+import { CategoryChannel } from '../../database/models/CategoryChannel';
 import { setChallengeMessage } from '../messages/ChallengeMessage';
-import { TeamServer } from '../../database2/models/TeamServer';
+import { TeamServer } from '../../database/models/TeamServer';
 
 export async function refreshChallengeChannel(challengeChannel: ChallengeChannel, client: Client<true>) {
   const teamServer = await challengeChannel.getTeamServer({ attributes: ['id', 'guildSnowflake'] });

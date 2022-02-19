@@ -1,7 +1,7 @@
 import { PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { getCTFByGuildContext } from '../../../../util/ResourceManager';
-import { Challenge } from '../../../../../database2/models/Challenge';
+import { Challenge } from '../../../../../database/models/Challenge';
 
 export default {
   name: 'get',

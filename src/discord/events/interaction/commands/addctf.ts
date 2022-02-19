@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { createCommandNotExecutedInGuildError } from '../../../../errors/CommandInteractionError';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
-import { CTF } from '../../../../database2/models/CTF';
+import { CTF } from '../../../../database/models/CTF';
 
 export default {
   name: 'addctf',

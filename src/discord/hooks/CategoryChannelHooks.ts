@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { CategoryChannel } from '../../database2/models/CategoryChannel';
+import { CategoryChannel } from '../../database/models/CategoryChannel';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import { createCategoryChannelOrFetchIfExists, destroyChannels } from '../util/ResourceManager';
 

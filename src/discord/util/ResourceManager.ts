@@ -13,10 +13,10 @@ import {
 } from 'discord.js';
 import { adminCommands, PopulatedCommandInteraction, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
-import { CTF } from '../../database2/models/CTF';
-import { TeamServer } from '../../database2/models/TeamServer';
-import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
-import { Challenge } from '../../database2/models/Challenge';
+import { CTF } from '../../database/models/CTF';
+import { TeamServer } from '../../database/models/TeamServer';
+import { ChallengeChannel } from '../../database/models/ChallengeChannel';
+import { Challenge } from '../../database/models/Challenge';
 import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
 import { logger } from '../../log';
 

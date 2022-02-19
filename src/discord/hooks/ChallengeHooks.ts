@@ -1,10 +1,10 @@
-import { TeamServer } from '../../database2/models/TeamServer';
+import { TeamServer } from '../../database/models/TeamServer';
 import { Client } from 'discord.js';
-import { Challenge } from '../../database2/models/Challenge';
+import { Challenge } from '../../database/models/Challenge';
 import { refreshChallengeChannel } from './ChallengeChannelHooks';
-import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
-import { Category } from '../../database2/models/Category';
-import { CTF } from '../../database2/models/CTF';
+import { ChallengeChannel } from '../../database/models/ChallengeChannel';
+import { Category } from '../../database/models/Category';
+import { CTF } from '../../database/models/CTF';
 
 export async function refreshAllChallenges(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCTF({ include: { model: Category, attributes: ['id'], include: [Challenge] } });

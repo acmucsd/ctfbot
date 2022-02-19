@@ -1,6 +1,6 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
-import { TeamServer } from '../../database2/models/TeamServer';
-import { CTF } from '../../database2/models/CTF';
+import { TeamServer } from '../../database/models/TeamServer';
+import { CTF } from '../../database/models/CTF';
 import { setChannelContent } from '../util/ResourceManager';
 
 export async function setTeamServerInviteChannelMessage(

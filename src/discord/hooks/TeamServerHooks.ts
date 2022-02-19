@@ -1,5 +1,5 @@
 import { Client } from 'discord.js';
-import { TeamServer } from '../../database2/models/TeamServer';
+import { TeamServer } from '../../database/models/TeamServer';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import { setTeamServerInfoMessage } from '../messages/TeamServerInfoMessage';
 import {
