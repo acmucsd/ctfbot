@@ -53,14 +53,20 @@ export async function createTextChannelOrFetchIfExists(
   }
 
   // create the channel if it doesn't exist
-  return (
-    (snowflake && ((await guild.channels.fetch(snowflake)) as TextChannel)) ||
-    (await guild.channels.create(name, {
-      type: 'GUILD_TEXT',
-      parent: options.parent,
-      permissionOverwrites: Object.entries(permissionOverwrites).map(([id, overwrite]) => ({ ...overwrite, id })),
-    }))
-  );
+  if (snowflake) {
+    const textChannel = (await guild.channels.fetch(snowflake)) as TextChannel;
+    if (textChannel) {
+      if (textChannel.name !== name) await textChannel.setName(name);
+
+      return textChannel;
+    }
+  }
+
+  return await guild.channels.create(name, {
+    type: 'GUILD_TEXT',
+    parent: options.parent,
+    permissionOverwrites: Object.entries(permissionOverwrites).map(([id, overwrite]) => ({ ...overwrite, id })),
+  });
 }
 
 export async function createCategoryChannelOrFetchIfExists(
