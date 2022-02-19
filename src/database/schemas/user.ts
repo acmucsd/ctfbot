@@ -10,5 +10,5 @@ export interface UserRow {
   id: number;
   ctf_id: number;
   user_snowflake: string;
-  team_id: number | null;
+  team_id: number;
 }

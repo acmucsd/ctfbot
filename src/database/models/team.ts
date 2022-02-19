@@ -2,8 +2,10 @@ import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { Challenge, CTF, Invite, TeamServer, User } from '.';
 import { ChallengeRow, InviteRow, TeamRow, UserRow } from '../schemas';
 import query from '../database';
-import { logger } from '../../log';
 import { NoRoomError } from '../../errors';
+import { logger } from '../../log';
+import { createDatabaseNullError } from '../../errors/DatabaseNullError';
+import { createDiscordNullError } from "../../errors/DiscordNullError";
 
 export default class Team {
   row: TeamRow;
@@ -32,21 +34,25 @@ export default class Team {
   async deleteTeam(client: Client) {
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    await teamServer.getGuild(client).channels.resolve(this.row.text_channel_snowflake)?.delete();
+    if (this.row.text_channel_snowflake)
+      await teamServer.getGuild(client).channels.resolve(this.row.text_channel_snowflake)?.delete();
     /** TODO: Remove every team member's team roles */
-    await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
-      /* Do nothing, because it means the team server already deleted*/
-    });
-    await ctf.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
-      /* Do nothing, because it means the team server already deleted*/
-    });
-    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
-      await ctf.deleteRole(client, this.row.team_role_snowflake_main).catch(() => {
-        /* Do nothing, because it means the team server part of the main server already deleted*/
+    if (this.row.team_role_snowflake_team_server)
+      await teamServer.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+        /* Do nothing, because it means the team server already deleted*/
       });
-    }
+    if (this.row.team_role_snowflake_team_server)
+      await ctf.deleteRole(client, this.row.team_role_snowflake_team_server).catch(() => {
+        /* Do nothing, because it means the team server already deleted*/
+      });
+    if (this.row.team_role_snowflake_main)
+      if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake) {
+        await ctf.deleteRole(client, this.row.team_role_snowflake_main).catch(() => {
+          /* Do nothing, because it means the team server part of the main server already deleted*/
+        });
+      }
     await query(`DELETE FROM teams WHERE id = ${this.row.id}`);
-    logger(`Deleted team **${this.row.name}** from ctf **${ctf.row.name}**`);
+    logger.info(`Deleted team **${this.row.name}** from ctf **${ctf.row.name}**`);
     /** TODO: Make and assign each member a new team */
   }
 
@@ -70,16 +76,18 @@ export default class Team {
     this.row.text_channel_snowflake = text_channel_snowflake;
   }
 
-  async setTeamCaptain() {}
+  // async setTeamCaptain() {}
 
   async setTeamServerID(client: Client, team_server_id: number) {
     const newTeamServer = await CTF.fromIdTeamServer(team_server_id);
     if (!(await newTeamServer.hasSpace(true))) throw new NoRoomError();
 
+    if (!this.row.team_role_snowflake_team_server) throw createDatabaseNullError('team_role_snowflake_team_server');
+
     if (this.row.team_server_id) {
       /** If there is a previous team server */ // Delete old text channel and team server role
       const oldTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-      oldTeamServer.deleteChannel(client, [this.row.text_channel_snowflake]);
+      if (this.row.text_channel_snowflake) oldTeamServer.deleteChannel(client, this.row.text_channel_snowflake);
       await oldTeamServer.deleteRole(client, this.row.team_role_snowflake_team_server);
     }
 
@@ -99,34 +107,34 @@ export default class Team {
     description +=
       "\n\nTo **invite** another person onto your team, you'll need to use `/invite @username`. You should do this in the Main Guild. Then, they will need to accept your invite. Similarly, to **join** another team, they will have to invite you first.";
     description += '\n\nLastly, to **submit flags**, you will need to use `/submit #challenge flag`.';
-    description += `\n\nPlease look for any users with the <@&${newTeamServer.row.admin_role_snowflake}> role if you have any questions, and happy hacking!`;
+    description += `\n\nPlease look for any users with the <@&${
+      newTeamServer.row.admin_role_snowflake ?? 'MISSING ADMIN ROLE'
+    }> role if you have any questions, and happy hacking!`;
 
     // // Move team channel to team category
     // await textChannel.setParent(newTeamServer.row.team_category_snowflake).catch(() => {
-    //   logger("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
+    //   logger.info("Couldn't add any more teams to the Teams Category! (Probably Discord's fault...)");
     // });
 
     // Make sure only the team can view their own team channel
-    await textChannel.overwritePermissions([
+    await textChannel.permissionOverwrites.set([
       {
         id: textChannel.guild.roles.everyone,
         deny: ['VIEW_CHANNEL'],
       },
       {
-        id: textChannel.guild.roles.resolve(this.row.team_role_snowflake_team_server),
+        id: this.row.team_role_snowflake_team_server,
         allow: ['VIEW_CHANNEL'],
       },
     ]);
 
     // Send welcome message
-    await textChannel.send(
-      new MessageEmbed()
+    await textChannel.send({ embeds: [new MessageEmbed()
         .setTitle(`Welcome to your personal space, ${this.row.name}`)
-        .setAuthor(`${newTeamServer.row.name} - Team ${this.row.name}`)
+        .setAuthor({ name: `${newTeamServer.row.name} - Team ${this.row.name}` })
         .setDescription(description)
         .setTimestamp()
-        .setColor('50c0bf'),
-    );
+        .setColor('#50c0bf')] });
 
     // Update the database with this channel
     await this.setTextChannelSnowflake(textChannel.id);
@@ -134,6 +142,9 @@ export default class Team {
 
   // Unique per CTF
   async setName(client: Client, newName: string) {
+    if(!this.row.text_channel_snowflake)
+      throw createDiscordNullError('text_channel_snowflake');
+
     const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
     const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
 
@@ -143,11 +154,6 @@ export default class Team {
     await query(`UPDATE teams SET name = $1 WHERE id = ${this.row.id}`, [newName]);
     this.row.name = newName;
 
-    if (this.row.team_role_snowflake_main)
-      await ctf.setRoleName(client, this.row.team_role_snowflake_main, `Team ${newName}`);
-    if (this.row.team_role_snowflake_main !== this.row.team_role_snowflake_team_server) {
-      await teamServer.setRoleName(client, this.row.team_role_snowflake_team_server, newName);
-    }
     await teamServer.renameChannel(client, this.row.text_channel_snowflake, newName);
     return newName;
   }
@@ -165,12 +171,6 @@ export default class Team {
     const oldColor = this.row.color?.toLowerCase();
     await query(`UPDATE teams SET color = $1 WHERE id = ${this.row.id}`, [color.toLowerCase()]);
     this.row.color = color;
-    const teamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-    const ctf = await CTF.fromIdCTF(teamServer.row.ctf_id);
-    await teamServer.setRoleColor(client, this.row.team_role_snowflake_team_server, color);
-    if (teamServer.row.guild_snowflake !== ctf.row.guild_snowflake && this.row.team_role_snowflake_main) {
-      await ctf.setRoleColor(client, this.row.team_role_snowflake_main, color);
-    }
     return `Changed **${this.row.name}**'s color ${oldColor != null ? `from **${oldColor}** ` : ''}to **${color}**`;
   }
 
@@ -197,70 +197,66 @@ export default class Team {
   }
 
   // add user to team
-  async addUser(client: Client, user: User) {
-    // can only add users that are alone!
-    const isUserAlone = await user.isAlone();
-    if (!isUserAlone) throw new Error('User has already joined a team');
-
-    const oldTeam = await user.getTeam();
-    const oldTeamServer = await CTF.fromIdTeamServer(oldTeam.row.team_server_id);
-    const oldTeamServerGuild = oldTeamServer.getGuild(client);
-    await oldTeam.deleteTeam(client);
-
-    await user.setTeamID(this.row.id);
-
-    // role granting
-    const guildMember = oldTeamServerGuild.member(user.row.user_snowflake);
-
-    // main guild
-    const mainGuildMember = oldTeamServer.ctf.getGuild(client).member(user.row.user_snowflake);
-    if (this.row.team_role_snowflake_main) await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
-
-    // IF the user is already on the right TeamServer, grant new roles
-    const newTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
-    const newTeamServerGuild = newTeamServer.getGuild(client);
-    if (oldTeamServer.row.id === newTeamServer.row.id)
-      await guildMember.roles.add(this.row.team_role_snowflake_team_server);
-    // otherwise, just defer to when they join the new teamserver
-    // btw we should kick them if this isn't the main guild
-    else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake) {
-      guildMember
-        .send(
-          new MessageEmbed()
-            .setTitle("You've been relocated!")
-            .setTimestamp()
-            .setDescription(
-              `Hey there! Because Team ${this.row.name} isn't on your previous team server, you've been relocated to their team server. Please join it here!`,
-            )
-            .setColor('50c0bf'),
-        )
-        .then(async () => {
-          await guildMember.send(`https://discord.gg/${newTeamServer.row.server_invite}`);
-          logger(`DM'd ${guildMember.user.username} that they must move to ${newTeamServerGuild.name}`);
-        })
-        .catch(() => {
-          logger(`Unable to DM ${guildMember.user.username}`);
-        });
-      await guildMember.kick('User was moved to a different team server');
-      // we'll also need to make sure we get the right TS role in the main guild
-      await mainGuildMember.roles.remove(oldTeamServer.row.invite_role_snowflake);
-      await mainGuildMember.roles.add(newTeamServer.row.invite_role_snowflake);
-    }
-
-    // Send a message to the new team server announcing their acceptance
-    await (newTeamServerGuild.channels.resolve(this.row.text_channel_snowflake) as TextChannel).send(
-      new MessageEmbed()
-        .setTitle(`Welcome ${guildMember.user.username} to Team ${this.row.name}!`)
-        .setTimestamp()
-        .setDescription(`Go forth and solve challenges!`)
-        .setColor('50c0bf'),
-    );
-    logger(
-      `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
-        this.row.id
-      })**`,
-    );
-  }
+  // async addUser(client: Client, user: User) {
+  //   // can only add users that are alone!
+  //   const isUserAlone = await user.isAlone();
+  //   if (!isUserAlone) throw new Error('User has already joined a team');
+  //
+  //   const oldTeam = await user.getTeam();
+  //   const oldTeamServer = await CTF.fromIdTeamServer(oldTeam.row.team_server_id);
+  //   await oldTeam.deleteTeam(client);
+  //
+  //   await user.setTeamID(this.row.id);
+  //
+  //   // main guild
+  //   const mainGuildMember = oldTeamServer.ctf.getGuild(client).member(user.row.user_snowflake);
+  //   if (this.row.team_role_snowflake_main) await mainGuildMember.roles.add(this.row.team_role_snowflake_main);
+  //
+  //   // IF the user is already on the right TeamServer, grant new roles
+  //   const newTeamServer = await CTF.fromIdTeamServer(this.row.team_server_id);
+  //   const newTeamServerGuild = newTeamServer.getGuild(client);
+  //   if (oldTeamServer.row.id === newTeamServer.row.id)
+  //     await guildMember.roles.add(this.row.team_role_snowflake_team_server);
+  //   // otherwise, just defer to when they join the new teamserver
+  //   // btw we should kick them if this isn't the main guild
+  //   else if (newTeamServer.ctf.row.guild_snowflake !== oldTeamServer.row.guild_snowflake) {
+  //     guildMember
+  //       .send(
+  //         new MessageEmbed()
+  //           .setTitle("You've been relocated!")
+  //           .setTimestamp()
+  //           .setDescription(
+  //             `Hey there! Because Team ${this.row.name} isn't on your previous team server, you've been relocated to their team server. Please join it here!`,
+  //           )
+  //           .setColor('#50c0bf'),
+  //       )
+  //       .then(async () => {
+  //         await guildMember.send(`https://discord.gg/${newTeamServer.row.server_invite}`);
+  //         logger.info(`DM'd ${guildMember.user.username} that they must move to ${newTeamServerGuild.name}`);
+  //       })
+  //       .catch(() => {
+  //         logger.info(`Unable to DM ${guildMember.user.username}`);
+  //       });
+  //     await guildMember.kick('User was moved to a different team server');
+  //     // we'll also need to make sure we get the right TS role in the main guild
+  //     await mainGuildMember.roles.remove(oldTeamServer.row.invite_role_snowflake);
+  //     await mainGuildMember.roles.add(newTeamServer.row.invite_role_snowflake);
+  //   }
+  //
+  //   // Send a message to the new team server announcing their acceptance
+  //   await (newTeamServerGuild.channels.resolve(this.row.text_channel_snowflake) as TextChannel).send( {
+  //     embeds: [new MessageEmbed()
+  //       .setTitle(`Welcome ${guildMember.user.username} to Team ${this.row.name}!`)
+  //       .setTimestamp()
+  //       .setDescription(`Go forth and solve challenges!`)
+  //       .setColor('#50c0bf')]
+  //   });
+  //   logger.info(
+  //     `**${client.users.resolve(user.row.user_snowflake).username}** has joined team **${this.row.name} (${
+  //       this.row.id
+  //     })**`,
+  //   );
+  // }
 
   /** User Retrieval */
   async getAllUsers() {
@@ -324,7 +320,7 @@ export default class Team {
     const { rows } = await query(
       `SELECT count(attempts.id) FROM attempts, users, teams WHERE attempts.user_id = users.id AND users.team_id = teams.id AND teams.id = ${this.row.id} AND challenge_id = ${challenge.row.id} AND attempts.successful = true`,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-return
     return rows[0] && rows[0].count && parseInt(rows[0].count) > 0;
   }
 
@@ -340,6 +336,10 @@ export default class Team {
 
   async getTeamChannel(client: Client) {
     const guild = await TeamServer.getGuildFromTeamServerID(client, this.row.team_server_id);
+    if(!guild)
+      throw createDatabaseNullError('team_server_id')
+    if(!this.row.text_channel_snowflake)
+      throw createDiscordNullError('text_channel_snowflake')
     return guild.channels.resolve(this.row.text_channel_snowflake) as TextChannel;
   }
 

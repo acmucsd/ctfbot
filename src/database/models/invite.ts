@@ -2,8 +2,8 @@ import query from '../database';
 import { InviteRow } from '../schemas';
 import User from './user';
 import Team from './team';
-import { Client, MessageEmbed, TextChannel, User as DiscordUser } from 'discord.js';
-import { registerReactionListener } from '../../events/messageReactionAdd/messageReactionAddEvent';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { createDiscordNullError } from "../../errors/DiscordNullError";
 
 export default class Invite {
   row: InviteRow;
@@ -15,6 +15,8 @@ export default class Invite {
   // send invite message
   async sendInviteMessage(client: Client, toUser: User, fromTeam: Team) {
     const currentTeam = await toUser.getTeam();
+    if(!currentTeam.row.text_channel_snowflake)
+      throw createDiscordNullError('text_channel_snowflake');
     const currentTeamChannel = (await client.channels.fetch(currentTeam.row.text_channel_snowflake)) as TextChannel;
 
     const message = new MessageEmbed();
@@ -29,32 +31,20 @@ export default class Invite {
       'If you join a team, you will not be able to leave it or join another. ***Make sure this is the team you would like to join.***',
     );
 
-    const sentMessage = await currentTeamChannel.send(message);
+    const sentMessage = await currentTeamChannel.send({ embeds: [message] });
     await this.setMessageSnowflake(sentMessage.id);
 
     // lets ALSO DM them IF they aren't on their team server
     const discordUser = client.users.resolve(toUser.row.user_snowflake);
-    if (discordUser && !currentTeamChannel.guild.member(discordUser)) {
+    if (discordUser && !currentTeamChannel.guild.members.resolve(discordUser)) {
       const invite = await currentTeamChannel.createInvite();
       await discordUser
         .send(`You have been invited to join a team. Join your team channel to accept the invite. ${invite.url}`)
-        .catch(() => {} /* I don't care if it works! */);
+        .catch(() => { console.log(`couldn't dm invite user...probably has DM's disabled`) } /* I don't care if it works! */);
     }
 
     // add a react listener to actually add the person to the team
     await sentMessage.react('👍');
-    this.registerInviteReactionListener();
-  }
-
-  registerInviteReactionListener() {
-    registerReactionListener(this.row.message_snowflake, '👍', async (discordUser: DiscordUser) => {
-      const team = await Team.fromID(this.row.team_id);
-      const user = await User.fromID(this.row.user_id);
-      await team.addUser(discordUser.client, user);
-      await this.setAccepted();
-      // delete this listener after an affirmative response
-      return true;
-    });
   }
 
   static async allPendingInvites() {

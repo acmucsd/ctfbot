@@ -74,8 +74,7 @@ export default class Category {
     // create a text channel for this challenge and add to the category
     for (const categoryChannel of categoryChannels) {
       const guildChannel = client.channels.resolve(categoryChannel.channel_snowflake) as CategoryChannel;
-      const channel = await guildChannel.guild.channels.create(name);
-      await channel.setParent(categoryChannel.channel_snowflake);
+      const channel = await guildChannel.guild.channels.create(name, { parent: categoryChannel.channel_snowflake, type: "GUILD_TEXT" });
       // build the VALUES query as we go
       challengeChannels.push(`(${challenge.row.id}, ${categoryChannel.teamserver_id}, ${channel.id})`);
     }
@@ -114,7 +113,7 @@ export default class Category {
 
   // set default permissions to not be able to send messages, etc
   static async setCategoryChannelPermissions(categoryChannel: CategoryChannel, teamServer: TeamServer) {
-    await categoryChannel.createOverwrite(categoryChannel.guild.roles.everyone, {
+    await categoryChannel.permissionOverwrites.create(categoryChannel.guild.roles.everyone, {
       SEND_MESSAGES: false,
       ADD_REACTIONS: false,
       SEND_TTS_MESSAGES: false,
@@ -123,8 +122,8 @@ export default class Category {
       CREATE_INSTANT_INVITE: false,
     });
     // if this CTF hasn't been published yet, participants shouldn't see it
-    if (teamServer.ctf.row?.start_date >= new Date())
-      await categoryChannel.createOverwrite(teamServer.row.participant_role_snowflake, {
+    if (teamServer.ctf.row.start_date == null || teamServer.ctf.row.start_date >= new Date())
+      await categoryChannel.permissionOverwrites.create(teamServer.row.participant_role_snowflake, {
         VIEW_CHANNEL: true,
       });
   }

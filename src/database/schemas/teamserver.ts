@@ -22,7 +22,7 @@ export interface TeamServerRow {
   team_category_snowflake: string | null;
   invite_channel_snowflake: string | null;
   admin_role_snowflake: string | null;
-  participant_role_snowflake: string | null;
+  participant_role_snowflake: string;
   invite_role_snowflake: string | null;
   server_invite: string | null;
   name: string;

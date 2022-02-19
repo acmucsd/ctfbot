@@ -1,11 +1,10 @@
-import { Client, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
+import { CategoryChannel, Client, ColorResolvable, Guild, GuildChannel, Role, TextChannel } from 'discord.js';
 import { logger } from '../../log';
 import { CTF, Team } from '.';
 import { CategoryChannelRow, ChallengeChannelRow, TeamRow, TeamServerRow } from '../schemas';
 import query from '../database';
-import { DupeTeamError } from '../../errors';
-import { setCommands } from '../../events/interaction/compat/commands';
-import { adminCommands, userCommands } from '../../events/interaction/interaction';
+import { adminCommands, userCommands } from '../../discord/events/interaction/interaction';
+import { createDiscordNullError } from '../../errors/DiscordNullError';
 
 export default class TeamServer {
   row: TeamServerRow;
@@ -23,15 +22,16 @@ export default class TeamServer {
     // TODO: Does deleting a team server delete all of the associated teams just like with a ctf?
     const teams = await this.getAllTeams();
     const guild = client.guilds.resolve(this.row.guild_snowflake);
+    if (!guild) throw createDiscordNullError('teamserver_guild');
     const mainGuild = this.ctf.getGuild(client);
 
     // Delete all team roles and channels
     teams.forEach((team) => {
-      void guild.channels.resolve(team.row.text_channel_snowflake).delete();
-      // TODO: If main is a team server and we remove the team server part, do we want the roles removed still?
-      void guild.roles.resolve(team.row.team_role_snowflake_team_server)?.delete();
+      if (team.row.text_channel_snowflake) void guild.channels.resolve(team.row.text_channel_snowflake)?.delete();
+      if (team.row.team_role_snowflake_team_server)
+        void guild.roles.resolve(team.row.team_role_snowflake_team_server)?.delete();
     });
-    logger(`Deleted all team channels and roles.`);
+    logger.info(`Deleted all team channels and roles.`);
 
     // delete all category and challenge channels
 
@@ -46,37 +46,38 @@ export default class TeamServer {
     // TODO: Same thing— if main is a team server and we remove the team server part, do we want the info channel removed still?
     // Remove channels and categories made during creation
     await guild.roles.resolve(this.row.participant_role_snowflake)?.delete();
-    this.deleteChannel(client, [this.row.info_channel_snowflake, this.row.team_category_snowflake]);
-    logger('Deleted CTF-Related roles, channels, and categories');
+    this.deleteChannel(client, this.row.info_channel_snowflake, this.row.team_category_snowflake);
+    logger.info('Deleted CTF-Related roles, channels, and categories');
 
-    await mainGuild.channels.resolve(this.row.invite_channel_snowflake)?.delete();
-    await mainGuild.roles.resolve(this.row.invite_role_snowflake)?.delete();
-    logger('Deleted TeamServer-related channels from main guild');
+    if (this.row.invite_channel_snowflake)
+      await mainGuild.channels.resolve(this.row.invite_channel_snowflake)?.delete();
+    if (this.row.invite_role_snowflake) await mainGuild.roles.resolve(this.row.invite_role_snowflake)?.delete();
+    logger.info('Deleted TeamServer-related channels from main guild');
 
     await query(`DELETE FROM team_servers WHERE id = ${this.row.id}`);
-    logger(`Deleted **${this.row.name}** TeamServer`);
+    logger.info(`Deleted **${this.row.name}** TeamServer`);
   }
 
   async setServerRole(role: Role) {
     await query(`UPDATE team_servers SET invite_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
     this.row.invite_role_snowflake = role.id;
-    logger(`Made a role for **${this.row.name}**`);
+    logger.info(`Made a role for **${this.row.name}**`);
   }
 
   async setServerInvite(client: Client) {
-    if (!this.row.info_channel_snowflake) {
-      // TODO: Make an error for if there is no info channel
-    }
-    const invite = await client.guilds
+    if (!this.row.info_channel_snowflake) throw createDiscordNullError('info_channel_snowflake');
+    const infoChannel = client.guilds
       .resolve(this.row.guild_snowflake)
-      .channels.resolve(this.row.info_channel_snowflake)
-      .createInvite({
-        temporary: false,
-        maxAge: 0,
-      });
+      ?.channels.resolve(this.row.info_channel_snowflake);
+    if (!infoChannel || !infoChannel.isText() || infoChannel.isThread())
+      throw createDiscordNullError('info_channel_snowflake');
+    const invite = await infoChannel.createInvite({
+      temporary: false,
+      maxAge: 0,
+    });
     await query(`UPDATE team_servers SET server_invite = $1 WHERE id = ${this.row.id}`, [invite.code]);
     this.row.server_invite = invite.code;
-    logger(`Made new invite for **${this.row.name}**`);
+    logger.info(`Made new invite for **${this.row.name}**`);
   }
 
   async setInviteChannelSnowflake(invite_channel_snowflake: string) {
@@ -84,7 +85,7 @@ export default class TeamServer {
       `UPDATE team_servers SET invite_channel_snowflake = ${invite_channel_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.invite_channel_snowflake = invite_channel_snowflake;
-    logger(`Set invite channel for **${this.row.name}** in main CTF`);
+    logger.info(`Set invite channel for **${this.row.name}** in main CTF`);
   }
 
   /** TeamServer Setters */
@@ -92,7 +93,7 @@ export default class TeamServer {
   async setInfoChannelSnowflake(info_channel_snowflake: string) {
     await query(`UPDATE team_servers SET info_channel_snowflake = ${info_channel_snowflake} WHERE id = ${this.row.id}`);
     this.row.info_channel_snowflake = info_channel_snowflake;
-    logger(`Set info channel for **${this.row.name}** as ${info_channel_snowflake}`);
+    logger.info(`Set info channel for **${this.row.name}** as ${info_channel_snowflake}`);
   }
 
   // Unique among other channels, valid for the TeamServer guild <- taken care of because it's made, not specified
@@ -101,7 +102,7 @@ export default class TeamServer {
       `UPDATE team_servers SET team_category_snowflake = ${team_category_snowflake} WHERE id = ${this.row.id}`,
     );
     this.row.team_category_snowflake = team_category_snowflake;
-    logger(`Set info channel for **${this.row.name}** as ${team_category_snowflake}`);
+    logger.info(`Set info channel for **${this.row.name}** as ${team_category_snowflake}`);
   }
 
   async setAdminRoleSnowflake(adminRoleSnowflake: string) {
@@ -112,7 +113,7 @@ export default class TeamServer {
   async setParticipantRole(role: Role) {
     await query(`UPDATE team_servers SET participant_role_snowflake = ${role.id} WHERE id = ${this.row.id}`);
     this.row.participant_role_snowflake = role.id;
-    logger(`Set **${this.row.name}**'s participant role`);
+    logger.info(`Set **${this.row.name}**'s participant role`);
   }
 
   async getAllChallengeChannels() {
@@ -135,14 +136,14 @@ export default class TeamServer {
    */
   async makeChannel(client: Client, name: string) {
     const guild = this.getGuild(client);
-    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'text');
+    let channel = guild.channels.cache.find((c) => c.name === `${name}` && c.isText());
     if (channel) {
       await channel.delete();
-      logger(`**${name}** found: deleted **${name}** channel`);
+      logger.info(`**${name}** found: deleted **${name}** channel`);
     }
-    channel = await guild.channels.create(`${name}`, { type: 'text' });
-    logger(`Created **${name}** channel`);
-    return channel as TextChannel;
+    channel = await guild.channels.create(`${name}`, { type: 'GUILD_TEXT' });
+    logger.info(`Created **${name}** channel`);
+    return channel;
   }
 
   async renameChannel(client: Client, channel_snowflake: string, newName: string) {
@@ -151,27 +152,26 @@ export default class TeamServer {
     if (channel) {
       const oldName = channel.name;
       await channel.setName(newName.toLowerCase().replace(' ', '-'));
-      logger(`Renamed **${oldName}** channel to **${newName}**`);
+      logger.info(`Renamed **${oldName}** channel to **${newName}**`);
     } else {
       throw new Error('channel not found');
     }
   }
 
-  deleteChannel(client: Client, channel_snowflakes: string[]) {
+  deleteChannel(client: Client, ...channel_snowflakes: (string | null)[]) {
     const guild = this.getGuild(client);
-    if (channel_snowflakes instanceof Array) {
-      channel_snowflakes.forEach((snowflake) => {
+    channel_snowflakes.forEach((snowflake) => {
+      if (snowflake)
         guild.channels
           .resolve(snowflake)
           ?.delete()
           .then((c) => {
-            logger(`${(c as GuildChannel).name} found: deleted that channel`);
+            logger.info(`${(c as GuildChannel).name} found: deleted that channel`);
           })
           .catch(() => {
-            logger(`Channel with id ${snowflake} not found`);
+            logger.info(`Channel with id ${snowflake} not found`);
           });
-      });
-    }
+    });
   }
 
   /**
@@ -180,14 +180,14 @@ export default class TeamServer {
    * @param client
    * @param name
    */
-  async makeCategory(client: Client, name: string) {
+  async makeCategory(client: Client, name: string): Promise<CategoryChannel> {
     const guild = this.getGuild(client);
-    let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'category');
+    let category = guild.channels.cache.find((c) => c.name === `${name}` && c.type === 'GUILD_CATEGORY');
     if (!category) {
-      category = await guild.channels.create(`${name}`, { type: 'category' });
-      logger(`**${name}** category not found: created **${name}** category`);
+      category = await guild.channels.create(`${name}`, { type: 'GUILD_CATEGORY' });
+      logger.info(`**${name}** category not found: created **${name}** category`);
     }
-    return category;
+    return category as CategoryChannel;
   }
 
   /** Team Creation */
@@ -219,10 +219,8 @@ export default class TeamServer {
   }
 
   async fromRoleTeam(team_role_snowflake: string) {
-    logger(`Looking for **${team_role_snowflake}**...`);
-    const {
-      rows,
-    } = await query(
+    logger.info(`Looking for **${team_role_snowflake}**...`);
+    const { rows } = await query(
       `SELECT * FROM teams WHERE (team_role_snowflake_team_server = $1 or team_role_snowflake_main = $1) and team_server_id = ${this.row.id} `,
       [team_role_snowflake],
     );
@@ -231,11 +229,10 @@ export default class TeamServer {
   }
 
   async fromChannelTeam(text_channel_snowflake: string) {
-    const {
-      rows,
-    } = await query(`SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`, [
-      text_channel_snowflake,
-    ]);
+    const { rows } = await query(
+      `SELECT * FROM teams WHERE team_server_id = ${this.row.id} and text_channel_snowflake = $1`,
+      [text_channel_snowflake],
+    );
     if (rows.length === 0) throw new Error('no team associated with that channel');
     return new Team(rows[0] as TeamRow);
   }
@@ -256,13 +253,11 @@ export default class TeamServer {
     const guild = this.getGuild(client);
     const existingRole = guild.roles.cache.find((role) => role.name === name);
     if (useExisting && existingRole) {
-      logger(`role ${name} already exists, using it`);
+      logger.info(`role ${name} already exists, using it`);
       return existingRole;
     }
-    const role = await guild.roles.create({
-      data: { name: `${name}` },
-    });
-    logger(`Made new role **${name}** in TeamServer **${this.row.name}**`);
+    const role = await guild.roles.create({ name: `${name}` });
+    logger.info(`Made new role **${name}** in TeamServer **${this.row.name}**`);
     return role;
   }
 
@@ -271,21 +266,21 @@ export default class TeamServer {
     const roleToDelete = guild.roles.resolve(role_snowflake);
     if (roleToDelete) {
       await roleToDelete.delete();
-      logger(`**${roleToDelete.name}** role found and deleted`);
+      logger.info(`**${roleToDelete.name}** role found and deleted`);
       return;
     }
-    logger(`**${roleToDelete.name}** role not found`);
+    logger.info(`**${role_snowflake}** role not found`);
   }
 
-  async setRoleColor(client: Client, role_snowflake: string, color: string) {
+  async setRoleColor(client: Client, role_snowflake: string, color: ColorResolvable) {
     const guild = this.getGuild(client);
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setColor(color);
-      logger(`**${roleToChange.name}**'s color is now **${color}**`);
+      logger.info(`**${roleToChange.name}**'s color is now **${String(color)}**`);
       return;
     }
-    logger(`**${roleToChange.name}** role not found`);
+    logger.info(`**${role_snowflake}** role not found`);
   }
 
   async setRoleName(client: Client, role_snowflake: string, new_name: string) {
@@ -293,28 +288,34 @@ export default class TeamServer {
     const roleToChange = guild.roles.cache.find((role) => role.id === role_snowflake);
     if (roleToChange) {
       await roleToChange.setName(new_name);
-      logger(`Renamed **${roleToChange.name}** role to **${new_name}**`);
+      logger.info(`Renamed **${roleToChange.name}** role to **${new_name}**`);
     } else {
       throw new Error('role not found in ctf');
     }
   }
 
   async registerCommands(client: Client) {
-    const applicationAdminCommands = await setCommands(client, adminCommands, this.row.guild_snowflake);
+    const guild = this.getGuild(client);
+    const applicationAdminCommands = await guild.commands.set(adminCommands);
+    if (!this.row.admin_role_snowflake) throw createDiscordNullError('admin_role_snowflake');
     // ensure only admins can use admin commands
-    for (const com of applicationAdminCommands) {
-      await com.allowRole(this.row.admin_role_snowflake);
+    for (const com of applicationAdminCommands.values()) {
+      await com.permissions.add({
+        permissions: [{ id: this.row.admin_role_snowflake, type: 'ROLE', permission: true }],
+      });
     }
-    const applicationUserCommands = await setCommands(client, userCommands, this.row.guild_snowflake);
+    const applicationUserCommands = await guild.commands.set(userCommands);
     // ensure only users can use user commands
-    for (const com of applicationUserCommands) {
-      await com.allowRole(this.row.participant_role_snowflake);
+    for (const com of applicationUserCommands.values()) {
+      await com.permissions.add({
+        permissions: [{ id: this.row.participant_role_snowflake, type: 'ROLE', permission: true }],
+      });
     }
   }
 
   async hasSpace(print?: boolean) {
     const hasSpace = (await this.getAllTeams()).length < this.row.team_limit;
-    if (print) logger(`Team server **${this.row.name}** has${hasSpace ? ' ' : ' no '}space`);
+    if (print) logger.info(`Team server **${this.row.name}** has${hasSpace ? ' ' : ' no '}space`);
     return hasSpace;
   }
 

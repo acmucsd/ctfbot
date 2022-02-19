@@ -4,7 +4,7 @@ COPY package.json .
 COPY package-lock.json .
 
 FROM base AS dependencies
-RUN apk add --no-cache git python2 make gcc g++
+RUN apk add --no-cache git python3 make gcc g++
 RUN npm set progress=false && npm config set depth 0
 RUN npm install --only=production
 RUN cp -R node_modules prod_node_modules

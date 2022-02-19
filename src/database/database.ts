@@ -7,11 +7,12 @@ import { logger } from '../log';
 const pool = new Pool(postgresConfig);
 
 // initialize each table
-initTables(pool)
-  .then(() => logger('tables initialized'))
-  .catch((err) => {
-    logger('database initialization failed', err);
-    process.exit(1);
-  });
+// initTables(pool)
+//   .then(() => logger.info('tables initialized'))
+//   .catch((err) => {
+//     logger.info('database initialization failed', err);
+//     process.exit(1);
+//   });
 
-export default (text: string, params?) => pool.query(text, params);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default async (text: string, params?: any[]) => pool.query(text, params);
