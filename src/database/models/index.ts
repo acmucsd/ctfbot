@@ -1,9 +1,0 @@
-export { default as Attachment } from './attachment';
-export { default as Attempt } from './attempt';
-export { default as Category } from './category';
-export { default as Challenge } from './challenge';
-export { default as CTF } from './ctf';
-export { default as Invite } from './invite';
-export { default as Team } from './team';
-export { default as TeamServer } from './teamserver';
-export { default as User } from './user';

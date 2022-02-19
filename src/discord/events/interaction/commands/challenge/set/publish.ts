@@ -1,6 +1,4 @@
-import { CTF } from '../../../../../../database/models';
 import { parse } from 'date-fns';
-import { UnknownChallengeError } from '../../../../../../errors/UnknownChallengeError';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { getChallengeByInteraction } from '../../../../../util/ResourceManager';

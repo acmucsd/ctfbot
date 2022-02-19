@@ -1,8 +1,6 @@
-import { CTF } from '../../../../../../database/models';
-import { UnknownChallengeError } from '../../../../../../errors/UnknownChallengeError';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
-import { getChallengeByChannelContext, getChallengeByInteraction } from '../../../../../util/ResourceManager';
+import { getChallengeByInteraction } from '../../../../../util/ResourceManager';
 
 export default {
   name: 'name',
