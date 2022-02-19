@@ -52,18 +52,18 @@ export function initChallengeChannel(sequelize: Sequelize) {
     },
   );
 
-  ChallengeChannel.belongsTo(TeamServer, {
-    onDelete: 'RESTRICT',
-    foreignKey: {
-      allowNull: false,
-    },
-  });
-  TeamServer.hasMany(ChallengeChannel);
-
-  ChallengeChannel.belongsTo(Challenge, {
-    onDelete: 'RESTRICT',
-    foreignKey: {
-      allowNull: false,
-    },
-  });
+  // ChallengeChannel.belongsTo(TeamServer, {
+  //   onDelete: 'RESTRICT',
+  //   foreignKey: {
+  //     allowNull: false,
+  //   },
+  // });
+  // TeamServer.hasMany(ChallengeChannel);
+  //
+  // ChallengeChannel.belongsTo(Challenge, {
+  //   onDelete: 'RESTRICT',
+  //   foreignKey: {
+  //     allowNull: false,
+  //   },
+  // });
 }

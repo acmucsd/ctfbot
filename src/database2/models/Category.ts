@@ -1,6 +1,7 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
+  HasManyAddAssociationMixin,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
   HasManyHasAssociationMixin,
@@ -31,18 +32,6 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
   declare readonly ctf?: CTF;
-
-  // declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
-  // declare countTeamServers: HasManyCountAssociationsMixin;
-  declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
-  // declare hasTeamServers: HasManyHasAssociationsMixin<TeamServer, number>;
-  // declare setTeamServers: HasManySetAssociationsMixin<TeamServer, number>;
-  // declare addTeamServer: HasManyAddAssociationMixin<TeamServer, number>;
-  // declare addTeamServers: HasManyAddAssociationsMixin<TeamServer, number>;
-  // declare removeTeamServer: HasManyRemoveAssociationMixin<TeamServer, number>;
-  // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
-  // declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
-  // declare readonly TeamServers?: TeamServer[];
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;
