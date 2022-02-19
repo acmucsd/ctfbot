@@ -119,7 +119,7 @@ or have the `CTF Admin` role that is created when the CTF is created.
 
 #### adding a new CTF
 ```java
-/addctf NAME [DESCRIPTION]
+/addctf NAME
 ```
 
 This creates a new CTF in the guild you're currently in. It will create some meta channels for announcements and logging. Avoid deleting these categories and channels, but you can otherwise name them / rearrange them freely.
@@ -133,8 +133,6 @@ This creates a new CTF in the guild you're currently in. It will create some met
 #### editing a CTF
 ```java
 /ctf set name NAME
-/ctf set description DESCRIPTION
-/ctf set admin ADMIN_ROLE
 /ctf set start [START_DATE] // (TODO)
 /ctf set end [END_DATE] // (TODO)
 ```
@@ -146,7 +144,6 @@ This effectively *publishes* a CTF.
 Likewise, using `set end` without specifying an end date will cause the current CTF to be closed immediately.~~
 
 **Note:** the above has yet to be implemented.
-Currently, you can run `/ctf set start` to publish challenge channels to those with the `@Participant` role but that's all it does. 
 
 #### removing a CTF
 ```java
@@ -157,90 +154,29 @@ This causes the removal of the current guild's CTF *and all associated Teams, Ca
 
 #### managing team servers
 ```java
-/addserver NAME LIMIT CTF_NAME
-/ctf server get [CTF_NAME]
-/ctf server del NAME [CTF_NAME]
+/addserver CTF_NAME
+/ctf server del
 ```
 
 The first command will add the current guild as a team server for the indicated CTF. Again, you must be an admin on the main CTF guild to run this command.
 
-The second command will list all of the team servers belonging to the indicated CTF. The current CTF will be inferred if you are already on the main CTF guild or a team server.
-
-The third command will remove the indicated team server from the indicated CTF. The CTF can also be inferred by the guild you are on. 
-
-#### ~~creating a team~~ (TODO)
-```java
-/team add NAME [SERVER_NAME]
-```
-
-Creating a team this way does not add anybody to the team, it is an *empty team*, initially. *This is the only command that technically creates invalid data.*
-
-**Note**: this will add a team to the indicated team server, or the server will be inferred from the current guild. If you are not in a team server, or the team server is full, even if there are other available team servers, the command will fail.
-
-**Note 2**: creating a team will always cause the creation of an associated *team role* and *team channel*.
-
-#### ~~editing a team~~ (TODO)
-```java
-/team set name NAME [TEAM_ROLE]
-/team set description DESCRIPTION [TEAM_ROLE]
-/team set color COLOR [TEAM_ROLE]
-/team set captain USER [TEAM_ROLE]
-/team set server SERVER_NAME [TEAM_ROLE]
-```
-
-Edit the name, description, role color, and captain of the associated team. If no team role is provided, the team to edit will be inferred, firstly from the current channel, and secondarily from the current user's team.
-
-**Note**: when setting the team server of a team, the target team server must not be full. Also, the current team's channels will be deleted, message history will be lost, and current members will be given an invite to the new server where their new team channels await.
-
-#### ~~managing teams~~ (TODO)
-```java
-/team get
-```
-
-Returns a list of all teams currently in the CTF.
-
-#### ~~managing team users~~ (TODO)
-```java
-/team user get [TEAM_ROLE]
-/team user add USER [TEAM_ROLE]
-/team user del USER [TEAM_ROLE]
-```
-
-Allows you to list the users in a team, add a user to a team, and delete a user from a team respectively. If no team role is provided, the team to edit will be inferred firstly from the current channel, and secondarily from the current user's team.
-
-**Note**: The usual restrictions apply; adding a user to a team will remove them from their previous team, removing a user from a team will add them to an individual team, and removing all the users from a team will cause that team to be deleted.
-
-**Note 2**: Removing a user from a team will cause that team to lose the points that the user earned on behalf of the team. The user will keep credit for the flags they've submitted, and if you add them to a different team, their new team will gain points accordingly. 
-
-**Note 3**: Removing a user from a team that is the team captain will *not* cause the captain to be reassigned, that must be done separately.
-
-#### ~~removing teams~~ (TODO)
-```java
-/team del [TEAM_ROLE]
-```
-
-Deletes the team indicated, or infers the team to delete, firstly from the current channel, and secondarily from the current user's team. 
-
-**Note**: This command kicks all the users off the team and adds each of them to individual teams.
-
-**Note 2**: This will also cause the permanent deletion of the team role and the team channels.
+The second command will remove the indicated team server from the CTF it is a member of.
 
 #### creating new categories
 ```java
-/category add NAME [DESCRIPTION]
+/category add NAME
 ```
 
-Creates a new category with the provided name and description. This automatically creates a channel category with the same name in the main CTF guild.
+Creates a new category with the provided name. This automatically creates a channel category with the same name in the main CTF guild.
 
 **Note**: Category names are **unique** per CTF.
 
 #### editing categories
 ```java
 /category set name NEW_NAME NAME
-/category set description DESCRIPTION NAME
 ```
 
-Edit the name and description of a category you identify by name.
+Edit the name of a category you identify by name.
 
 #### managing categories
 ```java
@@ -281,7 +217,7 @@ All of these settings can be changed in further commands.
 
 Edits the challenge variables in a predictable way. Each command infers the challenge from the current challenge channel.
 
-**Note 2**: Using `set publish` without specifying a publish time will set it to "now", publishing the challenge instantly.
+**Note**: Using `set publish` without specifying a publish time will set it to "now", publishing the challenge instantly.
 
 
 #### managing challenges
@@ -297,7 +233,7 @@ While indicating a particular challenge, returns all available information about
 /challenge del [CHALLENGE_NAME]
 ```
 
-Removes the challenge indicated, or infers it from the current challenge channel if its missing. *This causes all recorded attempts to solve this challenge to be deleted forever*.
+Removes the challenge based on the current challenge channel. *This causes all recorded attempts to solve this challenge to be deleted forever*.
 
 #### managing flags
 ```java
@@ -313,48 +249,13 @@ This index begins at 1 instead of zero and matches the way the flags are numbere
 
 The third command changes the number of points the indicated flag is worth.
 
-#### managing attachments
-```java
-/challenge attach get [CHALLENGE_NAME]
-/challenge attach add NAME URL [CHALLENGE_NAME]
-/challenge attach del NAME [CHALLENGE_NAME]
-```
-
-The first command will list all file attachments of a particular challenge. The current challenge can also be inferred if you are in a challenge channel.
-
-The second command will add a file attachment to an existing challenge. 
-
-The third command will delete a file attachment from a challenge.
-
 ### user commands
 
 All users in the server are able to use these commands regardless of admin status
 
-#### joining a team
-```java
-/invite DISCORD_USERNAME
-/join TEAM_NAME // (TODO)
-```
-
-Invite allows for the owner of a team to invite a user within the CTF to their current 
-team. Only succeeds if the username is valid, if the user has accepted ToS, and is on a team by themselves.
-
-Join works similarly to this, attempting to join a team but only succeeding if the 
-team name is valid, if the user attempting to join a team hasn't already joined another
-team, and as long as the user attempting to join has been invited to the team they
-are trying to join. If the user has yet to be invited, the bot will DM the team owner
-a message in which they can react to accept this invite. The message will only be sent once regardless of the times invited, and thus an ignore / "no reaction" is equivalent to a reject.
-
-**Note 1:** check for individuals being on a team of one through the database, not the server
-
-**Note 2:** if these are used outside the main server, the user is given instructions on 
-how to do it properly in the main server
-
-
 #### team management
 ```java
 /setname NAME
-/setcolor COLOR
 ```
 
 Similar to the admin only commands, these take in no argument for team and will only affect
@@ -381,16 +282,7 @@ team will be inferred.
 
 #### challenges
 ```java
-/submit CHALLENGE_NAME FLAG
+/submit FLAG
 ```
 
-Allows a user to submit a flag for a specified challenge, only counting the attempt as valid if the 
-challenge name is valid. If the name is a valid challenge, then the bot checks to assure the flag is
-correct, adjusting the user's attempts total accordingly with correct and incorrect attempts. If correct,
-first blood checks are done along with adjusting of points for that challenge.
-
-## notes
-
-A quick note about Slash Command support: We got tired of waiting for discord.js to support Slash Commands,
-so we've used [this PR](https://github.com/discordjs/discord.js/pull/5106/files) as a reference for creating
-our workarounds until it IS officially supported.
+Allows a user to submit a flag. If it matches some challenge, the flag is captured.
