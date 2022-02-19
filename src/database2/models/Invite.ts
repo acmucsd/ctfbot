@@ -21,12 +21,12 @@ export class Invite extends Model<InviteAttributes, InviteCreationAttributes> im
   // declare getUser: BelongsToGetAssociationMixin<User>;
   // declare setUser: BelongsToSetAssociationMixin<User, number>;
   // declare createUser: BelongsToCreateAssociationMixin<User>;
-  declare readonly user?: User;
+  declare readonly User?: User;
 
   // declare getTeam: BelongsToGetAssociationMixin<Team>;
   // declare setTeam: BelongsToSetAssociationMixin<Team, number>;
   // declare createTeam: BelongsToCreateAssociationMixin<Team>;
-  declare readonly team?: Team;
+  declare readonly Team?: Team;
 }
 
 export function initInvite(sequelize: Sequelize) {

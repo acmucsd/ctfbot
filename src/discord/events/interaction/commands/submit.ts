@@ -1,18 +1,12 @@
-import { CTF } from '../../../../database/models';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
+import { getCTFByGuildContext } from '../../../util/ResourceManager';
 
 export default {
   name: 'submit',
-  description: "Submits a challenge's flag",
+  description: 'Submits a flag for any challenge',
   default_permission: false,
   options: [
-    {
-      name: 'challenge_channel',
-      description: 'The challenge being attempted',
-      type: ApplicationCommandOptionTypes.CHANNEL,
-      required: true,
-    },
     {
       name: 'flag',
       description: "The challenge's flag",
@@ -21,15 +15,11 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.fromGuildSnowflakeCTF(interaction.guild.id);
-    const user = await ctf.fromUserSnowflakeUser(interaction.member.user.id);
+    const ctf = await getCTFByGuildContext(interaction.guild);
+    if (!ctf) throw new Error('this guild does not belong to a ctf');
 
-    const flag = interaction.options.getString('flag', true);
-    const challengeChannelSnowflake = interaction.options.getString('challenge_channel', true);
-    const challenge = await ctf.fromChannelSnowflakeChallenge(challengeChannelSnowflake);
+    const flag = ctf.getFlag(interaction.options.getString('flag', true));
 
-    const attempt = await challenge.submitFlag(interaction.client, user, flag);
-
-    return attempt.row.successful ? 'Flag submission was **correct**!' : 'Flag submission was **incorrect**...';
+    return 'to be implemented';
   },
 } as ChatInputCommandDefinition;

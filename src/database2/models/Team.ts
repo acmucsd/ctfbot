@@ -13,7 +13,7 @@ type TeamCreationAttributes = Optional<TeamAttributes, 'id' | 'textChannelSnowfl
 export class Team extends Model<TeamAttributes, TeamCreationAttributes> implements TeamAttributes {
   declare id: number;
   declare name: string;
-  declare textChannelSnowflake?: string;
+  declare textChannelSnowflake: string;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -21,7 +21,7 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   // declare getTeamServer: BelongsToGetAssociationMixin<TeamServer>;
   // declare setTeamServer: BelongsToSetAssociationMixin<TeamServer, number>;
   // declare createTeamServer: BelongsToCreateAssociationMixin<TeamServer>;
-  declare readonly teamServer?: TeamServer;
+  declare readonly TeamServer?: TeamServer;
 
   // declare getUsers: HasManyGetAssociationsMixin<User>;
   // declare countUsers: HasManyCountAssociationsMixin;
@@ -33,7 +33,7 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   // declare removeUser: HasManyRemoveAssociationMixin<User, number>;
   // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
   // declare createUser: HasManyCreateAssociationMixin<User>;
-  declare readonly users?: User[];
+  declare readonly Users?: User[];
 }
 
 export function initTeam(sequelize: Sequelize) {
@@ -48,14 +48,23 @@ export function initTeam(sequelize: Sequelize) {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      textChannelSnowflake: DataTypes.STRING,
+      textChannelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
     },
     {
       sequelize,
     },
   );
 
-  Team.belongsTo(TeamServer);
+  Team.belongsTo(TeamServer, {
+    onDelete: 'RESTRICT',
+    foreignKey: {
+      allowNull: false,
+    },
+  });
 
   initUser(sequelize);
   Team.hasMany(User);

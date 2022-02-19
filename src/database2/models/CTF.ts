@@ -9,6 +9,7 @@ import {
 import { initTeamServer, TeamServer } from './TeamServer';
 import { Category, initCategory } from './Category';
 import { Challenge } from './Challenge';
+import { Flag } from './Flag';
 
 interface CTFAttributes {
   id: number;
@@ -80,17 +81,29 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   declare readonly TeamServers?: TeamServer[];
 
-  //
-  // async submitFlag(flagText: string): Promise<Challenge | undefined> {
-  //   const challenges = await this.getChallenges({ include: { model: Flag, where: { flagText }, required: true } });
-  //
-  //   if (!challenges[0] || !challenges[0].Flags || !challenges[0].Flags[0]) return;
-  //
-  //   // otherwise, the flag matched something
-  //   // challenges[0].Flags[0].createFlagCapture();
-  //
-  //   return challenges[0];
-  // }
+  // returns the flag that matches, or nothing
+  async getFlag(flagText: string): Promise<Flag | undefined> {
+    const categories = await this.getCategories({
+      attributes: ['id'],
+      include: {
+        model: Challenge,
+        attributes: ['id'],
+        required: true,
+        include: [
+          {
+            model: Flag,
+            required: true,
+            where: { flagText },
+          },
+        ],
+      },
+    });
+
+    if (!categories || !categories[0].Challenges || !categories[0].Challenges[0].Flags) return;
+
+    // otherwise, the flag matched something
+    return categories[0].Challenges[0].Flags[0];
+  }
 }
 
 export function initCTF(sequelize: Sequelize) {

@@ -1,14 +1,5 @@
-import {
-  BelongsToGetAssociationMixin,
-  DataTypes,
-  HasManyCreateAssociationMixin,
-  HasManyHasAssociationsMixin,
-  Model,
-  Optional,
-  Sequelize,
-} from 'sequelize';
+import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Challenge } from './Challenge';
-import { FlagCapture, initFlagCapture } from './FlagCapture';
 import { User } from './User';
 
 interface FlagAttributes {

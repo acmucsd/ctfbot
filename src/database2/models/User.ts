@@ -31,7 +31,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare removeInvite: HasManyRemoveAssociationMixin<Invite, number>;
   // declare removeInvites: HasManyRemoveAssociationsMixin<Invite, number>;
   // declare createInvite: HasManyCreateAssociationMixin<Invite>;
-  // declare readonly invites?: Invite[];
+  // declare readonly Invites?: Invite[];
 }
 
 export function initUser(sequelize: Sequelize) {
@@ -42,14 +42,23 @@ export function initUser(sequelize: Sequelize) {
         autoIncrement: true,
         primaryKey: true,
       },
-      userSnowflake: DataTypes.STRING,
+      userSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        allowNull: false,
+      },
     },
     {
       sequelize,
     },
   );
 
-  User.belongsTo(Team);
+  User.belongsTo(Team, {
+    onDelete: 'RESTRICT',
+    foreignKey: {
+      allowNull: false,
+    },
+  });
 
   initInvite(sequelize);
   User.hasMany(Invite);
