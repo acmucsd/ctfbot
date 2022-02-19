@@ -31,7 +31,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   declare getCTF: BelongsToGetAssociationMixin<CTF>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly ctf?: CTF;
+  declare readonly CTF?: CTF;
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;
@@ -54,7 +54,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare addChallenges: HasManyAddAssociationsMixin<Challenge, number>;
   // declare removeChallenge: HasManyRemoveAssociationMixin<Challenge, number>;
   // declare removeChallenges: HasManyRemoveAssociationsMixin<Challenge, number>;
-  // declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
+  declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
   declare readonly Challenges?: Challenge[];
 }
 

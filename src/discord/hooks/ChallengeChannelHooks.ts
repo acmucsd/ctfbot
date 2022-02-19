@@ -5,6 +5,7 @@ import { ChallengeChannel } from '../../database2/models/ChallengeChannel';
 import { Category } from '../../database2/models/Category';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
 import { setChallengeMessage } from '../messages/ChallengeMessage';
+import { TeamServer } from '../../database2/models/TeamServer';
 
 export async function refreshChallengeChannel(challengeChannel: ChallengeChannel, client: Client<true>) {
   const teamServer = await challengeChannel.getTeamServer({ attributes: ['id', 'guildSnowflake'] });
@@ -16,7 +17,13 @@ export async function refreshChallengeChannel(challengeChannel: ChallengeChannel
     include: {
       model: Category,
       attributes: ['id'],
-      include: [{ model: CategoryChannel, attributes: ['channelSnowflake'], where: { teamServerId: teamServer.id } }],
+      include: [
+        {
+          model: CategoryChannel,
+          attributes: ['channelSnowflake'],
+          include: [{ model: TeamServer, attributes: ['id'], where: { id: teamServer.id } }],
+        },
+      ],
     },
   });
   if (!challenge.Category || !challenge.Category.CategoryChannels || !challenge.Category.CategoryChannels[0])

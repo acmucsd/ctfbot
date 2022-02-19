@@ -9,8 +9,6 @@ import {
 import { initTeamServer, TeamServer } from './TeamServer';
 import { Category, initCategory } from './Category';
 import { Challenge } from './Challenge';
-import { Flag } from './Flag';
-import { FlagCapture } from './FlagCapture';
 
 interface CTFAttributes {
   id: number;
@@ -70,18 +68,6 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   declare createCategory: HasManyCreateAssociationMixin<Category>;
   declare readonly Categories?: Category[];
 
-  declare getChallenges: HasManyGetAssociationsMixin<Challenge>;
-  // declare countChallenges: HasManyCountAssociationsMixin;
-  // declare hasChallenge: HasManyHasAssociationMixin<Challenge, number>;
-  // declare hasChallenges: HasManyHasAssociationsMixin<Challenge, number>;
-  // declare setChallenges: HasManySetAssociationsMixin<Challenge, number>;
-  // declare addChallenge: HasManyAddAssociationMixin<Challenge, number>;
-  // declare addChallenges: HasManyAddAssociationsMixin<Challenge, number>;
-  // declare removeChallenge: HasManyRemoveAssociationMixin<Challenge, number>;
-  // declare removeChallenges: HasManyRemoveAssociationsMixin<Challenge, number>;
-  declare createChallenge: HasManyCreateAssociationMixin<Challenge>;
-  declare readonly Challenges?: Challenge[];
-
   declare getTeamServers: HasManyGetAssociationsMixin<TeamServer>;
   // declare countTeamServers: HasManyCountAssociationsMixin;
   // declare hasTeamServer: HasManyHasAssociationMixin<TeamServer, number>;
@@ -95,16 +81,16 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   declare readonly TeamServers?: TeamServer[];
 
   //
-  async submitFlag(flagText: string): Promise<Challenge | undefined> {
-    const challenges = await this.getChallenges({ include: { model: Flag, where: { flagText }, required: true } });
-
-    if (!challenges[0] || !challenges[0].Flags || !challenges[0].Flags[0]) return;
-
-    // otherwise, the flag matched something
-    // challenges[0].Flags[0].createFlagCapture();
-
-    return challenges[0];
-  }
+  // async submitFlag(flagText: string): Promise<Challenge | undefined> {
+  //   const challenges = await this.getChallenges({ include: { model: Flag, where: { flagText }, required: true } });
+  //
+  //   if (!challenges[0] || !challenges[0].Flags || !challenges[0].Flags[0]) return;
+  //
+  //   // otherwise, the flag matched something
+  //   // challenges[0].Flags[0].createFlagCapture();
+  //
+  //   return challenges[0];
+  // }
 }
 
 export function initCTF(sequelize: Sequelize) {

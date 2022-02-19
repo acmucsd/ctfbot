@@ -114,13 +114,6 @@ export function initChallenge(sequelize: Sequelize) {
     },
   });
 
-  Challenge.belongsTo(CTF, {
-    onDelete: 'RESTRICT',
-    foreignKey: {
-      allowNull: false,
-    },
-  });
-
   initChallengeChannel(sequelize);
   Challenge.hasMany(ChallengeChannel);
 

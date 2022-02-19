@@ -1,6 +1,5 @@
 import { Category } from '../../database2/models/Category';
 import { TeamServer } from '../../database2/models/TeamServer';
-import { createDatabaseNullError } from '../../errors/DatabaseNullError';
 import { refreshCategoryChannel } from './CategoryChannelHooks';
 import { Client } from 'discord.js';
 import { CategoryChannel } from '../../database2/models/CategoryChannel';
@@ -45,7 +44,7 @@ export async function refreshCategory(category: Category, client: Client<true>) 
 
   // now we want to trigger a refresh of our dependant categoryChannels as well
   const channels = await category.getCategoryChannels();
-  await Promise.all(channels.map((chan) => refreshCategoryChannel(chan, client)));
+  await Promise.all(channels.map((chan) => refreshCategoryChannel(chan, client).then(() => chan.save())));
 }
 
 // mainly we just need to destroy challenges and category channels first

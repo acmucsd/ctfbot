@@ -12,7 +12,6 @@ import {
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
 import { setTeamServerInviteChannelMessage } from '../messages/TeamServerInviteChannelMessage';
-import { CategoryChannel } from '../../database2/models/CategoryChannel';
 
 export async function refreshTeamServer(teamServer: TeamServer, client: Client<true>) {
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
