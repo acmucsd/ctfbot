@@ -38,11 +38,6 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  declare getCTF: BelongsToGetAssociationMixin<CTF>;
-  declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
-  // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly ctf?: CTF;
-
   declare getCategory: BelongsToGetAssociationMixin<Category>;
   declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;

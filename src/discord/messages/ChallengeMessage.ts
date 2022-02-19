@@ -1,9 +1,14 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { setChannelContent } from '../util/ResourceManager';
 import { Challenge } from '../../database2/models/Challenge';
+import { CTF } from '../../database2/models/CTF';
 
 export async function setChallengeMessage(client: Client<true>, channel: TextChannel, challenge: Challenge) {
-  const category = await challenge.getCategory({ attributes: ['name'] });
+  const category = await challenge.getCategory({
+    attributes: ['name'],
+    include: { model: CTF, attributes: ['guildSnowflake'] },
+  });
+  if (!category.CTF) throw new Error('unexpected null ctf');
 
   const challengeMessage = new MessageEmbed();
   challengeMessage.setTitle(challenge.name);
@@ -14,9 +19,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
 
   // const attachments = await this.getAllAttachments();
   // attachments.forEach((attachment) => challengeMessage.addField(attachment.row.name, attachment.row.url));
-
-  const ctf = await challenge.getCTF({ attributes: ['guildSnowflake'] });
-  const guild = await client.guilds.fetch(ctf.guildSnowflake);
+  const guild = await client.guilds.fetch(category.CTF.guildSnowflake);
 
   // complicated nested query to fetch the associated first blood user and team, if defined
   // const flags = await challenge.getFlags({
