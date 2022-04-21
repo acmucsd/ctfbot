@@ -1,0 +1,68 @@
+version: "3.9"
+x-redash-env: &redash-env
+  PYTHONUNBUFFERED: 0
+  REDASH_LOG_LEVEL: "INFO"
+  REDASH_DATABASE_URL: "postgresql://postgres:${PGPASSWORD}@postgres/postgres"
+  REDASH_COOKIE_SECRET: "${REDASH_COOKIE_SECRET}"
+  REDASH_SECRET_KEY: "${REDASH_SECRET_KEY}"
+  REDASH_REDIS_URL: "redis://redis:6379/0"
+x-redash-service: &redash-service
+  image: redash/redash:8.0.0.b32245
+  depends_on:
+    - postgres
+    - redis
+  restart: always
+services:
+  server:
+    <<: *redash-service
+    command: server
+    ports:
+      - "5000:5000"
+    environment:
+      <<: *redash-env
+      REDASH_WEB_WORKERS: 4
+  scheduler:
+    <<: *redash-service
+    command: scheduler
+    environment:
+      <<: *redash-env
+      QUEUES: "celery"
+      WORKERS_COUNT: 1
+  scheduled_worker:
+    <<: *redash-service
+    command: worker
+    environment:
+      <<: *redash-env
+      QUEUES: "scheduled_queries,schemas"
+      WORKERS_COUNT: 1
+  adhoc_worker:
+    <<: *redash-service
+    command: worker
+    environment:
+      <<: *redash-env
+      QUEUES: "queries"
+      WORKERS_COUNT: 2
+  redis:
+    image: redis:5.0-alpine
+    restart: always
+  postgres:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_PASSWORD: "${PGPASSWORD}"
+    volumes:
+      - redash-db:/var/lib/postgresql/data
+    restart: always
+  nginx:
+    image: redash/nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    links:
+      - server:redash
+    restart: always
+networks:
+  default:
+    name: redash-sources
+volumes:
+  redash-db:
