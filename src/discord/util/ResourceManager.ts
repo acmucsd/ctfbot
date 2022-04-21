@@ -158,24 +158,32 @@ export async function registerGuildCommandsIfChanged(
     .sort()
     .forEach((comName) => internalCommandsHash.update(comName));
 
-  // only overwrite existing commands if they don't match
-  if (registeredCommandsHash.digest('hex') !== internalCommandsHash.digest('hex')) {
-    logger.info('detected change, setting guild commands');
-    await guild.commands.set(adminCommands.concat(userCommands));
-    // ensure only admins can use admin commands and users can use user commands
-    await guild.commands.permissions.set({
-      fullPermissions: guild.commands.cache.map((com) => ({
-        id: com.id,
-        permissions: [
-          {
-            id: userCommands.find((ucom) => ucom.name === com.name) ? userRole.id : adminRole.id,
-            type: ApplicationCommandPermissionTypes.ROLE,
-            permission: true,
-          },
-        ],
-      })),
-    });
-  }
+  const hasAdminRole = await guild.commands.cache.first()?.permissions.has({ permissionId: adminRole });
+  const hasUserRole = await guild.commands.cache.first()?.permissions.has({ permissionId: userRole });
+
+  if (
+    // if command roles have gotten desync'd
+    (hasAdminRole || hasUserRole) &&
+    // if they don't need updating, don't update
+    registeredCommandsHash.digest('hex') === internalCommandsHash.digest('hex')
+  )
+    return;
+
+  logger.info('detected change, setting guild commands');
+  await guild.commands.set(adminCommands.concat(userCommands));
+  // ensure only admins can use admin commands and users can use user commands
+  await guild.commands.permissions.set({
+    fullPermissions: guild.commands.cache.map((com) => ({
+      id: com.id,
+      permissions: [
+        {
+          id: userCommands.find((ucom) => ucom.name === com.name) ? userRole.id : adminRole.id,
+          type: ApplicationCommandPermissionTypes.ROLE,
+          permission: true,
+        },
+      ],
+    })),
+  });
 }
 
 /** This function takes in a channel and a series of messages, and does the following:
