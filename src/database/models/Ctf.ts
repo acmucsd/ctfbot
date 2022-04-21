@@ -26,6 +26,7 @@ interface CtfAttributes {
   scoreboardChannelSnowflake: string;
   tosChannelSnowflake: string;
   infoCategorySnowflake: string;
+  tosMessage: string;
 }
 
 type CtfCreationAttributes = Optional<
@@ -39,6 +40,7 @@ type CtfCreationAttributes = Optional<
   | 'scoreboardChannelSnowflake'
   | 'tosChannelSnowflake'
   | 'infoCategorySnowflake'
+  | 'tosMessage'
 >;
 
 export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements CtfAttributes {
@@ -53,6 +55,7 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   declare scoreboardChannelSnowflake: string;
   declare tosChannelSnowflake: string;
   declare infoCategorySnowflake: string;
+  declare tosMessage: string;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -153,6 +156,11 @@ export function initCtf(sequelize: Sequelize) {
       infoCategorySnowflake: {
         type: DataTypes.STRING,
         defaultValue: '',
+        allowNull: false,
+      },
+      tosMessage: {
+        type: DataTypes.JSON,
+        defaultValue: '[]',
         allowNull: false,
       },
     },
