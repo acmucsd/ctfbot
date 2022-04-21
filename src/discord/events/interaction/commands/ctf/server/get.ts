@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { createCommandNotExecutedInGuildError } from '../../../../../../errors/CommandInteractionError';
-import { CTF } from '../../../../../../database/models/CTF';
+import { Ctf } from '../../../../../../database/models/Ctf';
 import { Op } from 'sequelize';
 
 export default {
@@ -20,7 +20,7 @@ export default {
     if (!interaction.inCachedGuild()) throw createCommandNotExecutedInGuildError(interaction);
 
     const ctfname = interaction.options.getString('name');
-    const ctf = await CTF.findOne({
+    const ctf = await Ctf.findOne({
       where: { [Op.or]: [{ name: ctfname }, { guildSnowflake: interaction.guild.id }] },
     });
     if (!ctf) throw Error('no CTF found');

@@ -1,7 +1,7 @@
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { createCommandNotExecutedInGuildError } from '../../../../errors/CommandInteractionError';
-import { CTF } from '../../../../database/models/CTF';
+import { Ctf } from '../../../../database/models/Ctf';
 
 export default {
   name: 'addserver',
@@ -24,7 +24,7 @@ export default {
     if (!interaction.inCachedGuild()) throw createCommandNotExecutedInGuildError(interaction);
 
     const ctfname = interaction.options.getString('ctf_name');
-    const ctf = await CTF.findOne({ where: { name: ctfname } });
+    const ctf = await Ctf.findOne({ where: { name: ctfname } });
 
     if (!ctf) throw Error('no CTF by that name');
 

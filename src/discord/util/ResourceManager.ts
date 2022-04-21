@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import { adminCommands, PopulatedCommandInteraction, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
-import { CTF } from '../../database/models/CTF';
+import { Ctf } from '../../database/models/Ctf';
 import { TeamServer } from '../../database/models/TeamServer';
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { Challenge } from '../../database/models/Challenge';
@@ -203,13 +203,13 @@ export async function setChannelContent(client: Client<true>, channel: TextChann
 }
 
 export async function getCTFByGuildContext(guild: Guild) {
-  const ctf = await CTF.findOne({ where: { guildSnowflake: guild.id } });
+  const ctf = await Ctf.findOne({ where: { guildSnowflake: guild.id } });
   if (ctf) return ctf;
 
   // otherwise, see if this is a team server guild and return the original ctf
   const teamServer = await TeamServer.findOne({
     where: { guildSnowflake: guild.id },
-    include: { model: CTF, required: true },
+    include: { model: Ctf, required: true },
   });
 
   return teamServer?.CTF;

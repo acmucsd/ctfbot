@@ -2,7 +2,7 @@ import { parse } from 'date-fns';
 
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { CTF } from '../../../../../../database/models/CTF';
+import { Ctf } from '../../../../../../database/models/Ctf';
 
 export default {
   name: 'start',
@@ -17,7 +17,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await CTF.findOne({ where: { guildSnowflake: interaction.guild.id }, attributes: ['startDate'] });
+    const ctf = await Ctf.findOne({ where: { guildSnowflake: interaction.guild.id }, attributes: ['startDate'] });
     if (!ctf) return `This guild is not the main server for any CTFs`;
 
     const startDate = interaction.options.getString('start_date');

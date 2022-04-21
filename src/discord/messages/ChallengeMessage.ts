@@ -1,14 +1,14 @@
 import { Client, MessageEmbed, TextChannel } from 'discord.js';
 import { setChannelContent } from '../util/ResourceManager';
 import { Challenge } from '../../database/models/Challenge';
-import { CTF } from '../../database/models/CTF';
+import { Ctf } from '../../database/models/Ctf';
 import { User } from '../../database/models/User';
 import { Team } from '../../database/models/Team';
 
 export async function setChallengeMessage(client: Client<true>, channel: TextChannel, challenge: Challenge) {
   const category = await challenge.getCategory({
     attributes: ['name'],
-    include: { model: CTF, attributes: ['guildSnowflake'] },
+    include: { model: Ctf, attributes: ['guildSnowflake'] },
   });
   if (!category.CTF) throw new Error('unexpected null ctf');
 

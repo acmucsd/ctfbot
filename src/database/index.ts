@@ -1,13 +1,16 @@
 import { Sequelize } from 'sequelize';
 import { postgresConfig } from '../config';
-import { initCTF } from './models/CTF';
+import { initCtf } from './models/Ctf';
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
+  define: {
+    underscored: true,
+  },
   ...postgresConfig,
 });
 
 // this will initialize the CTF model AND all of its child dependants
-initCTF(sequelize);
+initCtf(sequelize);
 
 export default sequelize;

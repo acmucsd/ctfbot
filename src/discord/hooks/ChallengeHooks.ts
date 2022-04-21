@@ -4,7 +4,7 @@ import { Challenge } from '../../database/models/Challenge';
 import { refreshChallengeChannel } from './ChallengeChannelHooks';
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { Category } from '../../database/models/Category';
-import { CTF } from '../../database/models/CTF';
+import { Ctf } from '../../database/models/Ctf';
 
 export async function refreshAllChallenges(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCTF({ include: { model: Category, attributes: ['id'], include: [Challenge] } });
@@ -20,7 +20,7 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
     where: { '$CTF.TeamServers.ChallengeChannels.id$': null },
     include: [
       {
-        model: CTF,
+        model: Ctf,
         attributes: ['id'],
         include: [
           {

@@ -11,7 +11,7 @@ import { Category, initCategory } from './Category';
 import { Challenge } from './Challenge';
 import { Flag } from './Flag';
 
-interface CTFAttributes {
+interface CtfAttributes {
   id: number;
   name: string;
   guildSnowflake: string;
@@ -28,8 +28,8 @@ interface CTFAttributes {
   infoCategorySnowflake: string;
 }
 
-type CTFCreationAttributes = Optional<
-  CTFAttributes,
+type CtfCreationAttributes = Optional<
+  CtfAttributes,
   | 'id'
   | 'startDate'
   | 'endDate'
@@ -41,7 +41,7 @@ type CTFCreationAttributes = Optional<
   | 'infoCategorySnowflake'
 >;
 
-export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements CTFAttributes {
+export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements CtfAttributes {
   declare id: number;
   declare name: string;
   declare guildSnowflake: string;
@@ -106,8 +106,8 @@ export class CTF extends Model<CTFAttributes, CTFCreationAttributes> implements 
   }
 }
 
-export function initCTF(sequelize: Sequelize) {
-  CTF.init(
+export function initCtf(sequelize: Sequelize) {
+  Ctf.init(
     {
       id: {
         type: DataTypes.INTEGER,
@@ -162,9 +162,9 @@ export function initCTF(sequelize: Sequelize) {
   );
 
   initTeamServer(sequelize);
-  CTF.hasMany(TeamServer);
+  Ctf.hasMany(TeamServer);
 
   initCategory(sequelize);
-  CTF.hasMany(Category);
-  CTF.hasMany(Challenge);
+  Ctf.hasMany(Category);
+  Ctf.hasMany(Challenge);
 }

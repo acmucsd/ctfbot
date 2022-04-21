@@ -9,7 +9,7 @@ import {
   Optional,
   Sequelize,
 } from 'sequelize';
-import { CTF } from './CTF';
+import { Ctf } from './Ctf';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
 import { TeamServer } from './TeamServer';
@@ -28,10 +28,10 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  declare getCTF: BelongsToGetAssociationMixin<CTF>;
+  declare getCTF: BelongsToGetAssociationMixin<Ctf>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly CTF?: CTF;
+  declare readonly CTF?: Ctf;
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;
@@ -76,7 +76,7 @@ export function initCategory(sequelize: Sequelize) {
     },
   );
 
-  Category.belongsTo(CTF, {
+  Category.belongsTo(Ctf, {
     onDelete: 'RESTRICT',
     foreignKey: {
       allowNull: false,

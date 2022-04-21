@@ -1,6 +1,6 @@
-import { CTF } from '../../database/models/CTF';
+import { Ctf } from '../../database/models/Ctf';
 import { Client } from 'discord.js';
-import { destroyCTF, refreshCTF } from './CTFHooks';
+import { destroyCtf, refreshCtf } from './CtfHooks';
 import { destroyTeamServer, refreshTeamServer } from './TeamServerHooks';
 import { TeamServer } from '../../database/models/TeamServer';
 import { Category } from '../../database/models/Category';
@@ -14,14 +14,14 @@ import { destroyChallengeChannel, refreshChallengeChannel } from './ChallengeCha
 import { Flag } from '../../database/models/Flag';
 
 export async function initHooks(client: Client<true>) {
-  CTF.beforeCreate((ctf) =>
-    refreshCTF(ctf, client).catch(async (e) => {
-      await destroyCTF(ctf, client);
+  Ctf.beforeCreate((ctf) =>
+    refreshCtf(ctf, client).catch(async (e) => {
+      await destroyCtf(ctf, client);
       throw e;
     }),
   );
-  CTF.beforeUpdate((ctf) => refreshCTF(ctf, client));
-  CTF.beforeDestroy((ctf) => destroyCTF(ctf, client));
+  Ctf.beforeUpdate((ctf) => refreshCtf(ctf, client));
+  Ctf.beforeDestroy((ctf) => destroyCtf(ctf, client));
 
   TeamServer.beforeCreate((ts) =>
     refreshTeamServer(ts, client).catch(async (e) => {
@@ -67,8 +67,8 @@ export async function initHooks(client: Client<true>) {
   // TODO: after a flag gets captured, we queue up a periodic refresh
 
   // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
-  const ctfs = await CTF.findAll();
-  await Promise.all(ctfs.map((ctf) => refreshCTF(ctf, client)));
+  const ctfs = await Ctf.findAll();
+  await Promise.all(ctfs.map((ctf) => refreshCtf(ctf, client)));
   const teamServers = await TeamServer.findAll();
   await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client)));
 }

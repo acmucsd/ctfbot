@@ -11,7 +11,7 @@ import {
 import { Category } from './Category';
 import { Flag, initFlag } from './Flag';
 import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
-import { CTF } from './CTF';
+import { Ctf } from './Ctf';
 
 export interface ChallengeAttributes {
   id: number;

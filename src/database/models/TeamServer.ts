@@ -12,7 +12,7 @@ import {
   Optional,
   Sequelize,
 } from 'sequelize';
-import { CTF } from './CTF';
+import { Ctf } from './Ctf';
 import { initTeam, Team } from './Team';
 import { Category } from './Category';
 import { CategoryChannel } from './CategoryChannel';
@@ -59,10 +59,10 @@ export class TeamServer
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  declare getCTF: BelongsToGetAssociationMixin<CTF>;
+  declare getCTF: BelongsToGetAssociationMixin<Ctf>;
   // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
   // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly CTF?: CTF;
+  declare readonly CTF?: Ctf;
 
   // declare getTeams: HasManyGetAssociationsMixin<Team>;
   // declare countTeams: HasManyCountAssociationsMixin;
@@ -154,7 +154,7 @@ export function initTeamServer(sequelize: Sequelize) {
     },
   );
 
-  TeamServer.belongsTo(CTF, {
+  TeamServer.belongsTo(Ctf, {
     onDelete: 'RESTRICT',
     foreignKey: {
       allowNull: false,

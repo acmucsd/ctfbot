@@ -1,4 +1,4 @@
-import { CTF } from '../../database/models/CTF';
+import { Ctf } from '../../database/models/Ctf';
 import { Client } from 'discord.js';
 import { createDiscordNullError } from '../../errors/DiscordNullError';
 import {
@@ -11,7 +11,7 @@ import {
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
 
-export async function refreshCTF(ctf: CTF, client: Client<true>) {
+export async function refreshCtf(ctf: Ctf, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
@@ -60,7 +60,7 @@ export async function refreshCTF(ctf: CTF, client: Client<true>) {
   ctf.scoreboardChannelSnowflake = scoreboardChannel.id;
 }
 
-export async function destroyCTF(ctf: CTF, client: Client<true>) {
+export async function destroyCtf(ctf: Ctf, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
