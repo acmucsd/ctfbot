@@ -28,7 +28,7 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   declare getCtf: BelongsToGetAssociationMixin<Ctf>;
   // declare setCtf: BelongsToSetAssociationMixin<Ctf, number>;
   // declare createCtf: BelongsToCreateAssociationMixin<Ctf>;
-  declare readonly ctf?: Ctf;
+  declare readonly Ctf?: Ctf;
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;

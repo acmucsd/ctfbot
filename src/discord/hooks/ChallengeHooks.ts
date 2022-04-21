@@ -45,7 +45,7 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
     ],
   });
 
-  const ctf = category?.ctf;
+  const ctf = category?.Ctf;
   if (ctf?.TeamServers) {
     // create new challenge channels for the team servers that need it
     for (const teamServer of ctf.TeamServers) {
