@@ -7,7 +7,7 @@ import { Category } from '../../database/models/Category';
 import { Ctf } from '../../database/models/Ctf';
 
 export async function refreshAllChallenges(teamServer: TeamServer, client: Client<true>) {
-  const ctf = await teamServer.getCTF({ include: { model: Category, attributes: ['id'], include: [Challenge] } });
+  const ctf = await teamServer.getCtf({ include: { model: Category, attributes: ['id'], include: [Challenge] } });
   if (!ctf.Categories) return;
 
   const challenges = ctf.Categories.flatMap((cat) => cat.Challenges);
@@ -45,7 +45,7 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
     ],
   });
 
-  const ctf = category?.CTF;
+  const ctf = category?.ctf;
   if (ctf?.TeamServers) {
     // create new challenge channels for the team servers that need it
     for (const teamServer of ctf.TeamServers) {

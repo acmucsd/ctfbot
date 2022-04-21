@@ -1,10 +1,8 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
-  HasManyAddAssociationMixin,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
-  HasManyHasAssociationMixin,
   Model,
   Optional,
   Sequelize,
@@ -12,7 +10,6 @@ import {
 import { Ctf } from './Ctf';
 import { Challenge, initChallenge } from './Challenge';
 import { CategoryChannel, initCategoryChannel } from './CategoryChannel';
-import { TeamServer } from './TeamServer';
 
 interface CategoryAttributes {
   id: number;
@@ -28,10 +25,10 @@ export class Category extends Model<CategoryAttributes, CategoryCreationAttribut
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  declare getCTF: BelongsToGetAssociationMixin<Ctf>;
-  // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
-  // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly CTF?: Ctf;
+  declare getCtf: BelongsToGetAssociationMixin<Ctf>;
+  // declare setCtf: BelongsToSetAssociationMixin<Ctf, number>;
+  // declare createCtf: BelongsToCreateAssociationMixin<Ctf>;
+  declare readonly ctf?: Ctf;
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;
   // declare countCategoryChannels: HasManyCountAssociationsMixin;

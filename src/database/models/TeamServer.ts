@@ -1,20 +1,13 @@
 import {
   BelongsToGetAssociationMixin,
-  BelongsToManyAddAssociationMixin,
-  BelongsToManyHasAssociationMixin,
   DataTypes,
-  HasManyAddAssociationMixin,
-  HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
-  HasManyHasAssociationMixin,
-  HasManyHasAssociationsMixin,
   Model,
   Optional,
   Sequelize,
 } from 'sequelize';
 import { Ctf } from './Ctf';
 import { initTeam, Team } from './Team';
-import { Category } from './Category';
 import { CategoryChannel } from './CategoryChannel';
 import { ChallengeChannel } from './ChallengeChannel';
 
@@ -59,10 +52,10 @@ export class TeamServer
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  declare getCTF: BelongsToGetAssociationMixin<Ctf>;
-  // declare setCTF: BelongsToSetAssociationMixin<CTF, number>;
-  // declare createCTF: BelongsToCreateAssociationMixin<CTF>;
-  declare readonly CTF?: Ctf;
+  declare getCtf: BelongsToGetAssociationMixin<Ctf>;
+  // declare setCtf: BelongsToSetAssociationMixin<Ctf, number>;
+  // declare createCtf: BelongsToCreateAssociationMixin<Ctf>;
+  declare readonly Ctf?: Ctf;
 
   // declare getTeams: HasManyGetAssociationsMixin<Team>;
   // declare countTeams: HasManyCountAssociationsMixin;

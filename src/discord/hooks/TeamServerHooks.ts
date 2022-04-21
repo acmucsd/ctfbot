@@ -17,7 +17,7 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
-  const ctf = await teamServer.getCTF({ attributes: ['name', 'guildSnowflake'] });
+  const ctf = await teamServer.getCtf({ attributes: ['name', 'guildSnowflake'] });
   const ctfGuild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!ctfGuild) throw createDiscordNullError('guildSnowflake');
 
@@ -74,7 +74,7 @@ export async function destroyTeamServer(teamServer: TeamServer, client: Client<t
   const challengeChannels = await teamServer.getChallengeChannels();
   await Promise.all(challengeChannels.map((chan) => chan.destroy()));
 
-  const ctf = await teamServer.getCTF({ attributes: ['name', 'guildSnowflake'] });
+  const ctf = await teamServer.getCtf({ attributes: ['name', 'guildSnowflake'] });
   const ctfGuild = await client.guilds.fetch(ctf.guildSnowflake);
   if (!ctfGuild) throw createDiscordNullError('guildSnowflake');
 

@@ -10,7 +10,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
     attributes: ['name'],
     include: { model: Ctf, attributes: ['guildSnowflake'] },
   });
-  if (!category.CTF) throw new Error('unexpected null ctf');
+  if (!category.ctf) throw new Error('unexpected null ctf');
 
   const challengeMessage = new MessageEmbed();
   challengeMessage.setTitle(challenge.name);
@@ -21,7 +21,7 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
 
   // const attachments = await this.getAllAttachments();
   // attachments.forEach((attachment) => challengeMessage.addField(attachment.row.name, attachment.row.url));
-  const guild = await client.guilds.fetch(category.CTF.guildSnowflake);
+  const guild = await client.guilds.fetch(category.ctf.guildSnowflake);
 
   // complicated nested query to fetch the associated first blood user and team, if defined
   // todo: needs to actually get first blood, ordering is kinda screwy

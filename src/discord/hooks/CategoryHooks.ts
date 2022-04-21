@@ -5,12 +5,12 @@ import { Client } from 'discord.js';
 import { CategoryChannel } from '../../database/models/CategoryChannel';
 
 export async function refreshAllCategories(teamServer: TeamServer, client: Client<true>) {
-  const ctf = await teamServer.getCTF({ include: Category });
+  const ctf = await teamServer.getCtf({ include: Category });
   if (ctf.Categories) await Promise.all(ctf.Categories.map((cat) => refreshCategory(cat, client)));
 }
 
 export async function refreshCategory(category: Category, client: Client<true>) {
-  const ctf = await category.getCTF({
+  const ctf = await category.getCtf({
     attributes: [],
     where: { '$TeamServers.CategoryChannels.id$': null },
     include: {

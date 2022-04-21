@@ -212,7 +212,7 @@ export async function getCTFByGuildContext(guild: Guild) {
     include: { model: Ctf, required: true },
   });
 
-  return teamServer?.CTF;
+  return teamServer?.Ctf;
 }
 
 export async function getChallengeByInteraction(interaction: PopulatedCommandInteraction) {

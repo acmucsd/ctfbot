@@ -11,7 +11,7 @@ export default {
     const teamServer = await TeamServer.findOne({ where: { guildSnowflake: interaction.guild.id } });
     if (!teamServer) throw Error('this guild does not belong to any CTF as a team server');
 
-    const ctf = await teamServer.getCTF();
+    const ctf = await teamServer.getCtf();
 
     const { name } = teamServer;
     await teamServer.destroy();
