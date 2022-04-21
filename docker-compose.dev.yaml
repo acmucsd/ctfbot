@@ -5,27 +5,30 @@ services:
     environment:
       POSTGRES_PASSWORD: "${PGPASSWORD}"
       POSTGRES_USER: ctfbot
+    ports:
+      - "5432:5432"
     volumes:
       - ctfbot-db:/var/lib/postgresql/data
     networks:
       - redash-sources
       - ctfbot-net
-  ctfbot:
-    restart: always
-    depends_on:
-      - ctfbot-db
-    build:
-      context: .
-    environment:
-      DISCORD_TOKEN: "${DISCORD_TOKEN}"
-      PGPASSWORD: "${PGPASSWORD}"
-      PGUSER: "ctfbot"
-      PGHOST: "ctfbot-db"
-    volumes:
-      - ./:/app
-    command: npm run start
-    networks:
-      - ctfbot-net
+### depending on your platform, you might be better off just running ctfbot outside of its docker container for development
+#  ctfbot:
+#    restart: always
+#    depends_on:
+#      - ctfbot-db
+#    build:
+#      context: .
+#    environment:
+#      DISCORD_TOKEN: "${DISCORD_TOKEN}"
+#      PGPASSWORD: "${PGPASSWORD}"
+#      PGUSER: "ctfbot"
+#      PGHOST: "ctfbot-db"
+#    volumes:
+#      - ./:/app
+#    command: npm run start
+#    networks:
+#      - ctfbot-net
 networks:
   ctfbot-net:
     driver: bridge
