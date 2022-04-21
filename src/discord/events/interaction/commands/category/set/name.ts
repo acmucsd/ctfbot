@@ -1,6 +1,6 @@
 import { ExecutableSubCommandData, PopulatedCommandInteraction } from '../../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { getCTFByGuildContext } from '../../../../../util/ResourceManager';
+import { getCtfByGuildContext } from '../../../../../util/ResourceManager';
 import { createDiscordNullError } from '../../../../../../errors/DiscordNullError';
 
 export default {
@@ -22,7 +22,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await getCTFByGuildContext(interaction.guild);
+    const ctf = await getCtfByGuildContext(interaction.guild);
     if (!ctf) throw createDiscordNullError('ctf');
 
     const categoryName = interaction.options.getString('category_name', true);

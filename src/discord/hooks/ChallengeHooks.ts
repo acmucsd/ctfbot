@@ -17,7 +17,7 @@ export async function refreshAllChallenges(teamServer: TeamServer, client: Clien
 export async function refreshChallenge(challenge: Challenge, client: Client<true>) {
   const category = await challenge.getCategory({
     attributes: ['id'],
-    where: { '$CTF.TeamServers.ChallengeChannels.id$': null },
+    where: { '$Ctf.TeamServers.ChallengeChannels.id$': null },
     include: [
       {
         model: Ctf,

@@ -1,6 +1,6 @@
 import { PopulatedCommandInteraction } from '../../interaction';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
-import { getCTFByGuildContext } from '../../../../util/ResourceManager';
+import { getCtfByGuildContext } from '../../../../util/ResourceManager';
 import { Challenge } from '../../../../../database/models/Challenge';
 
 export default {
@@ -16,7 +16,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await getCTFByGuildContext(interaction.guild);
+    const ctf = await getCtfByGuildContext(interaction.guild);
     if (!ctf) throw new Error('this server is not associated with a CTF');
 
     const name = interaction.options.getString('name');

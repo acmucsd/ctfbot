@@ -202,7 +202,7 @@ export async function setChannelContent(client: Client<true>, channel: TextChann
   while (botMessages.length > 0) await botMessages.pop()?.delete();
 }
 
-export async function getCTFByGuildContext(guild: Guild) {
+export async function getCtfByGuildContext(guild: Guild) {
   const ctf = await Ctf.findOne({ where: { guildSnowflake: guild.id } });
   if (ctf) return ctf;
 

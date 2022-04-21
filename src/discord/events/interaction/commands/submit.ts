@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
-import { getCTFByGuildContext } from '../../../util/ResourceManager';
+import { getCtfByGuildContext } from '../../../util/ResourceManager';
 
 export default {
   name: 'submit',
@@ -15,7 +15,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await getCTFByGuildContext(interaction.guild);
+    const ctf = await getCtfByGuildContext(interaction.guild);
     if (!ctf) throw new Error('this guild does not belong to a ctf');
 
     const flag = ctf.getFlag(interaction.options.getString('flag', true));
