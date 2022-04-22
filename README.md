@@ -1,5 +1,6 @@
 # ctfbot
-Discord bot to facilitate an entire Capture the Flag competition internally. Official CTF platform of [San Diego CTF](https://sdc.tf).
+Discord bot to facilitate an entire Capture the Flag competition internally.
+Official CTF platform of [San Diego CTF](https://sdc.tf).
 
 ## disclaimer
 
@@ -38,11 +39,34 @@ DISCORD_TOKEN=yourtoken
 PGPASSWORD=somethingrandom
 ```
 
-The recommended way to run the project is with docker / [docker-compose](https://docs.docker.com/compose/). Make sure you have those installed.
+The recommended way to run the project is with docker / [docker-compose](https://docs.docker.com/compose/).
+Make sure you have those installed.
 Once installed, you should be able to do `docker-compose up` and everything *should* kinda work. 
 
 Currently, if you want to run the project in development mode (to see changes live), you'll need to run it outside of docker.
 See [CONTRIBUTING](./CONTRIBUTING.md#running-the-project-for-development) for more information.
+
+## redash
+
+This project also comes with a `docker-compose.redash.yaml` that will launch a local instance of [Redash](https://redash.io)
+that can then be connected to the bot database for both ease of development and monitoring in production.
+Doing this is **highly recommended**, it has a lot of value.
+
+You'll need to add the following environment variables to your `.env` file:
+```dotenv
+REDASH_COOKIE_SECRET=long_secret_of_your_choice
+REDASH_SECRET_KEY=long_secret_of_your_choice
+```
+
+Then, you can initialize the Redash database and launch the redash instance with:
+```bash
+docker-compose -f ./docker-compose.redash.yaml -p redash run --rm server create_db
+docker-compose -f ./docker-compose.redash.yaml -p redash up -d
+```
+
+Then, you can access the Redash server on localhost port 80. When you do so,
+you can set up the admin account and connect it to the bot database by using the hostname
+`ctfbot-db` and the credentials you create in your `.env` file.
 
 ## admin flow
 

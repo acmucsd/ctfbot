@@ -140,7 +140,7 @@ You can spin up a dev postgres server that the development version can connect t
 with the following command:
 
 ```bash
-docker run --name ctfbot-postgres -p 5432:5432 -e POSTGRES_PASSWORD=dAf1bjOwYUrVse8DsAZZBh2fkxXQwAbGrmE7EHUA -e POSTGRES_USER=ctfbot -d postgres
+docker-compose -f ./docker-compose.dev.yaml up -d
 ```
 
 From here, you'll need [node-gyp installed](https://github.com/nodejs/node-gyp#installation) and all the build tools to compile native bindings.
