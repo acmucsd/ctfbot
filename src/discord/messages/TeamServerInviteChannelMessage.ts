@@ -15,9 +15,11 @@ export async function setTeamServerInviteChannelMessage(
   infoMessage.setColor('#50c0bf');
 
   infoMessage.description = `Your dedicated CTF environment is **${teamServer.name}**.
-   Please join using the following invite to participate and access the challenges.
-   https://discord.gg/${teamServer.serverInvite}
+   Please join using the above invite to participate and access the challenges.
    `;
 
-  await setChannelContent(client, channel, infoMessage);
+  await setChannelContent(client, channel, {
+    content: `https://discord.gg/${teamServer.serverInvite}`,
+    embeds: [infoMessage],
+  });
 }
