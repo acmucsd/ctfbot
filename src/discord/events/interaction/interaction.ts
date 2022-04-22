@@ -15,6 +15,8 @@ import setname from './commands/setname';
 import standing from './commands/standing';
 import { createCommandNotFoundError } from '../../../errors/CommandInteractionError';
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
+import { handleButtonInteraction } from './buttons';
+import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
@@ -51,12 +53,7 @@ const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandl
   return commandDefinition.execute;
 };
 
-// handler for interaction events
-export const interactionEvent = async (interaction: Interaction) => {
-  // for now, we're only interested in ApplicationCommands that occur in a Guild and are of the type 'CHAT_INPUT'
-  if (!interaction.isCommand()) return;
-  if (!interaction.inCachedGuild()) return;
-
+const handleCommandInteraction = async (interaction: CommandInteraction<'cached'>) => {
   try {
     // send that we're loading the response to this, but we aren't ready to send it.
     await interaction.deferReply({ ephemeral: true });
@@ -78,21 +75,19 @@ export const interactionEvent = async (interaction: Interaction) => {
         }),
       ],
     });
-  } catch (_e) {
-    logger.error(_e);
-    // pretty print errors B)
-    const e = _e as Error;
-    await interaction
-      .editReply({
-        embeds: [
-          embedify({
-            description: e.message ?? 'Unknown cause',
-            title: e.name ?? 'Error',
-            footer: e.stack?.split('\n')[1],
-          }),
-        ],
-      })
-      .catch(() => logger.error('failed to respond with error code, the original channel was probably deleted'));
+  } catch (e) {
+    await sendErrorMessageForInteraction(interaction, e as Error);
+  }
+};
+
+// handler for interaction events
+export const interactionEvent = async (interaction: Interaction) => {
+  // for now, we're not interested in interactions that do not occur in a cached guild
+  if (!interaction.inCachedGuild()) return;
+  if (interaction.isCommand()) {
+    await handleCommandInteraction(interaction);
+  } else if (interaction.isButton()) {
+    await handleButtonInteraction(interaction);
   }
 };
 

@@ -10,6 +10,8 @@ import { initTeamServer, TeamServer } from './TeamServer';
 import { Category, initCategory } from './Category';
 import { Challenge } from './Challenge';
 import { Flag } from './Flag';
+import { Team } from './Team';
+import { User } from './User';
 
 interface CtfAttributes {
   id: number;
@@ -83,6 +85,48 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   declare readonly TeamServers?: TeamServer[];
+
+  // this query gets the team server with the least number of teams on it
+  async getMostEmptyTeamServer(): Promise<TeamServer> {
+    const teamServers = await this.getTeamServers({
+      group: ['TeamServer.id'],
+      order: [[Sequelize.fn('COUNT', Sequelize.col('Teams.*')), 'ASC']],
+      // because sequelize is well and truly braindead, we can't limit this to the top result we care about
+      // limit: 1,
+      include: [
+        {
+          attributes: [],
+          model: Team,
+        },
+      ],
+    });
+    if (teamServers.length === 0) throw new Error('no team servers found');
+    return teamServers[0];
+  }
+
+  async hasUser(userSnowflake: string): Promise<boolean> {
+    const teamServers = await this.getTeamServers({
+      attributes: ['id'],
+      include: [
+        {
+          model: Team,
+          attributes: ['id'],
+          required: true,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'userSnowflake'],
+              required: true,
+              where: {
+                userSnowflake,
+              },
+            },
+          ],
+        },
+      ],
+    });
+    return teamServers.length > 0;
+  }
 
   // returns the flag that matches, or nothing
   async getFlag(flagText: string): Promise<Flag | undefined> {

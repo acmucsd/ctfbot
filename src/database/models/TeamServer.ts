@@ -1,6 +1,7 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
+  HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
   Model,
   Optional,
@@ -66,7 +67,7 @@ export class TeamServer
   // declare addTeams: HasManyAddAssociationsMixin<Team, number>;
   // declare removeTeam: HasManyRemoveAssociationMixin<Team, number>;
   // declare removeTeams: HasManyRemoveAssociationsMixin<Team, number>;
-  // declare createTeam: HasManyCreateAssociationMixin<Team>;
+  declare createTeam: HasManyCreateAssociationMixin<Team>;
   declare readonly Teams?: Team[];
 
   declare getCategoryChannels: HasManyGetAssociationsMixin<CategoryChannel>;

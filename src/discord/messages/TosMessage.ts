@@ -6,7 +6,7 @@ export async function setTosMessage(client: Client<true>, channel: TextChannel, 
   // todo: json-schema verify this before parsing
   const embeds = JSON.parse(ctf.tosMessage) as MessageEmbed[];
   const row = new MessageActionRow().addComponents(
-    new MessageButton().setCustomId('tos-agree').setLabel('I Understand and Agree').setStyle('PRIMARY'),
+    new MessageButton().setCustomId('tosAgree').setLabel('I Understand and Agree').setStyle('PRIMARY'),
   );
 
   const fullMessage: MessageOptions = {

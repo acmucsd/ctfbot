@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { DataTypes, HasManyCreateAssociationMixin, Model, Optional, Sequelize } from 'sequelize';
 import { TeamServer } from './TeamServer';
 import { initUser, User } from './User';
 
@@ -32,7 +32,7 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   // declare addUsers: HasManyAddAssociationsMixin<User, number>;
   // declare removeUser: HasManyRemoveAssociationMixin<User, number>;
   // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
-  // declare createUser: HasManyCreateAssociationMixin<User>;
+  declare createUser: HasManyCreateAssociationMixin<User>;
   declare readonly Users?: User[];
 }
 

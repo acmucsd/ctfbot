@@ -2,8 +2,11 @@ import crypto from 'crypto';
 import {
   CategoryChannel,
   Client,
+  CommandInteraction,
   Guild,
   GuildBasedChannel,
+  Interaction,
+  MessageComponentInteraction,
   MessageEmbed,
   MessageOptions,
   PermissionResolvable,
@@ -19,7 +22,7 @@ import { TeamServer } from '../../database/models/TeamServer';
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { Challenge } from '../../database/models/Challenge';
 import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
-import { logger } from '../../log';
+import { embedify, logger } from '../../log';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -242,4 +245,21 @@ export async function getChallengeByChannelContext(channel: GuildBasedChannel | 
   });
   if (!challengeChannel || !challengeChannel.Challenge) throw new UnknownChallengeError();
   return challengeChannel.Challenge;
+}
+
+export async function sendErrorMessageForInteraction(
+  interaction: MessageComponentInteraction | CommandInteraction,
+  e: Error,
+) {
+  await interaction
+    .editReply({
+      embeds: [
+        embedify({
+          description: e.message ?? 'Unknown cause',
+          title: e.name ?? 'Error',
+          footer: e.stack?.split('\n')[1],
+        }),
+      ],
+    })
+    .catch(() => logger.error('failed to respond with error code, the original channel was probably deleted'));
 }

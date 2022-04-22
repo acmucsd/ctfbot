@@ -7,7 +7,7 @@ interface UserAttributes {
   userSnowflake: string;
 }
 
-type UserCreationAttributes = Optional<UserAttributes, 'id' | 'userSnowflake'>;
+type UserCreationAttributes = Optional<UserAttributes, 'id'>;
 
 export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare id: number;
@@ -44,7 +44,6 @@ export function initUser(sequelize: Sequelize) {
       },
       userSnowflake: {
         type: DataTypes.STRING,
-        defaultValue: '',
         allowNull: false,
       },
     },
