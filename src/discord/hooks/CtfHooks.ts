@@ -10,7 +10,7 @@ import {
   destroyRoles,
   registerGuildCommandsIfChanged,
 } from '../util/ResourceManager';
-import { setTOSMessage } from '../messages/TOSMessage';
+import { setTosMessage } from '../messages/TosMessage';
 
 export async function refreshCtf(ctf: Ctf, client: Client<true>) {
   const guild = await client.guilds.fetch(ctf.guildSnowflake);
@@ -51,7 +51,7 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
 
   // set TOS message WARNING: this is an unsafe operation
   console.log('proof');
-  await setTOSMessage(client, tosChannel, ctf);
+  await setTosMessage(client, tosChannel, ctf);
 
   // create scoreboard channel
   const scoreboardChannel = await createTextChannelOrFetchIfExists(
