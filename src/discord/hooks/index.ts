@@ -12,6 +12,8 @@ import { destroyChallenge, refreshAllChallenges, refreshChallenge } from './Chal
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { destroyChallengeChannel, refreshChallengeChannel } from './ChallengeChannelHooks';
 import { Flag } from '../../database/models/Flag';
+import { destroyTeam, refreshTeam } from './TeamHooks';
+import { Team } from '../../database/models/Team';
 
 export async function initHooks(client: Client<true>) {
   Ctf.beforeCreate((ctf) =>
@@ -65,6 +67,10 @@ export async function initHooks(client: Client<true>) {
   Flag.afterDestroy((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
 
   // TODO: after a flag gets captured, we queue up a periodic refresh
+
+  Team.beforeCreate((team) => refreshTeam(team, client));
+  Team.beforeUpdate((team) => refreshTeam(team, client));
+  Team.beforeDestroy((team) => destroyTeam(team, client));
 
   // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
   const ctfs = await Ctf.findAll();

@@ -3,6 +3,7 @@ import { logger } from '../../log';
 import { interactionEvent, registerCommands } from './interaction/interaction';
 import rateLimitEvent from './rateLimit';
 import { initHooks } from '../hooks';
+import { handleGuildMemberAdd } from './guildMemberAdd';
 
 export const eventLoader = (client: Client) => {
   client.on('ready', async (client) => {
@@ -11,13 +12,7 @@ export const eventLoader = (client: Client) => {
     await initHooks(client);
     //initializePeriodicUpdate(client);
 
-    // todo: we need to change these from reaction listeners to message components
-    //void initializeReactionListeners();
-
-    // client.on('message', (message) => void MessageEvent(message));
-    // client.on('messageReactionAdd', (reaction, user) => void messageReactionAddEvent(reaction, user));
-    // client.on('guildMemberAdd', (member) => void guildMemberAddEvent(member));
-    // client.on('guildMemberRemove', (member) => guildMemberRemoveEvent(member));
+    client.on('guildMemberAdd', (member) => handleGuildMemberAdd(member, client));
     client.on('rateLimit', (rateLimitInfo) =>
       rateLimitEvent(rateLimitInfo.timeout, rateLimitInfo.limit, rateLimitInfo.method, rateLimitInfo.path),
     );

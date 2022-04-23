@@ -33,7 +33,7 @@ export default {
       name,
       guildSnowflake: interaction.guild.id,
       adminRoleSnowflake: ctf.adminRoleSnowflake,
-      participantRoleSnowflake: ctf.participantRoleSnowflake,
+      participantRoleSnowflake: '',
     });
 
     return `Added Team Server **${newTeamServer.name}** to CTF **${ctf.name}**`;

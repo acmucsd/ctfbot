@@ -1,4 +1,12 @@
-import { DataTypes, HasManyCreateAssociationMixin, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  DataTypes,
+  HasManyCreateAssociationMixin,
+  HasManyGetAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { TeamServer } from './TeamServer';
 import { initUser, User } from './User';
 
@@ -18,12 +26,12 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getTeamServer: BelongsToGetAssociationMixin<TeamServer>;
+  declare getTeamServer: BelongsToGetAssociationMixin<TeamServer>;
   // declare setTeamServer: BelongsToSetAssociationMixin<TeamServer, number>;
   // declare createTeamServer: BelongsToCreateAssociationMixin<TeamServer>;
   declare readonly TeamServer?: TeamServer;
 
-  // declare getUsers: HasManyGetAssociationsMixin<User>;
+  declare getUsers: HasManyGetAssociationsMixin<User>;
   // declare countUsers: HasManyCountAssociationsMixin;
   // declare hasUser: HasManyHasAssociationMixin<User, number>;
   // declare hasUsers: HasManyHasAssociationsMixin<User, number>;

@@ -23,7 +23,6 @@ interface CtfAttributes {
   endDate?: Date;
   // discord stuff to be defined later
   adminRoleSnowflake: string;
-  participantRoleSnowflake: string;
   announcementsChannelSnowflake: string;
   scoreboardChannelSnowflake: string;
   tosChannelSnowflake: string;
@@ -37,7 +36,6 @@ type CtfCreationAttributes = Optional<
   | 'startDate'
   | 'endDate'
   | 'adminRoleSnowflake'
-  | 'participantRoleSnowflake'
   | 'announcementsChannelSnowflake'
   | 'scoreboardChannelSnowflake'
   | 'tosChannelSnowflake'
@@ -52,7 +50,6 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   declare startDate?: Date;
   declare endDate?: Date;
   declare adminRoleSnowflake: string;
-  declare participantRoleSnowflake: string;
   declare announcementsChannelSnowflake: string;
   declare scoreboardChannelSnowflake: string;
   declare tosChannelSnowflake: string;
@@ -173,11 +170,6 @@ export function initCtf(sequelize: Sequelize) {
       startDate: DataTypes.DATE,
       endDate: DataTypes.DATE,
       adminRoleSnowflake: {
-        type: DataTypes.STRING,
-        defaultValue: '',
-        allowNull: false,
-      },
-      participantRoleSnowflake: {
         type: DataTypes.STRING,
         defaultValue: '',
         allowNull: false,

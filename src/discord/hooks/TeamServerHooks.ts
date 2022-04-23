@@ -59,7 +59,7 @@ export async function refreshTeamServer(teamServer: TeamServer, client: Client<t
   await setTeamServerInviteChannelMessage(client, inviteChannel, ctf, teamServer);
 
   // register guild commands
-  await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
+  await registerGuildCommandsIfChanged(client, guild, adminRole, participantRole);
 }
 
 export async function destroyTeamServer(teamServer: TeamServer, client: Client<true>) {
@@ -73,6 +73,10 @@ export async function destroyTeamServer(teamServer: TeamServer, client: Client<t
   // destroy dependant challenge channels first
   const challengeChannels = await teamServer.getChallengeChannels();
   await Promise.all(challengeChannels.map((chan) => chan.destroy()));
+
+  // destroy dependant teams
+  const teams = await teamServer.getTeams();
+  await Promise.all(teams.map((team) => team.destroy()));
 
   const ctf = await teamServer.getCtf({ attributes: ['name', 'guildSnowflake'] });
   const ctfGuild = await client.guilds.fetch(ctf.guildSnowflake);

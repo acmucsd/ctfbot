@@ -1,5 +1,6 @@
 import { ButtonInteraction } from 'discord.js';
 import { getCtfByGuildContext } from '../../../util/ResourceManager';
+import { refreshTeam } from '../../../hooks/TeamHooks';
 
 export default async function handleTosAgree(interaction: ButtonInteraction<'cached'>): Promise<string> {
   // first, detect the CTF
@@ -18,5 +19,9 @@ export default async function handleTosAgree(interaction: ButtonInteraction<'cac
 
   // next, we create a new user and add them to the team
   await team.createUser({ userSnowflake: interaction.user.id });
+
+  // one last refresh on the team to get user added
+  await refreshTeam(team, interaction.client);
+
   return `You have been successfully added to team server <#${teamServer.inviteChannelSnowflake}>.`;
 }

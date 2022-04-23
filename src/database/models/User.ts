@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Team } from './Team';
 import { initInvite, Invite } from './Invite';
 
@@ -16,7 +16,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
 
-  // declare getTeam: BelongsToGetAssociationMixin<Team>;
+  declare getTeam: BelongsToGetAssociationMixin<Team>;
   // declare setTeam: BelongsToSetAssociationMixin<Team, number>;
   // declare createTeam: BelongsToCreateAssociationMixin<Team>;
   declare readonly Team?: Team;

@@ -20,13 +20,9 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
   const adminRole = await createRoleOrFetchIfExists(guild, ctf.adminRoleSnowflake, 'CTF Admin');
   ctf.adminRoleSnowflake = adminRole.id;
 
-  // create participant role
-  const participantRole = await createRoleOrFetchIfExists(guild, ctf.participantRoleSnowflake, 'Participant');
-  ctf.participantRoleSnowflake = participantRole.id;
-
   // register commands
   // TODO: take into account startDate and endDate when setting command permissions
-  await registerGuildCommandsIfChanged(client, guild, participantRole, adminRole);
+  await registerGuildCommandsIfChanged(client, guild, adminRole);
 
   // create info category
   const infoCategory = await createCategoryChannelOrFetchIfExists(guild, ctf.infoCategorySnowflake, 'INFO');
@@ -50,7 +46,6 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
   ctf.tosChannelSnowflake = tosChannel.id;
 
   // set TOS message WARNING: this is an unsafe operation
-  console.log('proof');
   await setTosMessage(client, tosChannel, ctf);
 
   // create scoreboard channel
@@ -78,7 +73,7 @@ export async function destroyCtf(ctf: Ctf, client: Client<true>) {
   await Promise.all(teamServers.map((ts) => ts.destroy()));
 
   // delete all the roles and channels
-  await destroyRoles(guild, ctf.adminRoleSnowflake, ctf.participantRoleSnowflake);
+  await destroyRoles(guild, ctf.adminRoleSnowflake);
   await destroyChannels(
     guild,
     ctf.infoCategorySnowflake,

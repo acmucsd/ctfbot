@@ -58,7 +58,7 @@ export class TeamServer
   // declare createCtf: BelongsToCreateAssociationMixin<Ctf>;
   declare readonly Ctf?: Ctf;
 
-  // declare getTeams: HasManyGetAssociationsMixin<Team>;
+  declare getTeams: HasManyGetAssociationsMixin<Team>;
   // declare countTeams: HasManyCountAssociationsMixin;
   // declare hasTeam: HasManyHasAssociationMixin<Team, number>;
   // declare hasTeams: HasManyHasAssociationsMixin<Team, number>;

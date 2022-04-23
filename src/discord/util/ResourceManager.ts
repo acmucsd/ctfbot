@@ -5,15 +5,16 @@ import {
   CommandInteraction,
   Guild,
   GuildBasedChannel,
-  Interaction,
   MessageComponentInteraction,
   MessageEmbed,
   MessageOptions,
   PermissionResolvable,
   Permissions,
   Role,
+  RoleResolvable,
   Snowflake,
   TextChannel,
+  UserResolvable,
 } from 'discord.js';
 import { adminCommands, PopulatedCommandInteraction, userCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
@@ -56,20 +57,28 @@ export async function createTextChannelOrFetchIfExists(
     permissionOverwrites[role].allow = [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ADD_REACTIONS];
   }
 
-  // create the channel if it doesn't exist
+  const finalPermissionOverwrites = Object.entries(permissionOverwrites).map(([id, overwrite]) => ({
+    ...overwrite,
+    id,
+  }));
+
   if (snowflake) {
     const textChannel = (await guild.channels.fetch(snowflake)) as TextChannel;
     if (textChannel) {
       if (textChannel.name !== name) await textChannel.setName(name);
+      // overly simple check to avoid unnecessarily setting permissions
+      if (textChannel.permissionOverwrites.cache.size !== finalPermissionOverwrites.length)
+        await textChannel.permissionOverwrites.set(finalPermissionOverwrites);
 
       return textChannel;
     }
   }
 
+  // create the channel if it doesn't exist
   return await guild.channels.create(name, {
     type: 'GUILD_TEXT',
     parent: options.parent,
-    permissionOverwrites: Object.entries(permissionOverwrites).map(([id, overwrite]) => ({ ...overwrite, id })),
+    permissionOverwrites: finalPermissionOverwrites,
   });
 }
 
@@ -129,8 +138,8 @@ export async function destroyRegisteredGuildCommands(guild: Guild) {
 export async function registerGuildCommandsIfChanged(
   client: Client<true>,
   guild: Guild,
-  userRole: Role,
   adminRole: Role,
+  userRole?: Role,
 ) {
   // hash of currently registered commands in this guild
   if (guild.commands.cache.size === 0) await guild.commands.fetch();
@@ -149,7 +158,7 @@ export async function registerGuildCommandsIfChanged(
 
   // hash of internal commands that we want registered in this guild
   const internalCommandsHash = crypto.createHash('sha256');
-  [...userCommands, ...adminCommands]
+  (userRole ? [...userCommands, ...adminCommands] : adminCommands)
     .map(
       (com) =>
         `${com.name} ${
@@ -163,7 +172,7 @@ export async function registerGuildCommandsIfChanged(
     .forEach((comName) => internalCommandsHash.update(comName));
 
   const hasAdminRole = await guild.commands.cache.first()?.permissions.has({ permissionId: adminRole });
-  const hasUserRole = await guild.commands.cache.first()?.permissions.has({ permissionId: userRole });
+  const hasUserRole = userRole && (await guild.commands.cache.first()?.permissions.has({ permissionId: userRole }));
 
   if (
     // if command roles have gotten desync'd
@@ -181,7 +190,7 @@ export async function registerGuildCommandsIfChanged(
       id: com.id,
       permissions: [
         {
-          id: userCommands.find((ucom) => ucom.name === com.name) ? userRole.id : adminRole.id,
+          id: userCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
           type: ApplicationCommandPermissionTypes.ROLE,
           permission: true,
         },
@@ -262,4 +271,10 @@ export async function sendErrorMessageForInteraction(
       ],
     })
     .catch(() => logger.error('failed to respond with error code, the original channel was probably deleted'));
+}
+
+export async function ensureUsersHaveRolesOnGuild(users: Snowflake[], roles: Snowflake[], guild: Guild) {
+  await guild.members.fetch({ user: users });
+  const usersInGuild = users.filter((us) => guild.members.cache.has(us));
+  await Promise.all(usersInGuild.map((u) => guild.members.cache.get(u)?.roles.set(roles)));
 }
