@@ -56,7 +56,12 @@ export async function createTextChannelOrFetchIfExists(
   // add writeRole perms
   for (const role of options.writeRoles) {
     permissionOverwrites[role] = permissionOverwrites[role] || {};
-    permissionOverwrites[role].allow = [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.ADD_REACTIONS];
+    permissionOverwrites[role].allow = [
+      // in case we already had allowed read roles
+      ...(permissionOverwrites[role].allow || []),
+      Permissions.FLAGS.SEND_MESSAGES,
+      Permissions.FLAGS.ADD_REACTIONS,
+    ];
   }
 
   const finalPermissionOverwrites = Object.entries(permissionOverwrites).map(([id, overwrite]) => ({
