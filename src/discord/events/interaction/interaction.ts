@@ -5,6 +5,7 @@ import {
   Client,
   CommandInteraction,
   Interaction,
+  UserContextMenuInteraction,
 } from 'discord.js';
 import { category, challenge, ctf } from './commands';
 import { embedify, logger } from '../../../log';
@@ -17,15 +18,16 @@ import { createCommandNotFoundError } from '../../../errors/CommandInteractionEr
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { handleButtonInteraction } from './buttons';
 import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
+import { handleUserInteraction } from './userCommands';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
 export const adminCommands: ChatInputCommandDefinition[] = [ctf, category, challenge];
-export const userCommands: ChatInputCommandDefinition[] = [submit, setname, standing];
-const commands: ChatInputCommandDefinition[] = [...topLevelCommands, ...userCommands, ...adminCommands];
+export const participantCommands: ChatInputCommandDefinition[] = [submit, setname, standing];
+const chatCommands: ChatInputCommandDefinition[] = [...topLevelCommands, ...participantCommands, ...adminCommands];
 
 const getHandlerForInteraction = (interaction: CommandInteraction): CommandHandler => {
-  const definition = commands.find((def) => def.name === interaction.commandName);
+  const definition = chatCommands.find((def) => def.name === interaction.commandName);
   if (!definition || !definition) throw createCommandNotFoundError(interaction);
 
   // handle the case where its a root-level command
@@ -88,6 +90,8 @@ export const interactionEvent = async (interaction: Interaction) => {
     await handleCommandInteraction(interaction);
   } else if (interaction.isButton()) {
     await handleButtonInteraction(interaction);
+  } else if (interaction.isUserContextMenu()) {
+    await handleUserInteraction(interaction);
   }
 };
 

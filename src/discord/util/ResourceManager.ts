@@ -14,9 +14,10 @@ import {
   RoleResolvable,
   Snowflake,
   TextChannel,
+  UserContextMenuInteraction,
   UserResolvable,
 } from 'discord.js';
-import { adminCommands, PopulatedCommandInteraction, userCommands } from '../events/interaction/interaction';
+import { adminCommands, PopulatedCommandInteraction, participantCommands } from '../events/interaction/interaction';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { Ctf } from '../../database/models/Ctf';
 import { TeamServer } from '../../database/models/TeamServer';
@@ -141,6 +142,8 @@ export async function registerGuildCommandsIfChanged(
   adminRole: Role,
   userRole?: Role,
 ) {
+  // TODO: this function is currently god awful, please fix
+
   // hash of currently registered commands in this guild
   if (guild.commands.cache.size === 0) await guild.commands.fetch();
   const registeredCommandsHash = crypto.createHash('sha256');
@@ -158,7 +161,7 @@ export async function registerGuildCommandsIfChanged(
 
   // hash of internal commands that we want registered in this guild
   const internalCommandsHash = crypto.createHash('sha256');
-  (userRole ? [...userCommands, ...adminCommands] : adminCommands)
+  (userRole ? [...participantCommands, ...adminCommands] : adminCommands)
     .map(
       (com) =>
         `${com.name} ${
@@ -183,14 +186,14 @@ export async function registerGuildCommandsIfChanged(
     return;
 
   logger.info('detected change, setting guild commands');
-  await guild.commands.set(adminCommands.concat(userCommands));
+  await guild.commands.set(adminCommands.concat(participantCommands));
   // ensure only admins can use admin commands and users can use user commands
   await guild.commands.permissions.set({
     fullPermissions: guild.commands.cache.map((com) => ({
       id: com.id,
       permissions: [
         {
-          id: userCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
+          id: participantCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
           type: ApplicationCommandPermissionTypes.ROLE,
           permission: true,
         },
@@ -257,7 +260,7 @@ export async function getChallengeByChannelContext(channel: GuildBasedChannel | 
 }
 
 export async function sendErrorMessageForInteraction(
-  interaction: MessageComponentInteraction | CommandInteraction,
+  interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction,
   e: Error,
 ) {
   await interaction

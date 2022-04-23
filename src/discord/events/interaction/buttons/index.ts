@@ -31,6 +31,4 @@ export async function handleButtonInteraction(interaction: ButtonInteraction<'ca
   } catch (e) {
     await sendErrorMessageForInteraction(interaction, e as Error);
   }
-
-  // do something with result here (maybe an ephemeral message?)
 }
