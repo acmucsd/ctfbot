@@ -1,8 +1,9 @@
-import { UserContextMenuInteraction } from 'discord.js';
+import { ApplicationCommandData, UserContextMenuInteraction } from 'discord.js';
 import { sendErrorMessageForInteraction } from '../../../util/ResourceManager';
 import { embedify } from '../../../../log';
 import { handleInvite } from './invite';
 import { ApplicationCommandType } from 'discord-api-types/v10';
+import { ApplicationCommandTypes } from 'discord.js/typings/enums';
 
 const userInteractionHandlers: {
   [key: string]: (interaction: UserContextMenuInteraction<'cached'>) => Promise<string>;
@@ -31,7 +32,7 @@ export async function handleUserInteraction(interaction: UserContextMenuInteract
 }
 
 // this can be passed directly to command registration
-export const userContextMenuCommands = Object.keys(userInteractionHandlers).map((name) => ({
+export const userContextMenuCommands: ApplicationCommandData[] = Object.keys(userInteractionHandlers).map((name) => ({
   name,
-  type: ApplicationCommandType.User,
+  type: ApplicationCommandTypes.USER,
 }));

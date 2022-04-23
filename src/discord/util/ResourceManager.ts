@@ -25,6 +25,7 @@ import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { Challenge } from '../../database/models/Challenge';
 import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
 import { embedify, logger } from '../../log';
+import { userContextMenuCommands } from '../events/interaction/userCommands';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -142,51 +143,25 @@ export async function registerGuildCommandsIfChanged(
   adminRole: Role,
   userRole?: Role,
 ) {
-  // TODO: this function is currently god awful, please fix
+  // only include user commands if we were given a user role
+  const commandsToRegister = [...(userRole ? participantCommands : []), ...adminCommands, ...userContextMenuCommands];
 
-  // hash of currently registered commands in this guild
   if (guild.commands.cache.size === 0) await guild.commands.fetch();
-  const registeredCommandsHash = crypto.createHash('sha256');
-  guild.commands.cache
-    .filter((com) => com.applicationId === client.application.id)
-    .map(
-      (com) =>
-        `${com.name} ${com.options
-          .map((opt) => opt.name)
-          .sort()
-          .join('')}`,
-    )
-    .sort()
-    .forEach((comName) => registeredCommandsHash.update(comName));
 
-  // hash of internal commands that we want registered in this guild
-  const internalCommandsHash = crypto.createHash('sha256');
-  (userRole ? [...participantCommands, ...adminCommands] : adminCommands)
-    .map(
-      (com) =>
-        `${com.name} ${
-          com.options
-            ?.map((opt) => opt.name)
-            .sort()
-            .join('') ?? ''
-        }`,
-    )
-    .sort()
-    .forEach((comName) => internalCommandsHash.update(comName));
+  // only if every command we want to register has already been registered
+  const alreadyRegistered = commandsToRegister.every((com) =>
+    guild.commands.cache.find((appCom) => appCom.applicationId === client.application.id && appCom.name === com.name),
+  );
 
   const hasAdminRole = await guild.commands.cache.first()?.permissions.has({ permissionId: adminRole });
   const hasUserRole = userRole && (await guild.commands.cache.first()?.permissions.has({ permissionId: userRole }));
 
-  if (
-    // if command roles have gotten desync'd
-    (hasAdminRole || hasUserRole) &&
-    // if they don't need updating, don't update
-    registeredCommandsHash.digest('hex') === internalCommandsHash.digest('hex')
-  )
-    return;
+  // if command role permissions have gotten desync'd
+  // or if there are unregistered commands, update
+  if ((hasAdminRole || hasUserRole) && alreadyRegistered) return;
 
   logger.info('detected change, setting guild commands');
-  await guild.commands.set(adminCommands.concat(participantCommands));
+  await guild.commands.set(commandsToRegister);
   // ensure only admins can use admin commands and users can use user commands
   await guild.commands.permissions.set({
     fullPermissions: guild.commands.cache.map((com) => ({
