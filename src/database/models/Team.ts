@@ -1,14 +1,17 @@
 import {
   BelongsToGetAssociationMixin,
   DataTypes,
+  HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
+  HasManyRemoveAssociationMixin,
   Model,
   Optional,
   Sequelize,
 } from 'sequelize';
 import { TeamServer } from './TeamServer';
 import { initUser, User } from './User';
+import { Ctf } from './Ctf';
 
 interface TeamAttributes {
   id: number;
@@ -32,13 +35,13 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   declare readonly TeamServer?: TeamServer;
 
   declare getUsers: HasManyGetAssociationsMixin<User>;
-  // declare countUsers: HasManyCountAssociationsMixin;
+  declare countUsers: HasManyCountAssociationsMixin;
   // declare hasUser: HasManyHasAssociationMixin<User, number>;
   // declare hasUsers: HasManyHasAssociationsMixin<User, number>;
   // declare setUsers: HasManySetAssociationsMixin<User, number>;
   // declare addUser: HasManyAddAssociationMixin<User, number>;
   // declare addUsers: HasManyAddAssociationsMixin<User, number>;
-  // declare removeUser: HasManyRemoveAssociationMixin<User, number>;
+  declare removeUser: HasManyRemoveAssociationMixin<User, number>;
   // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
   declare createUser: HasManyCreateAssociationMixin<User>;
   declare readonly Users?: User[];

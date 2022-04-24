@@ -2,7 +2,9 @@ import { ButtonInteraction } from 'discord.js';
 import { getCtfByGuildContext } from '../../../util/ResourceManager';
 import { refreshTeam } from '../../../hooks/TeamHooks';
 
-export default async function handleTosAgree(interaction: ButtonInteraction<'cached'>): Promise<string> {
+export default async function handleTosAgree(interaction: ButtonInteraction): Promise<string> {
+  if (!interaction.inCachedGuild()) throw new Error('tos agreement somehow not in cached guild');
+
   // first, detect the CTF
   const ctf = await getCtfByGuildContext(interaction.guild);
   if (!ctf) throw new Error('this tos somehow does not belong to a ctf');

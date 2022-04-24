@@ -2,12 +2,14 @@ import handleTosAgree from './tosAgree';
 import { ButtonInteraction } from 'discord.js';
 import { sendErrorMessageForInteraction } from '../../../util/ResourceManager';
 import { embedify } from '../../../../log';
+import handleInviteAccept from './inviteAccept';
 
-const buttonHandlers: { [key: string]: (interaction: ButtonInteraction<'cached'>, id: string) => Promise<string> } = {
+const buttonHandlers: { [key: string]: (interaction: ButtonInteraction, id: string) => Promise<string> } = {
   tosAgree: handleTosAgree,
+  inviteAccept: handleInviteAccept,
 };
 
-export async function handleButtonInteraction(interaction: ButtonInteraction<'cached'>) {
+export async function handleButtonInteraction(interaction: ButtonInteraction) {
   // send that we're loading the response to this, but we aren't ready to send it.
   await interaction.deferReply({ ephemeral: true });
 

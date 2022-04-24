@@ -83,6 +83,39 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   declare readonly TeamServers?: TeamServer[];
 
+  // get the user and their respective team in this ctf by user snowflake
+  // throws an error if that user has not yet joined the ctf
+  async getTeamAndUserFromSnowflake(userSnowflake: string): Promise<{ user: User; team: Team }> {
+    const teamServers = await this.getTeamServers({
+      include: [
+        {
+          model: Team,
+          required: true,
+          include: [
+            {
+              model: User,
+              required: true,
+              where: {
+                userSnowflake,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    if (
+      teamServers.length === 0 ||
+      !teamServers[0].Teams ||
+      !teamServers[0].Teams[0] ||
+      !teamServers[0].Teams[0].Users ||
+      !teamServers[0].Teams[0].Users[0]
+    )
+      throw new Error('that user needs to join the CTF and agree to the terms of service');
+
+    return { team: teamServers[0].Teams[0], user: teamServers[0].Teams[0].Users[0] };
+  }
+
   // this query gets the team server with the least number of teams on it
   async getMostEmptyTeamServer(): Promise<TeamServer> {
     const teamServers = await this.getTeamServers({

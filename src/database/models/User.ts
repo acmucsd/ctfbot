@@ -1,4 +1,14 @@
-import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  BelongsToSetAssociationMixin,
+  DataTypes,
+  HasManyCountAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { Team } from './Team';
 import { initInvite, Invite } from './Invite';
 
@@ -17,12 +27,12 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare readonly updatedAt: Date;
 
   declare getTeam: BelongsToGetAssociationMixin<Team>;
-  // declare setTeam: BelongsToSetAssociationMixin<Team, number>;
+  declare setTeam: BelongsToSetAssociationMixin<Team, number>;
   // declare createTeam: BelongsToCreateAssociationMixin<Team>;
   declare readonly Team?: Team;
 
   // declare getInvites: HasManyGetAssociationsMixin<Invite>;
-  // declare countInvites: HasManyCountAssociationsMixin;
+  declare countInvites: HasManyCountAssociationsMixin;
   // declare hasInvite: HasManyHasAssociationMixin<Invite, number>;
   // declare hasInvites: HasManyHasAssociationsMixin<Invite, number>;
   // declare setInvites: HasManySetAssociationsMixin<Invite, number>;

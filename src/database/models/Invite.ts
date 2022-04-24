@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { BelongsToSetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { User } from './User';
 import { Team } from './Team';
 
@@ -19,14 +19,29 @@ export class Invite extends Model<InviteAttributes, InviteCreationAttributes> im
   // declare readonly updatedAt: Date;
 
   // declare getUser: BelongsToGetAssociationMixin<User>;
-  // declare setUser: BelongsToSetAssociationMixin<User, number>;
+  declare setUser: BelongsToSetAssociationMixin<User, number>;
   // declare createUser: BelongsToCreateAssociationMixin<User>;
   declare readonly User?: User;
 
   // declare getTeam: BelongsToGetAssociationMixin<Team>;
-  // declare setTeam: BelongsToSetAssociationMixin<Team, number>;
+  declare setTeam: BelongsToSetAssociationMixin<Team, number>;
   // declare createTeam: BelongsToCreateAssociationMixin<Team>;
   declare readonly Team?: Team;
+
+  static async getInviteByUserAndTeam(userSnowflake: string, teamId: number): Promise<Invite | null> {
+    return await Invite.findOne({
+      include: [
+        {
+          model: Team,
+          where: { id: teamId },
+        },
+        {
+          model: User,
+          where: { userSnowflake },
+        },
+      ],
+    });
+  }
 }
 
 export function initInvite(sequelize: Sequelize) {

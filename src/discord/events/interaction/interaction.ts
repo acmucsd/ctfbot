@@ -84,12 +84,16 @@ const handleCommandInteraction = async (interaction: CommandInteraction<'cached'
 
 // handler for interaction events
 export const interactionEvent = async (interaction: Interaction) => {
-  // for now, we're not interested in interactions that do not occur in a cached guild
+  if (interaction.isButton()) {
+    await handleButtonInteraction(interaction);
+    return;
+  }
+
+  // for now, we're not interested in other interactions that do not occur in a cached guild
   if (!interaction.inCachedGuild()) return;
+
   if (interaction.isCommand()) {
     await handleCommandInteraction(interaction);
-  } else if (interaction.isButton()) {
-    await handleButtonInteraction(interaction);
   } else if (interaction.isUserContextMenu()) {
     await handleUserInteraction(interaction);
   }

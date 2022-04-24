@@ -243,6 +243,7 @@ export async function sendErrorMessageForInteraction(
   interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction,
   e: Error,
 ) {
+  logger.error(e);
   await interaction
     .editReply({
       embeds: [
