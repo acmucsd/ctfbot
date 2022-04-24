@@ -4,6 +4,7 @@ import { Challenge } from '../../database/models/Challenge';
 import { Ctf } from '../../database/models/Ctf';
 import { User } from '../../database/models/User';
 import { Team } from '../../database/models/Team';
+import { format } from 'date-fns';
 
 export async function setChallengeMessage(client: Client<true>, channel: TextChannel, challenge: Challenge) {
   const category = await challenge.getCategory({
@@ -13,7 +14,14 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
   if (!category.Ctf) throw new Error('unexpected null ctf');
 
   const challengeMessage = new MessageEmbed();
-  challengeMessage.setTitle(challenge.name);
+
+  challengeMessage.setTitle(
+    challenge.publishTime
+      ? challenge.publishTime <= new Date()
+        ? challenge.name
+        : `${challenge.name} - Scheduled for ${format(challenge.publishTime, 'hh:mm:ss aa MMM do u')}`
+      : `(DRAFT) ${challenge.name}`,
+  );
   challengeMessage.setDescription(challenge.prompt);
   challengeMessage.setAuthor({ name: `${category.name} - ${challenge.difficulty}` });
   challengeMessage.setFooter({ text: `By ${challenge.author}` });

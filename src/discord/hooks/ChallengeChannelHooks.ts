@@ -8,7 +8,9 @@ import { setChallengeMessage } from '../messages/ChallengeMessage';
 import { TeamServer } from '../../database/models/TeamServer';
 
 export async function refreshChallengeChannel(challengeChannel: ChallengeChannel, client: Client<true>) {
-  const teamServer = await challengeChannel.getTeamServer({ attributes: ['id', 'guildSnowflake'] });
+  const teamServer = await challengeChannel.getTeamServer({
+    attributes: ['id', 'guildSnowflake', 'participantRoleSnowflake'],
+  });
   const guild = await client.guilds.fetch(teamServer.guildSnowflake);
   if (!guild) throw createDiscordNullError('teamServer.guildSnowflake');
 
@@ -32,9 +34,12 @@ export async function refreshChallengeChannel(challengeChannel: ChallengeChannel
     challenge.Category.CategoryChannels[0].channelSnowflake,
   )) as DiscordCategoryChannel;
 
+  const isPublished = challenge.publishTime && challenge.publishTime <= new Date();
+
   // create the actual channel for this challenge
   const channel = await createTextChannelOrFetchIfExists(guild, challengeChannel.channelSnowflake, challenge.name, {
     parent: categoryChannel,
+    readRoles: isPublished ? [teamServer.participantRoleSnowflake] : [],
   });
   challengeChannel.channelSnowflake = channel.id;
 

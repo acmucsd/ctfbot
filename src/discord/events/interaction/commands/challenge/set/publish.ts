@@ -23,7 +23,8 @@ export default {
   ],
   async execute(interaction: PopulatedCommandInteraction) {
     const challenge = await getChallengeByInteraction(interaction);
-    const newPublishTime = parse(interaction.options.getString('publish_time') ?? '', 'yyyy MM dd HH:mm', new Date());
+    const timeString = interaction.options.getString('publish_time');
+    const newPublishTime = timeString ? parse(timeString, 'yyyy MM dd HH:mm', new Date()) : new Date();
     if (newPublishTime.toString() === 'Invalid Date') throw new Error('Date provided is not valid');
 
     challenge.publishTime = newPublishTime;
