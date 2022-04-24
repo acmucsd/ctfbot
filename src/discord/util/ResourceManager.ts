@@ -44,7 +44,13 @@ export async function createTextChannelOrFetchIfExists(
 
   // deny all permissions first
   permissionOverwrites[guild.roles.everyone.id] = {
-    deny: [Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL, Permissions.FLAGS.ADD_REACTIONS],
+    deny: [
+      Permissions.FLAGS.SEND_MESSAGES,
+      Permissions.FLAGS.VIEW_CHANNEL,
+      Permissions.FLAGS.ADD_REACTIONS,
+      Permissions.FLAGS.CREATE_PUBLIC_THREADS,
+      Permissions.FLAGS.CREATE_PRIVATE_THREADS,
+    ],
   };
 
   // add readRole perms
@@ -61,6 +67,8 @@ export async function createTextChannelOrFetchIfExists(
       ...(permissionOverwrites[role].allow || []),
       Permissions.FLAGS.SEND_MESSAGES,
       Permissions.FLAGS.ADD_REACTIONS,
+      Permissions.FLAGS.CREATE_PUBLIC_THREADS,
+      Permissions.FLAGS.CREATE_PRIVATE_THREADS,
     ];
   }
 
