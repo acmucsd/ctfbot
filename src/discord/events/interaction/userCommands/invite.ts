@@ -29,7 +29,14 @@ export async function handleInvite(interaction: UserContextMenuInteraction<'cach
   await invitation.save();
 
   // send DM follow up for invite
-  await sentInviteMessage(interaction.client, targetUser, team);
+  try {
+    await sentInviteMessage(interaction.client, targetUser, team);
+  } catch (e) {
+    await invitation.destroy();
+    throw new Error(
+      'This user appears to have private messages from non-friends disabled. They need to accept DMs in order to be invited to a team.',
+    );
+  }
 
   return 'Team invitation sent to their private messages';
 }

@@ -169,16 +169,18 @@ export async function registerGuildCommandsIfChanged(
   await guild.commands.set(commandsToRegister);
   // ensure only admins can use admin commands and users can use user commands
   await guild.commands.permissions.set({
-    fullPermissions: guild.commands.cache.map((com) => ({
-      id: com.id,
-      permissions: [
-        {
-          id: participantCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
-          type: ApplicationCommandPermissionTypes.ROLE,
-          permission: true,
-        },
-      ],
-    })),
+    fullPermissions: guild.commands.cache
+      .filter((com) => com.type === 'CHAT_INPUT')
+      .map((com) => ({
+        id: com.id,
+        permissions: [
+          {
+            id: participantCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
+            type: ApplicationCommandPermissionTypes.ROLE,
+            permission: true,
+          },
+        ],
+      })),
   });
 }
 
