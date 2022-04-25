@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 import { getCtfByGuildContext } from '../../../util/ResourceManager';
+import { debounceChallengeChannelUpdates } from '../../../util/UpdateDebouncer';
 
 export default {
   name: 'submit',
@@ -18,7 +19,12 @@ export default {
     const ctf = await getCtfByGuildContext(interaction.guild);
     if (!ctf) throw new Error('this guild does not belong to a ctf');
 
-    const flag = ctf.getFlag(interaction.options.getString('flag', true));
+    const flag = await ctf.getFlag(interaction.options.getString('flag', true));
+    if (!flag) throw new Error('Invalid flag. Checking for trailing spaces and typos.');
+    const challenge = await flag.getChallenge();
+
+    // update the challenge channels, but in a debounced fashion
+    debounceChallengeChannelUpdates(challenge, interaction.client);
 
     return 'to be implemented';
   },
