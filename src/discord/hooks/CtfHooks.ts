@@ -47,17 +47,6 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
 
   // set TOS message WARNING: this is an unsafe operation
   await setTosMessage(client, tosChannel, ctf);
-
-  // create scoreboard channel
-  const scoreboardChannel = await createTextChannelOrFetchIfExists(
-    guild,
-    ctf.scoreboardChannelSnowflake,
-    'scoreboard',
-    {
-      parent: infoCategory,
-    },
-  );
-  ctf.scoreboardChannelSnowflake = scoreboardChannel.id;
 }
 
 export async function destroyCtf(ctf: Ctf, client: Client<true>) {
@@ -74,13 +63,7 @@ export async function destroyCtf(ctf: Ctf, client: Client<true>) {
 
   // delete all the roles and channels
   await destroyRoles(guild, ctf.adminRoleSnowflake);
-  await destroyChannels(
-    guild,
-    ctf.infoCategorySnowflake,
-    ctf.announcementsChannelSnowflake,
-    ctf.tosChannelSnowflake,
-    ctf.scoreboardChannelSnowflake,
-  );
+  await destroyChannels(guild, ctf.infoCategorySnowflake, ctf.announcementsChannelSnowflake, ctf.tosChannelSnowflake);
 
   await destroyRegisteredGuildCommands(guild);
 }
