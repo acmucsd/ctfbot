@@ -27,8 +27,10 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
   challengeMessage.setFooter({ text: `By ${challenge.author}` });
   challengeMessage.setColor('#50c0bf');
 
-  // const attachments = await this.getAllAttachments();
-  // attachments.forEach((attachment) => challengeMessage.addField(attachment.row.name, attachment.row.url));
+  // add challenge fields
+  const fields = await challenge.getChallengeFields();
+  fields.forEach((field) => challengeMessage.addField(field.title, field.content));
+
   const guild = await client.guilds.fetch(category.Ctf.guildSnowflake);
 
   // complicated nested query to fetch the associated first blood user and team, if defined
