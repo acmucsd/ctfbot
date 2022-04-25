@@ -5,7 +5,6 @@ import {
   Client,
   CommandInteraction,
   Interaction,
-  UserContextMenuInteraction,
 } from 'discord.js';
 import { category, challenge, ctf } from './commands';
 import { embedify, logger } from '../../../log';
