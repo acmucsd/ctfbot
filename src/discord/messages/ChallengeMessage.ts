@@ -1,4 +1,4 @@
-import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, MessageActionRow, MessageButton, MessageEmbed, Modal, TextChannel } from 'discord.js';
 import { setChannelContent } from '../util/ResourceManager';
 import { Challenge } from '../../database/models/Challenge';
 import { Ctf } from '../../database/models/Ctf';
@@ -77,5 +77,13 @@ export async function setChallengeMessage(client: Client<true>, channel: TextCha
     }),
   );
 
-  await setChannelContent(client, channel, challengeMessage, ...flagMessages);
+  // add flag submission button
+  const row = new MessageActionRow().addComponents(
+    new MessageButton().setCustomId('flagModal').setLabel('Submit a Flag').setStyle('PRIMARY'),
+  );
+
+  await setChannelContent(client, channel, {
+    embeds: [challengeMessage, ...flagMessages],
+    components: [row],
+  });
 }

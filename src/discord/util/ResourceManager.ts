@@ -9,6 +9,7 @@ import {
   MessageEditOptions,
   MessageEmbed,
   MessageOptions,
+  ModalSubmitInteraction,
   PermissionResolvable,
   Permissions,
   Role,
@@ -254,7 +255,7 @@ export async function getChallengeByChannelContext(channel: GuildBasedChannel | 
 }
 
 export async function sendErrorMessageForInteraction(
-  interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction,
+  interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction | ModalSubmitInteraction,
   e: Error,
 ) {
   logger.error(e);

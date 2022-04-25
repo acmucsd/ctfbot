@@ -12,6 +12,7 @@ import {
 import { TeamServer } from './TeamServer';
 import { initUser, User } from './User';
 import { Ctf } from './Ctf';
+import { Flag } from './Flag';
 
 interface TeamAttributes {
   id: number;
@@ -45,6 +46,21 @@ export class Team extends Model<TeamAttributes, TeamCreationAttributes> implemen
   // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
   declare createUser: HasManyCreateAssociationMixin<User>;
   declare readonly Users?: User[];
+
+  async getPoints(): Promise<number> {
+    const users = await this.getUsers({
+      attributes: [],
+      include: [
+        {
+          model: Flag,
+          required: true,
+          attributes: ['pointValue'],
+        },
+      ],
+    });
+
+    return users.flatMap((user) => user.Flags).reduce((accum, curr) => accum + (curr?.pointValue || 0), 0);
+  }
 }
 
 export function initTeam(sequelize: Sequelize) {

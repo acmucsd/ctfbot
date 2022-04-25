@@ -11,6 +11,7 @@ import {
 } from 'sequelize';
 import { Team } from './Team';
 import { initInvite, Invite } from './Invite';
+import { Flag } from './Flag';
 
 interface UserAttributes {
   id: number;
@@ -42,6 +43,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare removeInvites: HasManyRemoveAssociationsMixin<Invite, number>;
   // declare createInvite: HasManyCreateAssociationMixin<Invite>;
   // declare readonly Invites?: Invite[];
+
+  declare readonly Flags?: Flag[];
 }
 
 export function initUser(sequelize: Sequelize) {

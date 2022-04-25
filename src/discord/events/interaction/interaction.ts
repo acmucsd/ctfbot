@@ -19,6 +19,7 @@ import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { handleButtonInteraction } from './buttons';
 import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
 import { handleUserInteraction } from './userCommands';
+import { handleModelSubmitInteraction } from './modelSubmit';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
@@ -92,7 +93,9 @@ export const interactionEvent = async (interaction: Interaction) => {
   // for now, we're not interested in other interactions that do not occur in a cached guild
   if (!interaction.inCachedGuild()) return;
 
-  if (interaction.isCommand()) {
+  if (interaction.isModalSubmit()) {
+    await handleModelSubmitInteraction(interaction);
+  } else if (interaction.isCommand()) {
     await handleCommandInteraction(interaction);
   } else if (interaction.isUserContextMenu()) {
     await handleUserInteraction(interaction);
