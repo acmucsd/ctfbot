@@ -85,7 +85,7 @@ export function initChallenge(sequelize: Sequelize) {
         allowNull: false,
       },
       prompt: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1024),
         defaultValue: '',
         allowNull: false,
       },
