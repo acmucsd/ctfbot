@@ -14,7 +14,10 @@ import { destroyChallengeChannel, refreshChallengeChannel } from './ChallengeCha
 import { Flag } from '../../database/models/Flag';
 import { destroyTeam, refreshTeam } from './TeamHooks';
 import { Team } from '../../database/models/Team';
+import { destroyScoreboard, refreshScoreboard } from './ScoreboardHooks';
+import { Scoreboard } from '../../database/models/Scoreboard';
 
+// responsible for hooking Discord side effects into database changes
 export async function initHooks(client: Client<true>) {
   Ctf.beforeCreate((ctf) =>
     refreshCtf(ctf, client).catch(async (e) => {
@@ -66,11 +69,13 @@ export async function initHooks(client: Client<true>) {
   Flag.afterUpdate((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
   Flag.afterDestroy((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
 
-  // TODO: after a flag gets captured, we queue up a periodic refresh
-
   Team.beforeCreate((team) => refreshTeam(team, client));
   Team.beforeUpdate((team) => refreshTeam(team, client));
   Team.beforeDestroy((team) => destroyTeam(team, client));
+
+  Scoreboard.beforeCreate((scoreboard) => refreshScoreboard(scoreboard, client));
+  Scoreboard.beforeUpdate((scoreboard) => refreshScoreboard(scoreboard, client));
+  Scoreboard.beforeDestroy((scoreboard) => destroyScoreboard(scoreboard, client));
 
   // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
   const ctfs = await Ctf.findAll();
