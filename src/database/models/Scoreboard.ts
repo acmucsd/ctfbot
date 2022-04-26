@@ -8,9 +8,10 @@ interface ScoreboardAttributes {
   minTeamSize?: number;
   maxTeamSize?: number;
   group: string;
+  channelSnowflake: string;
 }
 
-type ScoreboardCreationAttributes = Optional<ScoreboardAttributes, 'id'>;
+type ScoreboardCreationAttributes = Optional<ScoreboardAttributes, 'id' | 'channelSnowflake'>;
 
 export class Scoreboard
   extends Model<ScoreboardAttributes, ScoreboardCreationAttributes>
@@ -21,6 +22,7 @@ export class Scoreboard
   declare minTeamSize?: number;
   declare maxTeamSize?: number;
   declare group: string;
+  declare channelSnowflake: string;
 
   // declare readonly createdAt: Date;
   // declare readonly updatedAt: Date;
@@ -57,6 +59,11 @@ export function initScoreboard(sequelize: Sequelize) {
       group: {
         type: DataTypes.ENUM('PLAYERS', 'TEAMS'),
         defaultValue: 'TEAMS',
+        allowNull: false,
+      },
+      channelSnowflake: {
+        type: DataTypes.STRING,
+        defaultValue: '',
         allowNull: false,
       },
     },
