@@ -6,8 +6,10 @@ import {
   Guild,
   GuildBasedChannel,
   MessageComponentInteraction,
+  MessageEditOptions,
   MessageEmbed,
   MessageOptions,
+  ModalSubmitInteraction,
   PermissionResolvable,
   Permissions,
   Role,
@@ -200,7 +202,7 @@ export async function registerGuildCommandsIfChanged(
 export async function setChannelContent(
   client: Client<true>,
   channel: TextChannel,
-  ...messages: (MessageEmbed | MessageOptions)[]
+  ...messages: (MessageEmbed | MessageEditOptions)[]
 ) {
   const existingMessages = await channel.messages.fetch();
   const botMessages = Array.from(existingMessages.filter((message) => message.author.id === client.user.id).values());
@@ -214,6 +216,9 @@ export async function setChannelContent(
       continue;
     }
     // otherwise, we need to send it
+    // TODO: this ts exception has to be here because the type signatures in the latest v13 are broken
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     await channel.send(nextMessageToPost);
   }
 
@@ -250,7 +255,7 @@ export async function getChallengeByChannelContext(channel: GuildBasedChannel | 
 }
 
 export async function sendErrorMessageForInteraction(
-  interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction,
+  interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction | ModalSubmitInteraction,
   e: Error,
 ) {
   logger.error(e);

@@ -11,6 +11,7 @@ import {
 import { Category } from './Category';
 import { Flag, initFlag } from './Flag';
 import { ChallengeChannel, initChallengeChannel } from './ChallengeChannel';
+import { ChallengeField, initChallengeField } from './ChallengeField';
 
 export interface ChallengeAttributes {
   id: number;
@@ -65,6 +66,18 @@ export class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttri
   // declare removeFlags: HasManyRemoveAssociationsMixin<Flag, number>;
   declare createFlag: HasManyCreateAssociationMixin<Flag>;
   declare readonly Flags?: Flag[];
+
+  declare getChallengeFields: HasManyGetAssociationsMixin<ChallengeField>;
+  // declare countChallengeFields: HasManyCountAssociationsMixin;
+  // declare hasChallengeField: HasManyHasAssociationMixin<ChallengeField, number>;
+  // declare hasChallengeFields: HasManyHasAssociationsMixin<ChallengeField, number>;
+  // declare setChallengeFields: HasManySetAssociationsMixin<ChallengeField, number>;
+  // declare addChallengeField: HasManyAddAssociationMixin<ChallengeField, number>;
+  // declare addChallengeFields: HasManyAddAssociationsMixin<ChallengeField, number>;
+  // declare removeChallengeField: HasManyRemoveAssociationMixin<ChallengeField, number>;
+  // declare removeChallengeFields: HasManyRemoveAssociationsMixin<ChallengeField, number>;
+  declare createChallengeField: HasManyCreateAssociationMixin<ChallengeField>;
+  declare readonly ChallengeFields?: ChallengeField[];
 }
 
 export function initChallenge(sequelize: Sequelize) {
@@ -113,4 +126,7 @@ export function initChallenge(sequelize: Sequelize) {
 
   initFlag(sequelize);
   Challenge.hasMany(Flag);
+
+  initChallengeField(sequelize);
+  Challenge.hasMany(ChallengeField);
 }

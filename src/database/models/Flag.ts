@@ -1,4 +1,12 @@
-import { BelongsToGetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import {
+  BelongsToGetAssociationMixin,
+  DataTypes,
+  HasManyAddAssociationMixin,
+  HasManyCountAssociationsMixin,
+  Model,
+  Optional,
+  Sequelize,
+} from 'sequelize';
 import { Challenge } from './Challenge';
 import { User } from './User';
 
@@ -24,11 +32,11 @@ export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implemen
   declare readonly challenge?: Challenge;
 
   // declare getUsers: HasManyGetAssociationsMixin<User>;
-  // declare countUsers: HasManyCountAssociationsMixin;
+  declare countUsers: HasManyCountAssociationsMixin;
   // declare hasUser: HasManyHasAssociationMixin<User, number>;
   // declare hasUsers: HasManyHasAssociationsMixin<User, number>;
   // declare setUsers: HasManySetAssociationsMixin<User, number>;
-  // declare addUser: HasManyAddAssociationMixin<User, number>;
+  declare addUser: HasManyAddAssociationMixin<User, number>;
   // declare addUsers: HasManyAddAssociationsMixin<User, number>;
   // declare removeUser: HasManyRemoveAssociationMixin<User, number>;
   // declare removeUsers: HasManyRemoveAssociationsMixin<User, number>;
@@ -67,6 +75,6 @@ export function initFlag(sequelize: Sequelize) {
   });
 
   // many to many with users
-  Flag.belongsToMany(User, { through: 'FlagCaptures' });
-  User.belongsToMany(Flag, { through: 'FlagCaptures' });
+  Flag.belongsToMany(User, { through: 'flag_captures' });
+  User.belongsToMany(Flag, { through: 'flag_captures' });
 }

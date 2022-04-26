@@ -16,6 +16,7 @@ import { destroyTeam, refreshTeam } from './TeamHooks';
 import { Team } from '../../database/models/Team';
 import { destroyScoreboard, refreshScoreboard } from './ScoreboardHooks';
 import { Scoreboard } from '../../database/models/Scoreboard';
+import { ChallengeField } from '../../database/models/ChallengeField';
 
 // responsible for hooking Discord side effects into database changes
 export async function initHooks(client: Client<true>) {
@@ -68,6 +69,10 @@ export async function initHooks(client: Client<true>) {
   Flag.afterCreate((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
   Flag.afterUpdate((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
   Flag.afterDestroy((flag) => flag.getChallenge().then((chal) => refreshChallenge(chal, client)));
+  // same for challenge fields
+  ChallengeField.afterCreate((field) => field.getChallenge().then((chal) => refreshChallenge(chal, client)));
+  ChallengeField.afterUpdate((field) => field.getChallenge().then((chal) => refreshChallenge(chal, client)));
+  ChallengeField.afterDestroy((field) => field.getChallenge().then((chal) => refreshChallenge(chal, client)));
 
   Team.beforeCreate((team) => refreshTeam(team, client));
   Team.beforeUpdate((team) => refreshTeam(team, client));
