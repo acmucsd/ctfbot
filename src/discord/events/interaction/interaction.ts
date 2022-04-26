@@ -5,7 +5,6 @@ import {
   Client,
   CommandInteraction,
   Interaction,
-  UserContextMenuInteraction,
 } from 'discord.js';
 import { category, challenge, ctf } from './commands';
 import { embedify, logger } from '../../../log';
@@ -19,10 +18,11 @@ import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { handleButtonInteraction } from './buttons';
 import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
 import { handleUserInteraction } from './userCommands';
+import scoreboard from './commands/scoreboard';
 
 // our canonical list of application definitions
 export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
-export const adminCommands: ChatInputCommandDefinition[] = [ctf, category, challenge];
+export const adminCommands: ChatInputCommandDefinition[] = [ctf, category, challenge, scoreboard];
 export const participantCommands: ChatInputCommandDefinition[] = [submit, setname, standing];
 const chatCommands: ChatInputCommandDefinition[] = [...topLevelCommands, ...participantCommands, ...adminCommands];
 

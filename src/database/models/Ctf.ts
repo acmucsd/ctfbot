@@ -81,6 +81,18 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   declare readonly TeamServers?: TeamServer[];
 
+  declare getScoreboards: HasManyGetAssociationsMixin<Scoreboard>;
+  // declare countScoreboards: HasManyCountAssociationsMixin;
+  // declare hasScoreboard: HasManyHasAssociationMixin<Scoreboard, number>;
+  // declare hasScoreboards: HasManyHasAssociationsMixin<Scoreboard, number>;
+  // declare setScoreboards: HasManySetAssociationsMixin<Scoreboard, number>;
+  // declare addScoreboard: HasManyAddAssociationMixin<Scoreboard, number>;
+  // declare addScoreboards: HasManyAddAssociationsMixin<Scoreboard, number>;
+  // declare removeScoreboard: HasManyRemoveAssociationMixin<Scoreboard, number>;
+  // declare removeScoreboards: HasManyRemoveAssociationsMixin<Scoreboard, number>;
+  // declare createScoreboard: HasManyCreateAssociationMixin<Scoreboard>;
+  // declare readonly Scoreboards?: Scoreboard[];
+
   // get the user and their respective team in this ctf by user snowflake
   // throws an error if that user has not yet joined the ctf
   async getTeamAndUserFromSnowflake(userSnowflake: string): Promise<{ user: User; team: Team }> {

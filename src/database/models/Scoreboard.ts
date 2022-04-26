@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { BelongsToSetAssociationMixin, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Ctf } from './Ctf';
 import { Category } from './Category';
 
@@ -26,12 +26,12 @@ export class Scoreboard
   // declare readonly updatedAt: Date;
 
   // declare getCtf: BelongsToGetAssociationMixin<Ctf>;
-  // declare setCtf: BelongsToSetAssociationMixin<Ctf, number>;
+  declare setCtf: BelongsToSetAssociationMixin<Ctf, number>;
   // declare createCtf: BelongsToCreateAssociationMixin<Ctf>;
   // declare readonly Ctf?: Ctf;
 
   // declare getCategory: BelongsToGetAssociationMixin<Category>;
-  // declare setCategory: BelongsToSetAssociationMixin<Category, number>;
+  declare setCategory: BelongsToSetAssociationMixin<Category, number>;
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;
   // declare readonly Category?: Category;
 }
