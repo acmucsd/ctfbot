@@ -61,6 +61,10 @@ export async function destroyCtf(ctf: Ctf, client: Client<true>) {
   const teamServers = await ctf.getTeamServers();
   await Promise.all(teamServers.map((ts) => ts.destroy()));
 
+  // destroy all associated scoreboards as a side effect
+  const scoreboards = await ctf.getScoreboards();
+  await Promise.all(scoreboards.map((sb) => sb.destroy()));
+
   // delete all the roles and channels
   await destroyRoles(guild, ctf.adminRoleSnowflake);
   await destroyChannels(guild, ctf.infoCategorySnowflake, ctf.announcementsChannelSnowflake, ctf.tosChannelSnowflake);
