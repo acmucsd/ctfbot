@@ -6,5 +6,5 @@ export default (message: { description: string; title?: string; footer?: string;
     .setColor(message.color ?? '#e74c3c')
     .setDescription(message.description)
     .setTimestamp()
-    .setFooter(message.footer ?? '');
+    .setFooter({ text: message.footer ?? '' });
 };

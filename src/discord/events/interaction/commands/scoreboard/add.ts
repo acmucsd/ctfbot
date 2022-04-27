@@ -15,19 +15,19 @@ export default {
       required: true,
     },
     {
-      name: 'filterCategory',
+      name: 'category',
       description: 'Only show scores in the named category',
       type: ApplicationCommandOptionTypes.STRING,
       required: false,
     },
     {
-      name: 'filterMaxTeamSize',
+      name: 'maxsize',
       description: 'Only show teams with this many players or fewer',
       type: ApplicationCommandOptionTypes.NUMBER,
       required: false,
     },
     {
-      name: 'filterMinTeamSize',
+      name: 'minsize',
       description: 'Only show teams with this many players or greater',
       type: ApplicationCommandOptionTypes.NUMBER,
       required: false,
@@ -54,9 +54,9 @@ export default {
     if (!ctf) throw new Error('this server is not associated with a CTF');
 
     const name = interaction.options.getString('name', true);
-    const filterCategory = interaction.options.getString('filterCategory');
-    const maxTeamSize = interaction.options.getNumber('filterMaxTeamSize') || undefined;
-    const minTeamSize = interaction.options.getNumber('filterMinTeamSize') || undefined;
+    const filterCategory = interaction.options.getString('category');
+    const maxTeamSize = interaction.options.getNumber('maxsize') || undefined;
+    const minTeamSize = interaction.options.getNumber('minsize') || undefined;
     const group = interaction.options.getString('group') || 'TEAMS';
 
     // we build instead of save so we can postpone the query until the very end
