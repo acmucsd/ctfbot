@@ -12,6 +12,7 @@ import { Challenge } from './Challenge';
 import { Flag } from './Flag';
 import { Team } from './Team';
 import { User } from './User';
+import { initScoreboard, Scoreboard } from './Scoreboard';
 
 interface CtfAttributes {
   id: number;
@@ -24,7 +25,6 @@ interface CtfAttributes {
   // discord stuff to be defined later
   adminRoleSnowflake: string;
   announcementsChannelSnowflake: string;
-  scoreboardChannelSnowflake: string;
   tosChannelSnowflake: string;
   infoCategorySnowflake: string;
   tosMessage: string;
@@ -37,7 +37,6 @@ type CtfCreationAttributes = Optional<
   | 'endDate'
   | 'adminRoleSnowflake'
   | 'announcementsChannelSnowflake'
-  | 'scoreboardChannelSnowflake'
   | 'tosChannelSnowflake'
   | 'infoCategorySnowflake'
   | 'tosMessage'
@@ -51,7 +50,6 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   declare endDate?: Date;
   declare adminRoleSnowflake: string;
   declare announcementsChannelSnowflake: string;
-  declare scoreboardChannelSnowflake: string;
   declare tosChannelSnowflake: string;
   declare infoCategorySnowflake: string;
   declare tosMessage: string;
@@ -82,6 +80,18 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   // declare removeTeamServers: HasManyRemoveAssociationsMixin<TeamServer, number>;
   declare createTeamServer: HasManyCreateAssociationMixin<TeamServer>;
   declare readonly TeamServers?: TeamServer[];
+
+  declare getScoreboards: HasManyGetAssociationsMixin<Scoreboard>;
+  // declare countScoreboards: HasManyCountAssociationsMixin;
+  // declare hasScoreboard: HasManyHasAssociationMixin<Scoreboard, number>;
+  // declare hasScoreboards: HasManyHasAssociationsMixin<Scoreboard, number>;
+  // declare setScoreboards: HasManySetAssociationsMixin<Scoreboard, number>;
+  // declare addScoreboard: HasManyAddAssociationMixin<Scoreboard, number>;
+  // declare addScoreboards: HasManyAddAssociationsMixin<Scoreboard, number>;
+  // declare removeScoreboard: HasManyRemoveAssociationMixin<Scoreboard, number>;
+  // declare removeScoreboards: HasManyRemoveAssociationsMixin<Scoreboard, number>;
+  // declare createScoreboard: HasManyCreateAssociationMixin<Scoreboard>;
+  // declare readonly Scoreboards?: Scoreboard[];
 
   // get the user and their respective team in this ctf by user snowflake
   // throws an error if that user has not yet joined the ctf
@@ -212,11 +222,6 @@ export function initCtf(sequelize: Sequelize) {
         defaultValue: '',
         allowNull: false,
       },
-      scoreboardChannelSnowflake: {
-        type: DataTypes.STRING,
-        defaultValue: '',
-        allowNull: false,
-      },
       tosChannelSnowflake: {
         type: DataTypes.STRING,
         defaultValue: '',
@@ -244,4 +249,7 @@ export function initCtf(sequelize: Sequelize) {
   initCategory(sequelize);
   Ctf.hasMany(Category);
   Ctf.hasMany(Challenge);
+
+  initScoreboard(sequelize);
+  Ctf.hasMany(Scoreboard);
 }

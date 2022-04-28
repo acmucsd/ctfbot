@@ -1,24 +1,40 @@
 import { Challenge } from '../../database/models/Challenge';
-import { refreshChallenge } from "../hooks/ChallengeHooks";
-import { Client } from "discord.js";
+import { refreshChallenge } from '../hooks/ChallengeHooks';
+import { Client } from 'discord.js';
+import { Scoreboard } from '../../database/models/Scoreboard';
+import { refreshScoreboard } from '../hooks/ScoreboardHooks';
 
 // a hashmap from challenge ids to their timeout ID
-const mapping = new Map<number, NodeJS.Timeout>();
+const challengeMapping = new Map<number, NodeJS.Timeout>();
+// a hashmap from scoreboard ids to their timeout ID
+const scoreboardMapping = new Map<number, NodeJS.Timeout>();
 
 // this function will trigger an update to challenge channels... but no more than
 // once every two minutes
 export function debounceChallengeChannelUpdates(challenge: Challenge, client: Client<true>) {
-  const timeout = mapping.get(challenge.id);
+  debounceAction(challengeMapping, challenge.id, () => void refreshChallenge(challenge, client), 1000 * 120);
+}
 
-  // if there's currently a timeout for this challenge, just ignore for now
+// this function will trigger an update to scoreboard channels... but no more than
+// once every two minutes
+export function debounceScoreboardUpdates(scoreboard: Scoreboard, client: Client<true>) {
+  debounceAction(scoreboardMapping, scoreboard.id, () => void refreshScoreboard(scoreboard, client), 1000 * 120);
+}
+
+// generic debouncing function
+// requires a discriminating id of some kind
+function debounceAction(hashmap: Map<number, NodeJS.Timeout>, id: number, action: () => void, delayMS: number) {
+  const timeout = hashmap.get(id);
+
+  // if there's currently a timeout for this action, just ignore for now
   if (timeout) return;
 
-  // otherwise, kick off the update to happen in two minutes
-  mapping.set(
-    challenge.id,
+  // otherwise, kick off the update to happen in however many minutes
+  hashmap.set(
+    id,
     setTimeout(() => {
-      mapping.delete(challenge.id);
-      void refreshChallenge(challenge, client);
-    }, 1000 * 120),
+      hashmap.delete(id);
+      action();
+    }, delayMS),
   );
 }

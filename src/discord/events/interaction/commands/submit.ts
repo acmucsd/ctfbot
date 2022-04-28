@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { ChatInputCommandDefinition, PopulatedCommandInteraction } from '../interaction';
 import { getCtfByGuildContext } from '../../../util/ResourceManager';
-import { debounceChallengeChannelUpdates } from '../../../util/UpdateDebouncer';
+import { debounceChallengeChannelUpdates, debounceScoreboardUpdates } from '../../../util/UpdateDebouncer';
 
 export default {
   name: 'submit',
@@ -25,6 +25,9 @@ export default {
 
     // update the challenge channels, but in a debounced fashion
     debounceChallengeChannelUpdates(challenge, interaction.client);
+    // same with all the scoreboards
+    const scoreboards = await ctf.getScoreboards({ attributes: ['id'] });
+    scoreboards.forEach((scoreboard) => debounceScoreboardUpdates(scoreboard, interaction.client));
 
     return 'to be implemented';
   },
