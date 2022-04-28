@@ -178,20 +178,22 @@ export async function registerGuildCommandsIfChanged(
   logger.info('detected change, setting guild commands');
   await guild.commands.set(commandsToRegister);
   // ensure only admins can use admin commands and users can use user commands
-  await guild.commands.permissions.set({
-    fullPermissions: guild.commands.cache
-      .filter((com) => com.type === 'CHAT_INPUT')
-      .map((com) => ({
-        id: com.id,
-        permissions: [
-          {
-            id: participantCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
-            type: ApplicationCommandPermissionTypes.ROLE,
-            permission: true,
-          },
-        ],
-      })),
-  });
+  // TODO: we can't use the bulk command permissions anymore because Discord took it away with no notice :)))
+  // await Promise.all(
+  //   guild.commands.cache
+  //     .filter((appCom) => appCom.applicationId === client.application.id && appCom.type === 'CHAT_INPUT')
+  //     .map((com) =>
+  //       com.permissions.set({
+  //         permissions: [
+  //           {
+  //             id: participantCommands.find((ucom) => ucom.name === com.name) && userRole ? userRole.id : adminRole.id,
+  //             type: ApplicationCommandPermissionTypes.ROLE,
+  //             permission: true,
+  //           },
+  //         ],
+  //       }),
+  //     ),
+  // );
 }
 
 /** This function takes in a channel and a series of messages, and does the following:
