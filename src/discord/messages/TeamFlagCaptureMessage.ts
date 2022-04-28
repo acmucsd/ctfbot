@@ -14,7 +14,7 @@ export async function sendTeamFlagCaptureMessage(
 
   message.description = `Player <@${userSnowflake}> just captured a **correct** flag for the challenge **${challengeName}**.\n`;
   message.description += `Your team has been awarded ${points} points.\n`;
-  message.description += `You are the #**${solves}** person to solve this challenge.`;
+  message.description += `You are the #**${solves}** person to capture this flag.`;
   message.addField('Team Points', `${totalPoints}`);
   message.setTimestamp();
 
