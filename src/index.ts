@@ -3,6 +3,7 @@ import { discordConfig } from './config';
 import { eventLoader } from './discord/events';
 import sequelize from './database';
 import { logger } from './log';
+import { launchWebServer } from './web';
 
 if (!discordConfig.token)
   throw new Error('discord token not provided, please set the DISCORD_TOKEN environment variable');
@@ -23,6 +24,7 @@ client
   .then(() => {
     logger.info('database initialization was successful');
   })
+  .then(() => launchWebServer())
   .catch(() => {
     console.log('initialization failed, aborting');
     process.exit(1);
