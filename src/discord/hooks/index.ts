@@ -82,9 +82,11 @@ export async function initHooks(client: Client<true>) {
   Scoreboard.beforeUpdate((scoreboard) => refreshScoreboard(scoreboard, client));
   Scoreboard.beforeDestroy((scoreboard) => destroyScoreboard(scoreboard, client));
 
-  // now, everytime we start up, we should just refresh all of our CTFs and TeamServers anyways
+  // now, everytime we start up, we should just refresh all of our CTFs, TeamServers, and Challenges anyways
   const ctfs = await Ctf.findAll();
   await Promise.all(ctfs.map((ctf) => refreshCtf(ctf, client)));
   const teamServers = await TeamServer.findAll();
   await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client)));
+  const challenges = await Challenge.findAll();
+  await Promise.all(challenges.map((chal) => refreshChallenge(chal, client)));
 }

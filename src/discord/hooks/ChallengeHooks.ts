@@ -15,6 +15,8 @@ export async function refreshAllChallenges(teamServer: TeamServer, client: Clien
   await Promise.all(challenges.map((chal) => chal && refreshChallenge(chal, client)));
 }
 
+const publishTimers = new Map<number, NodeJS.Timeout>();
+
 export async function refreshChallenge(challenge: Challenge, client: Client<true>) {
   const category = await challenge.getCategory({
     attributes: ['id'],
@@ -60,6 +62,25 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
   // now we want to trigger a refresh of our dependant challengeChannels as well
   const channels = await challenge.getChallengeChannels();
   await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client).then(() => chan.save())));
+
+  // lastly, if this challenge isn't published yet, make sure we set a timer for it to happen at the appropriate time
+  const msUntilPublish = (challenge.publishTime?.valueOf() || 0) - Date.now();
+  if (msUntilPublish > 0) {
+    const timeout = publishTimers.get(challenge.id);
+    // nuke the current timeout, if its set (publishTime might have changed)
+    if (timeout) clearTimeout(timeout);
+    // set a new one
+    publishTimers.set(
+      challenge.id,
+      setTimeout(() => {
+        Challenge.findByPk(challenge.id)
+          .then((chal) => chal && void refreshChallenge(chal, client))
+          .catch(() => {
+            /* don't care */
+          });
+      }, msUntilPublish),
+    );
+  }
 }
 
 export const debouncedRefreshChallenge = createDebouncer((id, client) => {
