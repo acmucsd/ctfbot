@@ -23,7 +23,7 @@ export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cach
   // grant this user the flag capture
   await flag.addUser(user);
   // update the challenge channels, but in a debounced fashion
-  const challenge = await flag.getChallenge({ attributes: ['id'] });
+  const challenge = await flag.getChallenge({ attributes: ['id', 'name'] });
   debouncedRefreshChallenge(challenge.id, interaction.client);
   // same with all the scoreboards
   const scoreboards = await ctf.getScoreboards({ attributes: ['id'] });
@@ -31,20 +31,8 @@ export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cach
 
   // send follow-up message to team channel
   const teamChannel = await interaction.client.channels.fetch(team.textChannelSnowflake);
-  if (teamChannel && teamChannel instanceof TextChannel) {
-    // stuff for the message
-    const challenge = await flag.getChallenge({ attributes: ['name'] });
-    const solves = await flag.countUsers();
-    const totalPoints = await team.getPoints();
-    await sendTeamFlagCaptureMessage(
-      teamChannel,
-      user.userSnowflake,
-      challenge.name,
-      flag.pointValue,
-      solves,
-      totalPoints,
-    );
-  }
+  if (teamChannel && teamChannel instanceof TextChannel)
+    await sendTeamFlagCaptureMessage(teamChannel, team, user, flag, challenge);
 
   return 'Flag successfully captured! 🎉';
 }

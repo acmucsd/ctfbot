@@ -186,7 +186,14 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
       },
     });
 
-    if (!categories || !categories[0].Challenges || !categories[0].Challenges[0].Flags) return;
+    if (
+      categories.length === 0 ||
+      !categories[0].Challenges ||
+      categories[0].Challenges.length === 0 ||
+      !categories[0].Challenges[0].Flags ||
+      categories[0].Challenges[0].Flags.length === 0
+    )
+      return;
 
     // otherwise, the flag matched something
     return categories[0].Challenges[0].Flags[0];
