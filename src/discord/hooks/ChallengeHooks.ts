@@ -5,6 +5,7 @@ import { refreshChallengeChannel } from './ChallengeChannelHooks';
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
 import { Category } from '../../database/models/Category';
 import { Ctf } from '../../database/models/Ctf';
+import { createDebouncer } from '../util/UpdateDebouncer';
 
 export async function refreshAllChallenges(teamServer: TeamServer, client: Client<true>) {
   const ctf = await teamServer.getCtf({ include: { model: Category, attributes: ['id'], include: [Challenge] } });
@@ -60,6 +61,14 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
   const channels = await challenge.getChallengeChannels();
   await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client).then(() => chan.save())));
 }
+
+export const debouncedRefreshChallenge = createDebouncer((id, client) => {
+  Challenge.findByPk(id)
+    .then((chal) => chal && void refreshChallenge(chal, client))
+    .catch(() => {
+      /* don't care */
+    });
+}, 1000 * 120);
 
 // mainly we just need to destroy all category channels first
 export async function destroyChallenge(challenge: Challenge) {

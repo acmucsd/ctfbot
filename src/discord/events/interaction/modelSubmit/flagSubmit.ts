@@ -1,7 +1,8 @@
 import { ModalSubmitInteraction, TextChannel } from 'discord.js';
 import { getCtfByGuildContext } from '../../../util/ResourceManager';
 import { sendTeamFlagCaptureMessage } from '../../../messages/TeamFlagCaptureMessage';
-import { debounceChallengeChannelUpdates, debounceScoreboardUpdates } from '../../../util/UpdateDebouncer';
+import { debouncedRefreshScoreboard } from '../../../hooks/ScoreboardHooks';
+import { debouncedRefreshChallenge } from '../../../hooks/ChallengeHooks';
 
 export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cached'>): Promise<string> {
   // get the CTF of this guild
@@ -22,11 +23,11 @@ export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cach
   // grant this user the flag capture
   await flag.addUser(user);
   // update the challenge channels, but in a debounced fashion
-  const challenge = await flag.getChallenge();
-  debounceChallengeChannelUpdates(challenge, interaction.client);
+  const challenge = await flag.getChallenge({ attributes: ['id'] });
+  debouncedRefreshChallenge(challenge.id, interaction.client);
   // same with all the scoreboards
-  const scoreboards = await ctf.getScoreboards();
-  scoreboards.forEach((scoreboard) => debounceScoreboardUpdates(scoreboard, interaction.client));
+  const scoreboards = await ctf.getScoreboards({ attributes: ['id'] });
+  scoreboards.forEach((scoreboard) => debouncedRefreshScoreboard(scoreboard.id, interaction.client));
 
   // send follow-up message to team channel
   const teamChannel = await interaction.client.channels.fetch(team.textChannelSnowflake);
