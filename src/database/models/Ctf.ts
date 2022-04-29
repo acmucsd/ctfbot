@@ -91,7 +91,7 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
   // declare removeScoreboard: HasManyRemoveAssociationMixin<Scoreboard, number>;
   // declare removeScoreboards: HasManyRemoveAssociationsMixin<Scoreboard, number>;
   // declare createScoreboard: HasManyCreateAssociationMixin<Scoreboard>;
-  // declare readonly Scoreboards?: Scoreboard[];
+  declare readonly Scoreboards?: Scoreboard[];
 
   // get the user and their respective team in this ctf by user snowflake
   // throws an error if that user has not yet joined the ctf
