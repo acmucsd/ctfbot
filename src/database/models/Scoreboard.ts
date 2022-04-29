@@ -47,56 +47,10 @@ export class Scoreboard
   // declare createCategory: BelongsToCreateAssociationMixin<Category>;
   // declare readonly Category?: Category;
 
-  // insane ugly raw-mode query that returns an ordered list of team names, last submissions, and total points
+  // TODO: handle grouping, min/max, and category filters
   async getTeamData(): Promise<{ name: string; lastSubmission: Date; points: number }[]> {
-    // there are some truly idiotic reasons why we have to build this query this way
-    // just don't ask, I'm a broken man at this point
     const ctf = await this.getCtf({ attributes: ['id'] });
-    return (await ctf.getTeamServers({
-      attributes: [
-        [Sequelize.col('Teams.name'), 'name'],
-        [Sequelize.fn('sum', Sequelize.col('Teams.Users.Flags.point_value')), 'points'],
-        [Sequelize.fn('max', Sequelize.col('Teams.Users.Flags.flag_captures.created_at')), 'lastSubmission'],
-      ],
-      raw: true,
-      // we want to flatten this along teams
-      group: ['Teams.id', 'Teams.name'],
-      // order first by points, then by who got that number of points FIRST
-      order: [
-        [Sequelize.col('points'), 'DESC'],
-        [Sequelize.col('lastSubmission'), 'ASC'],
-      ],
-      include: [
-        {
-          model: Team,
-          attributes: ['id'],
-          required: true,
-          include: [
-            {
-              model: User,
-              attributes: [],
-              required: true,
-              include: [
-                {
-                  model: Flag,
-                  required: true,
-                  attributes: [],
-                  through: {
-                    attributes: [],
-                  },
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      // due to using custom attributes in aggregations, we gotta basically just override the type signature of this object
-      // hope you don't have any bugs!
-    })) as unknown as {
-      name: string;
-      lastSubmission: Date;
-      points: number;
-    }[];
+    return await ctf.getTeamData();
   }
 }
 

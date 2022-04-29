@@ -198,6 +198,59 @@ export class Ctf extends Model<CtfAttributes, CtfCreationAttributes> implements 
     // otherwise, the flag matched something
     return categories[0].Challenges[0].Flags[0];
   }
+
+  // insane ugly raw-mode query that returns an ordered list of team names, last submissions, and total points
+  async getTeamData(): Promise<{ id: number; name: string; lastSubmission: Date; points: number }[]> {
+    // there are some truly idiotic reasons why we have to build this query this way
+    // just don't ask, I'm a broken man at this point
+    return (await this.getTeamServers({
+      attributes: [
+        [Sequelize.col('Teams.id'), 'id'],
+        [Sequelize.col('Teams.name'), 'name'],
+        [Sequelize.fn('sum', Sequelize.col('Teams.Users.Flags.point_value')), 'points'],
+        [Sequelize.fn('max', Sequelize.col('Teams.Users.Flags.flag_captures.created_at')), 'lastSubmission'],
+      ],
+      raw: true,
+      // we want to flatten this along teams
+      group: ['Teams.id', 'Teams.name'],
+      // order first by points, then by who got that number of points FIRST
+      order: [
+        [Sequelize.col('points'), 'DESC'],
+        [Sequelize.col('lastSubmission'), 'ASC'],
+      ],
+      include: [
+        {
+          model: Team,
+          attributes: ['id'],
+          required: true,
+          include: [
+            {
+              model: User,
+              attributes: [],
+              required: true,
+              include: [
+                {
+                  model: Flag,
+                  required: true,
+                  attributes: [],
+                  through: {
+                    attributes: [],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      // due to using custom attributes in aggregations, we gotta basically just override the type signature of this object
+      // hope you don't have any bugs!
+    })) as unknown as {
+      id: number;
+      name: string;
+      lastSubmission: Date;
+      points: number;
+    }[];
+  }
 }
 
 export function initCtf(sequelize: Sequelize) {
