@@ -64,7 +64,7 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
   await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client).then(() => chan.save())));
 
   // lastly, if this challenge isn't published yet, make sure we set a timer for it to happen at the appropriate time
-  const msUntilPublish = (challenge.publishTime?.valueOf() || 0) - Date.now();
+  const msUntilPublish = Math.floor(challenge.publishTime?.getTime() || 0 / 1000) - Date.now();
   if (msUntilPublish > 0) {
     const timeout = publishTimers.get(challenge.id);
     // nuke the current timeout, if its set (publishTime might have changed)
