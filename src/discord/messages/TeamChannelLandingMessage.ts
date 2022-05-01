@@ -20,7 +20,7 @@ If that doesn't work, you can also use the \`/submit\` command, which accepts yo
   message.addField(
     'How to I invite people to my team?',
     `1. Make sure they have joined the **main server** and **accepted the Terms of Service**.
-2. Right click on their user and select "Apps > **Invite to your Team**"
+2. Right click on their user **in the main server** and select "Apps > **Invite to your Team**"
 
 They should receive a Direct Message inviting them to your team. If they accept, they'll be relocated to your **Team Server** and **Team Channel**.`,
   );
