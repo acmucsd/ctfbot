@@ -84,9 +84,9 @@ export async function initHooks(client: Client<true>) {
 
   // now, everytime we start up, we should just refresh all of our CTFs, TeamServers, and Challenges anyways
   const ctfs = await Ctf.findAll();
-  await Promise.all(ctfs.map((ctf) => refreshCtf(ctf, client)));
+  await Promise.all(ctfs.map((ctf) => refreshCtf(ctf, client).then(() => ctf.save())));
   const teamServers = await TeamServer.findAll();
-  await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client)));
+  await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client).then(() => ts.save())));
   const challenges = await Challenge.findAll();
   await Promise.all(challenges.map((chal) => refreshChallenge(chal, client)));
 }
