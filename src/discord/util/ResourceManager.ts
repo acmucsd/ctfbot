@@ -28,6 +28,7 @@ import { Challenge } from '../../database/models/Challenge';
 import { UnknownChallengeError } from '../../errors/UnknownChallengeError';
 import { embedify, logger } from '../../log';
 import { userContextMenuCommands } from '../events/interaction/userCommands';
+import { discordConfig } from '../../config';
 
 export async function createTextChannelOrFetchIfExists(
   guild: Guild,
@@ -261,13 +262,14 @@ export async function sendErrorMessageForInteraction(
   e: Error,
 ) {
   logger.error(e);
+  const stack = discordConfig.debug ? e.stack?.split('\n')[1] : 'Contact a CTF Admin if you think this is a mistake.';
   await interaction
     .editReply({
       embeds: [
         embedify({
           description: e.message ?? 'Unknown cause',
           title: e.name ?? 'Error',
-          footer: e.stack?.split('\n')[1],
+          footer: stack,
         }),
       ],
     })

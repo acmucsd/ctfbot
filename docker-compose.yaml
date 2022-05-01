@@ -19,6 +19,7 @@ services:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       PGPASSWORD: "${PGPASSWORD}"
       PGHOST: "postgres"
+      NODE_ENV: "production"
     networks:
       - ctfbot-net
 networks:
