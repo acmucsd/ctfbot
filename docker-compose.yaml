@@ -20,6 +20,7 @@ services:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       PGPASSWORD: "${PGPASSWORD}"
       PGHOST: "ctfbot-db"
+      NODE_ENV: "production"
     networks:
       - ctfbot-net
 networks:
