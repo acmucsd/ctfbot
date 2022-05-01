@@ -1,4 +1,4 @@
-import { Client, MessageActionRow, MessageButton, MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import { User } from '../../database/models/User';
 import { Team } from '../../database/models/Team';
 
@@ -28,7 +28,7 @@ export async function sentInviteAcceptanceMessages(
   teamConfirmationMessage.setColor('#50c0bf');
 
   teamConfirmationMessage.description =
-    `**${discordUser.username}** has accepted your invitation to join the team.` +
+    `**${discordUser.username}** has accepted your invitation to join the team. ` +
     `They should have received an invite to join the team server and should join shortly.`;
 
   const teamChannel = await client.channels.fetch(newTeam.textChannelSnowflake);
