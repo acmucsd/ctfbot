@@ -17,7 +17,7 @@ import { createCommandNotFoundError } from '../../../errors/CommandInteractionEr
 import { ApplicationCommandOptionTypes } from 'discord.js/typings/enums';
 import { handleButtonInteraction } from './buttons';
 import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
-import { handleUserInteraction } from './userCommands';
+import { handleUserInteraction, userContextMenuCommands } from './userCommands';
 import { handleModelSubmitInteraction } from './modelSubmit';
 import scoreboard from './commands/scoreboard';
 
@@ -105,7 +105,7 @@ export const interactionEvent = async (interaction: Interaction) => {
 export const registerCommands = async (client: Client<true>) => {
   logger.info('registering commands....');
   // first, register global commands
-  await client.application.commands.set(topLevelCommands);
+  await client.application.commands.set([...topLevelCommands, ...userContextMenuCommands]);
 
   logger.info(`registered global commands`);
 };

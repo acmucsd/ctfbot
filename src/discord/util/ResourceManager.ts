@@ -164,7 +164,7 @@ export async function registerGuildCommandsIfChanged(
   userRole?: Role,
 ) {
   // only include user commands if we were given a user role
-  const commandsToRegister = [...(userRole ? participantCommands : []), ...adminCommands, ...userContextMenuCommands];
+  const commandsToRegister = [...(userRole ? participantCommands : []), ...adminCommands];
 
   if (guild.commands.cache.size === 0) await guild.commands.fetch();
 
