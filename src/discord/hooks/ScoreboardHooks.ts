@@ -11,7 +11,9 @@ export async function refreshScoreboard(scoreboard: Scoreboard, client: Client<t
   if (!guild) throw createDiscordNullError('guildSnowflake');
 
   // create the actual channel for this Scoreboard
-  const channel = await createTextChannelOrFetchIfExists(guild, scoreboard.channelSnowflake, scoreboard.name);
+  const channel = await createTextChannelOrFetchIfExists(guild, scoreboard.channelSnowflake, scoreboard.name, {
+    preservePermissions: true,
+  });
   scoreboard.channelSnowflake = channel.id;
 
   // set channel content
