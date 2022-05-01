@@ -6,6 +6,9 @@ import { initHooks } from '../hooks';
 import { handleGuildMemberAdd } from './guildMemberAdd';
 
 export const eventLoader = (client: Client) => {
+  client.on('rateLimit', (rateLimitInfo) =>
+    rateLimitEvent(rateLimitInfo.timeout, rateLimitInfo.limit, rateLimitInfo.method, rateLimitInfo.path),
+  );
   client.on('ready', async (client) => {
     logger.info('ready event received');
     await registerCommands(client);
@@ -13,9 +16,6 @@ export const eventLoader = (client: Client) => {
     //initializePeriodicUpdate(client);
 
     client.on('guildMemberAdd', (member) => handleGuildMemberAdd(member, client));
-    client.on('rateLimit', (rateLimitInfo) =>
-      rateLimitEvent(rateLimitInfo.timeout, rateLimitInfo.limit, rateLimitInfo.method, rateLimitInfo.path),
-    );
 
     client.on('interactionCreate', (interaction) => interactionEvent(interaction));
   });
