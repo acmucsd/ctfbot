@@ -1,6 +1,6 @@
 const discord = {
   token: process.env.DISCORD_TOKEN,
-  debug: process.env.NODE_ENV !== 'production',
+  debug: process.env.DISCORD_STACKTRACE ?? true,
 };
 
 export default discord;
