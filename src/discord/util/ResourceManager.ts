@@ -262,7 +262,9 @@ export async function sendErrorMessageForInteraction(
   e: Error,
 ) {
   logger.error(e);
-  const stack = discordConfig.debug ? e.stack?.split('\n')[1] : 'Contact a CTF Admin if you think this is a mistake.';
+  const stack = discordConfig.hideStacktrace
+    ? 'Contact a CTF Admin if you think this is a mistake.'
+    : e.stack?.split('\n')[1];
   await interaction
     .editReply({
       embeds: [

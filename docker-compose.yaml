@@ -20,7 +20,7 @@ services:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       PGPASSWORD: "${PGPASSWORD}"
       PGHOST: "ctfbot-db"
-      DISCORD_STACKTRACE: "false"
+      HIDE_DISCORD_STACKTRACE: "true"
     networks:
       - ctfbot-net
 networks:
