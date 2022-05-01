@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import {
   CategoryChannel,
   Client,
@@ -8,19 +7,15 @@ import {
   MessageComponentInteraction,
   MessageEditOptions,
   MessageEmbed,
-  MessageOptions,
   ModalSubmitInteraction,
   PermissionResolvable,
   Permissions,
   Role,
-  RoleResolvable,
   Snowflake,
   TextChannel,
   UserContextMenuInteraction,
-  UserResolvable,
 } from 'discord.js';
-import { adminCommands, PopulatedCommandInteraction, participantCommands } from '../events/interaction/interaction';
-import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
+import { adminCommands, participantCommands, PopulatedCommandInteraction } from '../events/interaction/interaction';
 import { Ctf } from '../../database/models/Ctf';
 import { TeamServer } from '../../database/models/TeamServer';
 import { ChallengeChannel } from '../../database/models/ChallengeChannel';
@@ -34,7 +29,12 @@ export async function createTextChannelOrFetchIfExists(
   guild: Guild,
   snowflake: string,
   name: string,
-  options: { parent?: CategoryChannel; readRoles?: Snowflake[]; writeRoles?: Snowflake[] } = {},
+  options: {
+    parent?: CategoryChannel;
+    readRoles?: Snowflake[];
+    writeRoles?: Snowflake[];
+    preservePermissions?: boolean;
+  } = {},
 ): Promise<TextChannel> {
   const permissionOverwrites: { [key: Snowflake]: { deny?: PermissionResolvable[]; allow?: PermissionResolvable[] } } =
     {};
@@ -85,7 +85,11 @@ export async function createTextChannelOrFetchIfExists(
     if (textChannel) {
       if (textChannel.name !== name) await textChannel.setName(name);
       // overly simple check to avoid unnecessarily setting permissions
-      if (textChannel.permissionOverwrites.cache.size !== finalPermissionOverwrites.length)
+      if (
+        textChannel.permissionOverwrites.cache.size !== finalPermissionOverwrites.length &&
+        // if preservePermissions is enabled, permissions will not be overwritten even if they are different
+        !options.preservePermissions
+      )
         await textChannel.permissionOverwrites.set(finalPermissionOverwrites);
 
       return textChannel;

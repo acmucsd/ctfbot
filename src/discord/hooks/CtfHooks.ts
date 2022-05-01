@@ -35,6 +35,7 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
     'announcements',
     {
       parent: infoCategory,
+      preservePermissions: true,
     },
   );
   ctf.announcementsChannelSnowflake = announcementsChannel.id;
@@ -42,6 +43,7 @@ export async function refreshCtf(ctf: Ctf, client: Client<true>) {
   // create TOS channel
   const tosChannel = await createTextChannelOrFetchIfExists(guild, ctf.tosChannelSnowflake, 'terms-of-service', {
     parent: infoCategory,
+    preservePermissions: true,
   });
   ctf.tosChannelSnowflake = tosChannel.id;
 
