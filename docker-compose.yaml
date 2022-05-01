@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  postgres:
+  ctfbot-db:
     image: postgres
     environment:
       POSTGRES_PASSWORD: "${PGPASSWORD}"
@@ -9,6 +9,7 @@ services:
       - ctfbot-db:/var/lib/postgresql/data
     networks:
       - ctfbot-net
+      - redash-sources
   ctfbot:
     restart: always
     depends_on:
@@ -18,10 +19,16 @@ services:
     environment:
       DISCORD_TOKEN: "${DISCORD_TOKEN}"
       PGPASSWORD: "${PGPASSWORD}"
-      PGHOST: "postgres"
+      PGHOST: "ctfbot-db"
     networks:
       - ctfbot-net
 networks:
   ctfbot-net:
+    driver: bridge
+  redash-sources:
+    name: redash-sources
 volumes:
   ctfbot-db:
+
+
+
