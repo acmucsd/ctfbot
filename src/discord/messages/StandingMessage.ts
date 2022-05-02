@@ -11,12 +11,14 @@ export async function sendStandingMessage(teamChannel: TextChannel, ctf: Ctf, te
   // generate the scoreboard first
   const teams = await ctf.getTeamData();
   const teamIndex = teams.findIndex((t) => t.id === team.id);
-  const surroundingTeams = teams.slice(Math.max(teamIndex - 3, 0), Math.min(teamIndex + 4, teams.length));
+  const startIndex = Math.max(teamIndex - 3, 0);
+  const endIndex = Math.min(teamIndex + 4, teams.length);
+  const surroundingTeams = teams.slice(startIndex, endIndex);
 
   const standingEmbed = new MessageEmbed()
     .setTitle(`Team ${team.name} Current Ranking`)
     .setDescription(`showing the ${surroundingTeams.length} surrounding teams`)
-    .setFields(generateFieldsForTeamScoreboard(surroundingTeams));
+    .setFields(generateFieldsForTeamScoreboard(surroundingTeams, startIndex));
 
   // convoluted query designed to fetch all challenges
   // and make it easy to see which ones we have captured

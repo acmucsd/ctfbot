@@ -32,10 +32,11 @@ export async function setScoreboardMessage(client: Client<true>, scoreboard: Sco
 
 export function generateFieldsForTeamScoreboard(
   teams: { name: string; lastSubmission: Date; points: number }[],
+  offset = 0,
 ): EmbedFieldData[] {
   return teams
     .map((team, i) => [
-      { name: `${i} - ${team.name}`, value: '\u200b', inline: true },
+      { name: `${offset + i} - ${team.name}`, value: '\u200b', inline: true },
       { name: `\u200b`, value: '\u200b', inline: true },
       {
         name: `${team.points} pts`,
