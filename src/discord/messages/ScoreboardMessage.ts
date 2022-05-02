@@ -23,8 +23,8 @@ export async function setScoreboardMessage(client: Client<true>, scoreboard: Sco
   const teams = await scoreboard.getTeamData();
 
   // we can only fit 8 teams into each embed due to Discord's limit of 25 fields per embed
-  const embeds = arrayChunk(teams, 8).map((embed) =>
-    new MessageEmbed().setDescription('\u200b').addFields(generateFieldsForTeamScoreboard(embed)),
+  const embeds = arrayChunk(teams, 8).map((embed, i) =>
+    new MessageEmbed().setDescription('\u200b').addFields(generateFieldsForTeamScoreboard(embed, i * 8)),
   );
 
   await setChannelContent(client, channel, ...embeds);
