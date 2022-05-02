@@ -9,6 +9,11 @@ export async function sentInviteMessage(client: Client<true>, user: User, newTea
 
   inviteMessage.description = `You can either **accept** this invitation below, or ignore this message to decline the invitation.`;
 
+  inviteMessage.addField(
+    'Warning',
+    'If you have already captured flags individually, those captures will be lost when you move to your new team.',
+  );
+
   const row = new MessageActionRow().addComponents(
     new MessageButton()
       // putting the targetTeam id here lets us disambiguate invitation acceptance events later
