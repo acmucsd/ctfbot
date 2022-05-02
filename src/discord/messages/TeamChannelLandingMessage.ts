@@ -34,5 +34,6 @@ They should receive a Direct Message inviting them to your team. If they accept,
   );
   message.setTimestamp();
 
-  await teamChannel.send({ embeds: [message] });
+  const mess = await teamChannel.send({ embeds: [message] });
+  await mess.pin();
 }
