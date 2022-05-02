@@ -33,7 +33,9 @@ export default async function handleInviteAccept(interaction: ButtonInteraction,
   await team.destroy();
 
   // remove their current flag captures
-  await user.removeFlags();
+  // unfortunately, we have to do this in an N+1 way
+  const flags = await user.getFlags();
+  await user.removeFlags(flags);
 
   // update invite
   invite.accepted = true;

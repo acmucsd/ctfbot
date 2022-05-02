@@ -4,6 +4,7 @@ import {
   DataTypes,
   HasManyAddAssociationMixin,
   HasManyCountAssociationsMixin,
+  HasManyGetAssociationsMixin,
   HasManyHasAssociationMixin,
   HasManyHasAssociationsMixin,
   HasManyRemoveAssociationsMixin,
@@ -46,7 +47,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare createInvite: HasManyCreateAssociationMixin<Invite>;
   // declare readonly Invites?: Invite[];
 
-  // declare getFlags: HasManyGetAssociationsMixin<Flag>;
+  declare getFlags: HasManyGetAssociationsMixin<Flag>;
   // declare countFlags: HasManyCountAssociationsMixin;
   // declare hasFlag: HasManyHasAssociationMixin<Flag, number>;
   // declare hasFlags: HasManyHasAssociationsMixin<Flag, number>;
