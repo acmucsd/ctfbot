@@ -4,6 +4,7 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   HasManyGetAssociationsMixin,
+  HasManyHasAssociationMixin,
   HasManyRemoveAssociationMixin,
   Model,
   Optional,

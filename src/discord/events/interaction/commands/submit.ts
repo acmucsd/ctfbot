@@ -5,6 +5,7 @@ import { debouncedRefreshChallenge } from '../../../hooks/ChallengeHooks';
 import { debouncedRefreshScoreboard } from '../../../hooks/ScoreboardHooks';
 import { TextChannel } from 'discord.js';
 import { sendTeamFlagCaptureMessage } from '../../../messages/TeamFlagCaptureMessage';
+import { Flag } from '../../../../database/models/Flag';
 
 export default {
   name: 'submit',
@@ -28,8 +29,13 @@ export default {
     const flag = await ctf.getFlag(interaction.options.getString('flag', true));
     if (!flag) throw new Error('Invalid flag. Checking for trailing spaces and typos.');
 
-    // check to make sure this user has not already captured this flag
-    if (await flag.hasUser(user)) throw new Error('You have already captured this flag.');
+    const usersThatHaveCaptured = await team.getUsers({
+      attributes: [],
+      include: { model: Flag, attributes: [], where: { id: flag.id }, required: true },
+    });
+
+    // check to make sure this team has not already captured this flag
+    if (usersThatHaveCaptured.length > 0) throw new Error('You have already captured this flag.');
 
     // grant this user the flag capture
     await flag.addUser(user);

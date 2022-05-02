@@ -3,6 +3,7 @@ import { getCtfByGuildContext } from '../../../util/ResourceManager';
 import { sendTeamFlagCaptureMessage } from '../../../messages/TeamFlagCaptureMessage';
 import { debouncedRefreshScoreboard } from '../../../hooks/ScoreboardHooks';
 import { debouncedRefreshChallenge } from '../../../hooks/ChallengeHooks';
+import { Flag } from '../../../../database/models/Flag';
 
 export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cached'>): Promise<string> {
   // get the CTF of this guild
@@ -17,8 +18,13 @@ export async function handleFlagSubmit(interaction: ModalSubmitInteraction<'cach
 
   if (!flag) throw new Error('That is not the correct flag. Check for trailing spaces, typos, etc.');
 
-  // check to make sure this user has not already captured this flag
-  if (await flag.hasUser(user)) throw new Error('You have already captured this flag.');
+  const usersThatHaveCaptured = await team.getUsers({
+    attributes: [],
+    include: { model: Flag, attributes: [], where: { id: flag.id }, required: true },
+  });
+
+  // check to make sure this team has not already captured this flag
+  if (usersThatHaveCaptured.length > 0) throw new Error('You have already captured this flag.');
 
   // grant this user the flag capture
   await flag.addUser(user);
