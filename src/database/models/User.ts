@@ -2,9 +2,11 @@ import {
   BelongsToGetAssociationMixin,
   BelongsToSetAssociationMixin,
   DataTypes,
+  HasManyAddAssociationMixin,
   HasManyCountAssociationsMixin,
   HasManyHasAssociationMixin,
   HasManyHasAssociationsMixin,
+  HasManyRemoveAssociationsMixin,
   Model,
   Optional,
   Sequelize,
@@ -44,6 +46,16 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   // declare createInvite: HasManyCreateAssociationMixin<Invite>;
   // declare readonly Invites?: Invite[];
 
+  // declare getFlags: HasManyGetAssociationsMixin<Flag>;
+  // declare countFlags: HasManyCountAssociationsMixin;
+  // declare hasFlag: HasManyHasAssociationMixin<Flag, number>;
+  // declare hasFlags: HasManyHasAssociationsMixin<Flag, number>;
+  // declare setFlags: HasManySetAssociationsMixin<Flag, number>;
+  // declare addFlag: HasManyAddAssociationMixin<Flag, number>;
+  // declare addFlags: HasManyAddAssociationsMixin<Flag, number>;
+  // declare removeFlag: HasManyRemoveAssociationMixin<Flag, number>;
+  declare removeFlags: HasManyRemoveAssociationsMixin<Flag, number>;
+  // declare createFlag: HasManyCreateAssociationMixin<Flag>;
   declare readonly Flags?: Flag[];
 }
 

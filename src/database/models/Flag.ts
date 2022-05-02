@@ -3,7 +3,6 @@ import {
   DataTypes,
   HasManyAddAssociationMixin,
   HasManyCountAssociationsMixin,
-  HasManyHasAssociationMixin,
   Model,
   Optional,
   Sequelize,
@@ -34,7 +33,7 @@ export class Flag extends Model<FlagAttributes, FlagCreationAttributes> implemen
 
   // declare getUsers: HasManyGetAssociationsMixin<User>;
   declare countUsers: HasManyCountAssociationsMixin;
-  declare hasUser: HasManyHasAssociationMixin<User, number>;
+  // declare hasUser: HasManyHasAssociationMixin<User, number>;
   // declare hasUsers: HasManyHasAssociationsMixin<User, number>;
   // declare setUsers: HasManySetAssociationsMixin<User, number>;
   declare addUser: HasManyAddAssociationMixin<User, number>;
