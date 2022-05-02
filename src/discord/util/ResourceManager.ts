@@ -213,7 +213,7 @@ export async function setChannelContent(
 ) {
   // only fetch channel content if necessary
   const existingMessages =
-    channel.messages.cache.size > messages.length ? channel.messages.cache : await channel.messages.fetch();
+    channel.messages.cache.size >= messages.length ? channel.messages.cache : await channel.messages.fetch();
   const botMessages = Array.from(existingMessages.filter((message) => message.author.id === client.user.id).values());
 
   for (const nextMessage of messages) {
