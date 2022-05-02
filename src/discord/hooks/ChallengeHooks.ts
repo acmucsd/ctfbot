@@ -17,7 +17,7 @@ export async function refreshAllChallenges(teamServer: TeamServer, client: Clien
 
 const publishTimers = new Map<number, NodeJS.Timeout>();
 
-export async function refreshChallenge(challenge: Challenge, client: Client<true>) {
+export async function refreshChallenge(challenge: Challenge, client: Client<true>, skipChannels = false) {
   const category = await challenge.getCategory({
     attributes: ['id'],
     where: { '$Ctf.TeamServers.ChallengeChannels.id$': null },
@@ -60,8 +60,10 @@ export async function refreshChallenge(challenge: Challenge, client: Client<true
   }
 
   // now we want to trigger a refresh of our dependant challengeChannels as well
-  const channels = await challenge.getChallengeChannels();
-  await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client).then(() => chan.save())));
+  if (!skipChannels) {
+    const channels = await challenge.getChallengeChannels();
+    await Promise.all(channels.map((chan) => refreshChallengeChannel(chan, client).then(() => chan.save())));
+  }
 
   // lastly, if this challenge isn't published yet, make sure we set a timer for it to happen at the appropriate time
   const msUntilPublish = Math.floor(challenge.publishTime?.getTime() || 0 / 1000) - Date.now();

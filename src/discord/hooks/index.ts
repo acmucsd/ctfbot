@@ -88,5 +88,5 @@ export async function initHooks(client: Client<true>) {
   const teamServers = await TeamServer.findAll();
   await Promise.all(teamServers.map((ts) => refreshTeamServer(ts, client).then(() => ts.save())));
   const challenges = await Challenge.findAll();
-  await Promise.all(challenges.map((chal) => refreshChallenge(chal, client)));
+  await Promise.all(challenges.map((chal) => refreshChallenge(chal, client, true)));
 }
