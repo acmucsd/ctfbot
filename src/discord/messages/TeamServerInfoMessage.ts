@@ -19,7 +19,7 @@ export async function setTeamServerInfoMessage(
   
   By joining, you should have been given the <@&${
     teamServer.participantRoleSnowflake ?? ''
-  }> role and your team role, and you should have access to one channel with your name, that is your workspace for this CTF. You can find more information there.
+  }> role and you should have access to one channel with your name. That channel is your workspace for this CTF. You can find more information there.
   
   If you cannot find it, please let a <@&${teamServer.adminRoleSnowflake ?? ''}> know.
   
