@@ -21,6 +21,7 @@ services:
       PGPASSWORD: "${PGPASSWORD}"
       PGHOST: "ctfbot-db"
       HIDE_DISCORD_STACKTRACE: "true"
+      NODE_ENV: "production"
     networks:
       - ctfbot-net
 networks:
