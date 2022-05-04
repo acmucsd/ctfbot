@@ -78,8 +78,8 @@ const handleCommandInteraction = async (interaction: CommandInteraction<'cached'
         }),
       ],
     });
-  } catch (e) {
-    await sendErrorMessageForInteraction(interaction, e as Error);
+  } catch (e: unknown) {
+    await sendErrorMessageForInteraction(interaction, e);
   }
 };
 
