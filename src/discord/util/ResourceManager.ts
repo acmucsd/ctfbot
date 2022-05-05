@@ -266,7 +266,7 @@ export async function sendErrorMessageForInteraction(
   e: Error,
 ) {
   // I literally have no clue why I have to do this
-  logger.error(e.name ?? 'Error', e.message ?? 'Unknown cause', e.stack ?? 'Unknown stack');
+  logger.error(e.message ?? e.name ?? 'Unknown cause');
   const stack = discordConfig.hideStacktrace
     ? 'Contact a CTF Admin if you think this is a mistake.'
     : e.stack?.split('\n')[1];
