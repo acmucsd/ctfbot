@@ -20,9 +20,10 @@ import { sendErrorMessageForInteraction } from '../../util/ResourceManager';
 import { handleUserInteraction, userContextMenuCommands } from './userCommands';
 import { handleModelSubmitInteraction } from './modelSubmit';
 import scoreboard from './commands/scoreboard';
+import invite from './commands/invite';
 
 // our canonical list of application definitions
-export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver];
+export const topLevelCommands: ChatInputCommandDefinition[] = [addctf, addserver, invite];
 export const adminCommands: ChatInputCommandDefinition[] = [ctf, category, challenge, scoreboard];
 export const participantCommands: ChatInputCommandDefinition[] = [submit, setname, standing];
 const chatCommands: ChatInputCommandDefinition[] = [...topLevelCommands, ...participantCommands, ...adminCommands];

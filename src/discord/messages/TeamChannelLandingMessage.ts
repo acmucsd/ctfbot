@@ -22,6 +22,8 @@ If that doesn't work, you can also use the \`/submit\` command, which accepts yo
     `1. Make sure they have joined the **main server** and **accepted the Terms of Service**.
 2. Right click on their user **in the main server** and select "Apps > **Invite to your Team**"
 
+If that doesn't work for you, you can also join the main server and use the \`/invite\` command.
+
 They should receive a Direct Message inviting them to your team. If they accept, they'll be relocated to your **Team Server** and **Team Channel**.`,
   );
   message.addField(
