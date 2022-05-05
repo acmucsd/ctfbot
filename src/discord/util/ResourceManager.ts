@@ -263,11 +263,10 @@ export async function getChallengeByChannelContext(channel: GuildBasedChannel | 
 
 export async function sendErrorMessageForInteraction(
   interaction: MessageComponentInteraction | CommandInteraction | UserContextMenuInteraction | ModalSubmitInteraction,
-  _e: unknown,
+  e: Error,
 ) {
   // I literally have no clue why I have to do this
-  logger.error(_e);
-  const e = _e as Error;
+  logger.error(e.name ?? 'Error', e.message ?? 'Unknown cause', e.stack ?? 'Unknown stack');
   const stack = discordConfig.hideStacktrace
     ? 'Contact a CTF Admin if you think this is a mistake.'
     : e.stack?.split('\n')[1];
