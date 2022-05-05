@@ -22,6 +22,8 @@ services:
       PGHOST: "ctfbot-db"
       HIDE_DISCORD_STACKTRACE: "true"
       NODE_ENV: "production"
+    ports:
+      - "8080:80"
     networks:
       - ctfbot-net
 networks:
