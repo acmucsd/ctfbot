@@ -12,7 +12,7 @@ apiRouter.get('/ctf/:ctfId/ctftime', (req, res) => {
       }
       const teamData = await ctf.Scoreboards[0].getTeamData();
       res.send({
-        standings: teamData.map((team, i) => ({ pos: 1 + i, team: team.name, score: team.points })),
+        standings: teamData.map((team, i) => ({ pos: 1 + i, team: team.name, score: parseInt(String(team.points)) })),
       });
     })
     .catch(() => {
