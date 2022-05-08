@@ -17,7 +17,7 @@ export default {
     },
   ],
   async execute(interaction: PopulatedCommandInteraction) {
-    const ctf = await Ctf.findOne({ where: { guildSnowflake: interaction.guild.id }, attributes: ['startDate', 'id'] });
+    const ctf = await Ctf.findOne({ where: { guildSnowflake: interaction.guild.id } });
     if (!ctf) return `This guild is not the main server for any CTFs`;
 
     const startDate = interaction.options.getString('start_date');
