@@ -35,5 +35,9 @@ export const handleGuildMemberAdd = async (member: GuildMember | PartialGuildMem
   }
 
   //otherwise, refresh this team to re-grant access
-  await refreshTeam(teams[0], client);
+  try {
+    await refreshTeam(teams[0], client);
+  } catch (e) {
+    console.log('issue refreshing team:', e);
+  }
 };
