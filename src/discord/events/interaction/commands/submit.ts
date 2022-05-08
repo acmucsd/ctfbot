@@ -37,6 +37,10 @@ export default {
     // check to make sure this team has not already captured this flag
     if (usersThatHaveCaptured.length > 0) throw new Error('You have already captured this flag.');
 
+    // make sure the CTF hasn't ended
+    if (ctf.endDate && ctf.endDate < new Date())
+      throw new Error('this is the correct flag, but the CTF has ended, so your submission will not be counted');
+
     // grant this user the flag capture
     await flag.addUser(user);
 
